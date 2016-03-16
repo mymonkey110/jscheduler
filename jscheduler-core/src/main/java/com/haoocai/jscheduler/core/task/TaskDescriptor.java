@@ -15,29 +15,39 @@ import java.util.Map;
 public class TaskDescriptor implements Serializable {
     private static final long serialVersionUID = 5224933468107682449L;
 
+    private String app;
+
     private String name;
 
     private String cronExpression;
 
     private Map extraParams;
 
-    public TaskDescriptor(String name, String cronExpression) {
+    public TaskDescriptor(String app, String name, String cronExpression) {
+        Validate.isTrue(StringUtils.isNotBlank(app), "app name can't be blank");
         Validate.isTrue(StringUtils.isNotBlank(name), "task name can't be blank");
         Validate.isTrue(CronExpression.isValidExpression(cronExpression), "cron expression is not valid,please refer to 'https://en.wikipedia.org/wiki/Cron'");
 
+        this.app = app;
         this.name = name;
         this.cronExpression = cronExpression;
     }
 
-    public TaskDescriptor(String name, String cronExpression, Map extraParams) {
+    public TaskDescriptor(String app, String name, String cronExpression, Map extraParams) {
+        Validate.isTrue(StringUtils.isNotBlank(app), "app name can't be blank");
         Validate.isTrue(StringUtils.isNotBlank(name), "task name can't be blank");
         Validate.isTrue(CronExpression.isValidExpression(cronExpression), "cron expression is not valid,please refer to 'https://en.wikipedia.org/wiki/Cron'");
 
+        this.app = app;
         this.name = name;
         this.cronExpression = cronExpression;
         if (extraParams != null && !extraParams.isEmpty()) {
             this.extraParams = extraParams;
         }
+    }
+
+    public String getApp() {
+        return app;
     }
 
     public String getName() {
@@ -55,7 +65,8 @@ public class TaskDescriptor implements Serializable {
     @Override
     public String toString() {
         return "TaskDescriptor{" +
-                "name='" + name + '\'' +
+                "app='" + app + '\'' +
+                ", name='" + name + '\'' +
                 ", cronExpression='" + cronExpression + '\'' +
                 ", extraParams=" + extraParams +
                 '}';
