@@ -12,7 +12,7 @@ public class SchedulerUnit {
 
     public SchedulerUnit(String ip, int port) {
         Validate.isTrue(InetAddressValidator.getInstance().isValid(ip), "ip address is illegal");
-        Validate.inclusiveBetween(0, 65535L, port);
+        Validate.inclusiveBetween(1, 65535, port);
 
         this.ip = ip;
         this.port = port;
