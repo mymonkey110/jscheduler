@@ -4,10 +4,12 @@ import com.haoocai.jscheduler.core.SchedulerUnit;
 import com.haoocai.jscheduler.core.task.TaskDescriptor;
 import com.haoocai.jscheduler.core.task.TaskInvoker;
 import org.apache.zookeeper.ZooKeeper;
+import org.springframework.stereotype.Service;
 
 /**
  * @author mymonkey110@gmail.com on 16/3/16.
  */
+@Service
 public class TaskInvokerImpl implements TaskInvoker {
     private final ZooKeeper zooKeeper;
 
