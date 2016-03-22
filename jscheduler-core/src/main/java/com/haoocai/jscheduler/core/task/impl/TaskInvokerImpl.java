@@ -36,9 +36,12 @@ public class TaskInvokerImpl implements TaskInvoker {
     public void invoke(TaskDescriptor taskDescriptor, SchedulerUnit schedulerUnit) {
         String invokePath = rootPath + PATH_SEP + ID + PATH_SEP + taskDescriptor.getApp() + PATH_SEP + schedulerUnit.identify();
 
+        SchedulerContext context = new SchedulerContext(taskDescriptor.getName(), System.currentTimeMillis(), taskDescriptor.getExtraParams());
 
         try {
             Stat stat = zooKeeper.exists(invokePath, false);
+
+
         } catch (KeeperException e) {
             LOG.error("try to invoke task:{} on {} encounter error,code:{}.", taskDescriptor.getName(), schedulerUnit.identify(), e.code());
         } catch (InterruptedException e) {
@@ -46,8 +49,4 @@ public class TaskInvokerImpl implements TaskInvoker {
         }
     }
 
-    //fixme
-    private SchedulerContext assembleScheContext(TaskDescriptor taskDescriptor) {
-        return null;
-    }
 }

@@ -1,9 +1,12 @@
 package com.haoocai.jscheduler.core.scheduler;
 
-import com.haoocai.jscheduler.core.JschedulerConfig;
 import com.haoocai.jscheduler.core.task.TaskDescriptor;
 import com.haoocai.jscheduler.core.zk.ZKManager;
+import org.apache.zookeeper.ZooKeeper;
 import org.springframework.stereotype.Service;
+
+import javax.annotation.PostConstruct;
+import java.util.Objects;
 
 /**
  * @author mymonkey110@gmail.com on 16/3/16.
@@ -11,10 +14,15 @@ import org.springframework.stereotype.Service;
 @Service
 public class ZKSchedulerManager implements SchedulerManager {
 
-    private ZKManager zkManager;
+    private ZooKeeper zooKeeper;
 
-    //todo init zkManager
-    public ZKSchedulerManager(JschedulerConfig config) {
+    public void setZooKeeper(ZKManager zkManager) throws Exception {
+        Objects.requireNonNull(zooKeeper);
+        this.zooKeeper = zkManager.getZooKeeper();
+    }
+
+    @PostConstruct
+    public void init() {
 
     }
 
