@@ -26,6 +26,10 @@ public class SchedulerUnit {
         return port;
     }
 
+    public String identify() {
+        return ip + ":" + port;
+    }
+
     @Override
     public String toString() {
         return "SchedulerUnit{" +
