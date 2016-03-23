@@ -62,6 +62,6 @@ public class ZKTools {
 		   }
 		   index++;
 	   }
-	   return (String[])dealList.toArray(new String[0]);
+	   return dealList.toArray(new String[0]);
    }
 }

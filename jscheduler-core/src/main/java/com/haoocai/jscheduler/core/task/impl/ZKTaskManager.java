@@ -2,7 +2,6 @@ package com.haoocai.jscheduler.core.task.impl;
 
 import com.haoocai.jscheduler.core.task.TaskDescriptor;
 import com.haoocai.jscheduler.core.task.TaskManager;
-import com.haoocai.jscheduler.core.zk.ZKManager;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.zookeeper.ZooKeeper;
@@ -30,7 +29,7 @@ public class ZKTaskManager implements TaskManager {
     }
 
     @Override
-    public TaskDescriptor getSpecTaskDescriptor(String taskName) {
+    public TaskDescriptor getSpecTaskDescriptor(String app, String taskName) {
         return null;
     }
 }

@@ -1,11 +1,13 @@
 package com.haoocai.jscheduler.core.scheduler;
 
+import com.haoocai.jscheduler.core.SchedulerUnit;
 import com.haoocai.jscheduler.core.task.TaskDescriptor;
 import com.haoocai.jscheduler.core.zk.ZKManager;
 import org.apache.zookeeper.ZooKeeper;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -42,7 +44,12 @@ public class ZKSchedulerManager implements SchedulerManager {
     }
 
     @Override
-    public TaskDescriptor getSpecTaskDescriptor(String taskName) {
+    public List<SchedulerUnit> getAllSchedulerUnits(TaskDescriptor taskDescriptor) {
+        return null;
+    }
+
+    @Override
+    public TaskDescriptor getSpecTaskDescriptor(TaskDescriptor taskDescriptor) {
         return null;
     }
 

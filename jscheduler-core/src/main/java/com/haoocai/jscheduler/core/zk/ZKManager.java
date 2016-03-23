@@ -9,14 +9,17 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.haoocai.jscheduler.core.Constants.VERSION;
 
 /**
  * @author mymonkey110@gmail.com on 16/3/16.
  */
 @Repository
-public class ZKManager {
+public class ZKManager{
     private static Logger log = LoggerFactory.getLogger(ZKManager.class);
     private ZooKeeper zk;
     private List<ACL> acl = new ArrayList<>();
@@ -27,7 +30,6 @@ public class ZKManager {
     private String username;
     private String password;
     private int sessionTimeout;
-
 
     @PostConstruct
     public void init() throws Exception {
@@ -95,6 +97,7 @@ public class ZKManager {
         }
     }
 
+    @PreDestroy
     public void close() throws InterruptedException {
         log.info("关闭zookeeper连接");
         if (zk == null) {
@@ -140,7 +143,7 @@ public class ZKManager {
                 checkParent(zk, rootPath);
             }
             //设置版本信息
-            zk.setData(rootPath, Version.getVersion().getBytes(), -1);
+            zk.setData(rootPath, VERSION.getBytes(), -1);
         } else {
             //先校验父亲节点，本身是否已经是schedule的目录
             if (isCheckParentPath) {
@@ -148,13 +151,7 @@ public class ZKManager {
             }
             byte[] value = zk.getData(rootPath, false, null);
             if (value == null) {
-                zk.setData(rootPath, Version.getVersion().getBytes(), -1);
-            } else {
-                String dataVersion = new String(value);
-                if (!Version.isCompatible(dataVersion)) {
-                    throw new Exception("TBSchedule程序版本 " + Version.getVersion() + " 不兼容Zookeeper中的数据版本 " + dataVersion);
-                }
-                log.info("当前的程序版本:" + Version.getVersion() + " 数据版本: " + dataVersion);
+                zk.setData(rootPath, VERSION.getBytes(), -1);
             }
         }
     }
@@ -177,10 +174,6 @@ public class ZKManager {
                 }
             }
         }
-    }
-
-    public List<ACL> getAcl() {
-        return acl;
     }
 
     public ZooKeeper getZooKeeper() throws Exception {
