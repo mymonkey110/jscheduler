@@ -22,7 +22,7 @@ import static com.haoocai.jscheduler.core.Constants.VERSION;
 public class ZKManager{
     private static Logger log = LoggerFactory.getLogger(ZKManager.class);
     private ZooKeeper zk;
-    private List<ACL> acl = new ArrayList<>();
+    private List<ACL> acl = new ArrayList<ACL>();
     private boolean isCheckParentPath = true;
 
     private String rootPath;

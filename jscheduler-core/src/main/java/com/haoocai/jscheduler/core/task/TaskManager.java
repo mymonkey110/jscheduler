@@ -7,6 +7,10 @@ import java.util.List;
  */
 public interface TaskManager {
 
+    void register(TaskDescriptor taskDescriptor);
+
+    void unregister(TaskDescriptor taskDescriptor);
+
     List<TaskDescriptor> getAllTaskDescriptor();
 
     TaskDescriptor getSpecTaskDescriptor(String app, String taskName);

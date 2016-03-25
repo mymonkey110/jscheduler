@@ -8,17 +8,13 @@ import java.util.List;
 /**
  * @author mymonkey110@gmail.com on 16/3/16.
  */
-public interface SchedulerManager {
-
-    void register();
+public interface SchedulerService {
 
     void reloadAllTask();
 
-    void reloadSpecTask(String taskName);
+    void reloadSpecTask(TaskDescriptor taskDescriptor);
 
     List<SchedulerUnit> getAllSchedulerUnits(TaskDescriptor taskDescriptor);
 
     TaskDescriptor getSpecTaskDescriptor(TaskDescriptor taskDescriptor);
-
-    void start();
 }

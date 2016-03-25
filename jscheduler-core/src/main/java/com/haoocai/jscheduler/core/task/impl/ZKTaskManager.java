@@ -2,25 +2,31 @@ package com.haoocai.jscheduler.core.task.impl;
 
 import com.haoocai.jscheduler.core.task.TaskDescriptor;
 import com.haoocai.jscheduler.core.task.TaskManager;
+import com.haoocai.jscheduler.core.zk.ZKManager;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.zookeeper.ZooKeeper;
+import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
  * @author mymonkey110@gmail.com on 16/3/16.
  */
+@Service
 public class ZKTaskManager implements TaskManager {
-    private final ZooKeeper zooKeeper;
-    private final String rootPath;
+    @Resource
+    private ZKManager zkManager;
 
-    public ZKTaskManager(ZooKeeper zooKeeper, String rootPath) {
-        Validate.notNull(zooKeeper, "zookeeper is null");
-        Validate.isTrue(StringUtils.isNotBlank(rootPath), "jscheduler root path can't be blank");
+    @Override
+    public void register(TaskDescriptor taskDescriptor) {
+        
+    }
 
-        this.zooKeeper = zooKeeper;
-        this.rootPath = rootPath;
+    @Override
+    public void unregister(TaskDescriptor taskDescriptor) {
+
     }
 
     @Override
