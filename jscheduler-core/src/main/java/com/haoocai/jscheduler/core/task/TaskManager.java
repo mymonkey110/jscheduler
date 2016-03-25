@@ -7,11 +7,11 @@ import java.util.List;
  */
 public interface TaskManager {
 
-    void register(TaskDescriptor taskDescriptor);
+    void register(TaskDescriptor taskDescriptor) throws TaskException;
 
     void unregister(TaskDescriptor taskDescriptor);
 
-    List<TaskDescriptor> getAllTaskDescriptor();
+    List<TaskDescriptor> getAppTasks(String app);
 
     TaskDescriptor getSpecTaskDescriptor(String app, String taskName);
 }

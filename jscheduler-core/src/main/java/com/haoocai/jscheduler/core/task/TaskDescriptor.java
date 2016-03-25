@@ -24,13 +24,7 @@ public class TaskDescriptor implements Serializable {
     private Map extraParams;
 
     public TaskDescriptor(String app, String name, String cronExpression) {
-        Validate.isTrue(StringUtils.isNotBlank(app), "app name can't be blank");
-        Validate.isTrue(StringUtils.isNotBlank(name), "task name can't be blank");
-        Validate.isTrue(CronExpression.isValidExpression(cronExpression), "cron expression is not valid,please refer to 'https://en.wikipedia.org/wiki/Cron'");
-
-        this.app = app;
-        this.name = name;
-        this.cronExpression = cronExpression;
+        this(app, name, cronExpression, null);
     }
 
     public TaskDescriptor(String app, String name, String cronExpression, Map extraParams) {

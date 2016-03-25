@@ -1,26 +1,34 @@
 package com.haoocai.jscheduler.core.zk;
 
+import com.google.common.base.Preconditions;
+import org.apache.commons.lang3.SerializationUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.zookeeper.*;
 import org.apache.zookeeper.data.ACL;
 import org.apache.zookeeper.data.Id;
+import org.apache.zookeeper.data.Stat;
 import org.apache.zookeeper.server.auth.DigestAuthenticationProvider;
+import org.apache.zookeeper.server.util.SerializeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.haoocai.jscheduler.core.Constants.ID;
+import static com.haoocai.jscheduler.core.Constants.PATH_SEP;
 import static com.haoocai.jscheduler.core.Constants.VERSION;
 
 /**
  * @author mymonkey110@gmail.com on 16/3/16.
  */
 @Repository
-public class ZKManager{
-    private static Logger log = LoggerFactory.getLogger(ZKManager.class);
+public class ZKManager {
+    private static Logger LOG = LoggerFactory.getLogger(ZKManager.class);
     private ZooKeeper zk;
     private List<ACL> acl = new ArrayList<ACL>();
     private boolean isCheckParentPath = true;
@@ -30,15 +38,17 @@ public class ZKManager{
     private String username;
     private String password;
     private int sessionTimeout;
+    private String prefixPath;
 
     @PostConstruct
     public void init() throws Exception {
         connect();
+        this.prefixPath = rootPath + PATH_SEP + ID + PATH_SEP;
     }
 
 
     /**
-     * 重连zookeeper
+     * reConnect to zookeeper
      *
      * @throws Exception
      */
@@ -70,36 +80,36 @@ public class ZKManager{
 
     private void sessionEvent(WatchedEvent event) {
         if (event.getState() == Watcher.Event.KeeperState.SyncConnected) {
-            log.info("Connect to zookeeper successfully!");
+            LOG.info("Connect to zookeeper successfully!");
         } else if (event.getState() == Watcher.Event.KeeperState.Expired) {
-            log.error("Connect timeout,try reConnect...");
+            LOG.error("Connect timeout,try reConnect...");
             try {
                 reConnection();
             } catch (Exception e) {
-                log.error(e.getMessage(), e);
+                LOG.error(e.getMessage(), e);
             }
         } else if (event.getState() == Watcher.Event.KeeperState.Disconnected) {
-            log.info("jscheduler disconnect with zookeeper,try reConnect...");
+            LOG.info("jscheduler disconnect with zookeeper,try reConnect...");
             try {
                 reConnection();
             } catch (Exception e) {
-                log.error(e.getMessage(), e);
+                LOG.error(e.getMessage(), e);
             }
         } else if (event.getState() == Watcher.Event.KeeperState.NoSyncConnected) {
-            log.info("jscheduler NoSyncConnected，try reConnect...");
+            LOG.info("jscheduler NoSyncConnected，try reConnect...");
             try {
                 reConnection();
             } catch (Exception e) {
-                log.error(e.getMessage(), e);
+                LOG.error(e.getMessage(), e);
             }
         } else {
-            log.info("jscheduler received unexpected status，event.getState() =" + event.getState() + ", event  value=" + event.toString());
+            LOG.info("jscheduler received unexpected status，event.getState() =" + event.getState() + ", event  value=" + event.toString());
         }
     }
 
     @PreDestroy
     public void close() throws InterruptedException {
-        log.info("关闭zookeeper连接");
+        LOG.info("close connection with zookeeper.");
         if (zk == null) {
             return;
         }
@@ -130,6 +140,60 @@ public class ZKManager{
         isCheckParentPath = checkParentPath;
     }
 
+    public String getRootPath() {
+        return rootPath;
+    }
+
+    public boolean exist(String path) {
+        Preconditions.checkArgument(StringUtils.isNotBlank(path), "path is blank");
+
+        try {
+            Stat stat = zk.exists(prefixPath + path, false);
+            return stat != null;
+        } catch (Exception e) {
+            LOG.warn("judge path:{} exists error:{}.", path, e.getMessage(), e);
+            throw new ZKRuntimeException(e);
+        }
+    }
+
+    public void createNode(String path, Serializable data) throws ZKException {
+        Preconditions.checkArgument(StringUtils.isNotBlank(path), "path is blank");
+        Preconditions.checkNotNull(data);
+
+        try {
+            zk.create(prefixPath + path, SerializationUtils.serialize(data), acl, CreateMode.PERSISTENT);
+        } catch (Exception e) {
+            throw new ZKException(e);
+        }
+    }
+
+    public void deleteNode(String path) {
+        Preconditions.checkArgument(StringUtils.isNotBlank(path), "path is blank");
+
+        try {
+            zk.delete(prefixPath + path, -1);
+        } catch (Exception e) {
+            throw new ZKRuntimeException(e);
+        }
+    }
+
+    public List<String> getNodeChildren(String path) {
+        Preconditions.checkArgument(StringUtils.isNotBlank(path), "path is blank");
+
+        try {
+            return zk.getChildren(prefixPath + path, false);
+        } catch (Exception e) {
+            throw new ZKRuntimeException(e);
+        }
+    }
+
+    //todo not finish yet
+    public <T> T getNodeData(String path, Class T) {
+        Preconditions.checkArgument(StringUtils.isNotBlank(path), "path is blank");
+        Preconditions.checkNotNull(T);
+
+        return null;
+    }
 
     private boolean checkZookeeperState() throws Exception {
         return zk != null && zk.getState() == ZooKeeper.States.CONNECTED;
