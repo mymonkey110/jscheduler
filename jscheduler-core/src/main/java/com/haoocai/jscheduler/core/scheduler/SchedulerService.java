@@ -10,11 +10,9 @@ import java.util.List;
  */
 public interface SchedulerService {
 
-    void reloadAllTask();
-
     void reloadSpecTask(TaskDescriptor taskDescriptor);
 
     List<SchedulerUnit> getAllSchedulerUnits(TaskDescriptor taskDescriptor);
 
-    TaskDescriptor getSpecTaskDescriptor(TaskDescriptor taskDescriptor);
+    void start();
 }

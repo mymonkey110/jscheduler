@@ -8,7 +8,6 @@ import org.apache.zookeeper.data.ACL;
 import org.apache.zookeeper.data.Id;
 import org.apache.zookeeper.data.Stat;
 import org.apache.zookeeper.server.auth.DigestAuthenticationProvider;
-import org.apache.zookeeper.server.util.SerializeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
@@ -20,7 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.haoocai.jscheduler.core.Constants.ID;
-import static com.haoocai.jscheduler.core.Constants.PATH_SEP;
 import static com.haoocai.jscheduler.core.Constants.VERSION;
 
 /**
@@ -43,7 +41,7 @@ public class ZKManager {
     @PostConstruct
     public void init() throws Exception {
         connect();
-        this.prefixPath = rootPath + PATH_SEP + ID + PATH_SEP;
+        this.prefixPath = rootPath + "/" + ID + "/";
     }
 
 
@@ -187,12 +185,27 @@ public class ZKManager {
         }
     }
 
-    //todo not finish yet
     public <T> T getNodeData(String path, Class T) {
         Preconditions.checkArgument(StringUtils.isNotBlank(path), "path is blank");
         Preconditions.checkNotNull(T);
 
-        return null;
+        try {
+            byte[] data = zk.getData(prefixPath + path, false, new Stat());
+            return SerializationUtils.deserialize(data);
+        } catch (Exception e) {
+            throw new ZKRuntimeException(e);
+        }
+    }
+
+    public void writeNodeData(String path, Serializable data) {
+        Preconditions.checkArgument(StringUtils.isNotBlank(path), "path is blank");
+        Preconditions.checkNotNull(data);
+
+        try {
+            zk.setData(prefixPath + path, SerializationUtils.serialize(data), -1);
+        } catch (Exception e) {
+            throw new ZKRuntimeException(e);
+        }
     }
 
     private boolean checkZookeeperState() throws Exception {

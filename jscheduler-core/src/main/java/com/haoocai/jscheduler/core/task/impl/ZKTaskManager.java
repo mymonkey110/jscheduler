@@ -7,8 +7,6 @@ import com.haoocai.jscheduler.core.task.TaskManager;
 import com.haoocai.jscheduler.core.zk.ZKException;
 import com.haoocai.jscheduler.core.zk.ZKManager;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
-import org.apache.zookeeper.ZooKeeper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -16,8 +14,6 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.haoocai.jscheduler.core.Constants.PATH_SEP;
 
 /**
  * @author mymonkey110@gmail.com on 16/3/16.
@@ -33,7 +29,7 @@ public class ZKTaskManager implements TaskManager {
     public void register(TaskDescriptor taskDescriptor) throws TaskException {
         Preconditions.checkNotNull(taskDescriptor);
 
-        String path = taskDescriptor.getApp() + PATH_SEP + taskDescriptor.getName();
+        String path = taskDescriptor.getApp() + "/" + taskDescriptor.getName();
 
         try {
             zkManager.createNode(path, taskDescriptor);
@@ -47,7 +43,7 @@ public class ZKTaskManager implements TaskManager {
     public void unregister(TaskDescriptor taskDescriptor) {
         Preconditions.checkNotNull(taskDescriptor);
 
-        String path = taskDescriptor.getApp() + PATH_SEP + taskDescriptor.getName();
+        String path = taskDescriptor.getApp() + "/" + taskDescriptor.getName();
 
         zkManager.deleteNode(path);
     }
@@ -68,6 +64,9 @@ public class ZKTaskManager implements TaskManager {
 
     @Override
     public TaskDescriptor getSpecTaskDescriptor(String app, String taskName) {
-        return null;
+        Preconditions.checkArgument(StringUtils.isNotBlank(app), "app name can't be blank!");
+        Preconditions.checkArgument(StringUtils.isNotBlank(taskName), "task name can't be blank!");
+
+        return zkManager.getNodeData(app + "/" + taskName, TaskDescriptor.class);
     }
 }
