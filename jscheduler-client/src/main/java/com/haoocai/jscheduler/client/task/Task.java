@@ -1,4 +1,4 @@
-package com.haoocai.jscheduler.client.util;
+package com.haoocai.jscheduler.client.task;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

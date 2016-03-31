@@ -7,6 +7,13 @@ import com.haoocai.jscheduler.client.SchedulerContext;
  */
 public interface Job {
     /**
+     * task name for job
+     *
+     * @return task name
+     */
+    String task();
+
+    /**
      * execute specific job
      *
      * @param context schedule context
