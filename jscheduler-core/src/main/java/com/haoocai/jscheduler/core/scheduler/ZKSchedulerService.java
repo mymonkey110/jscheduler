@@ -1,7 +1,6 @@
 package com.haoocai.jscheduler.core.scheduler;
 
 import com.google.common.base.Preconditions;
-import com.haoocai.jscheduler.core.SchedulerUnit;
 import com.haoocai.jscheduler.core.task.TaskDescriptor;
 import com.haoocai.jscheduler.core.zk.ZKManager;
 import org.slf4j.Logger;

@@ -1,4 +1,4 @@
-package com.haoocai.jscheduler.core;
+package com.haoocai.jscheduler.core.scheduler;
 
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.validator.routines.InetAddressValidator;

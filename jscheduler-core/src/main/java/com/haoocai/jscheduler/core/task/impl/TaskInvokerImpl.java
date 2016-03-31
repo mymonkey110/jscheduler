@@ -2,7 +2,7 @@ package com.haoocai.jscheduler.core.task.impl;
 
 import com.google.common.base.Preconditions;
 import com.haoocai.jscheduler.client.SchedulerContext;
-import com.haoocai.jscheduler.core.SchedulerUnit;
+import com.haoocai.jscheduler.core.scheduler.SchedulerUnit;
 import com.haoocai.jscheduler.core.task.TaskDescriptor;
 import com.haoocai.jscheduler.core.task.TaskInvoker;
 import com.haoocai.jscheduler.core.zk.ZKManager;

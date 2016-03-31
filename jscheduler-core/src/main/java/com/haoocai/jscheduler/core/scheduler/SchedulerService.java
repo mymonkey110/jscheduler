@@ -1,6 +1,5 @@
 package com.haoocai.jscheduler.core.scheduler;
 
-import com.haoocai.jscheduler.core.SchedulerUnit;
 import com.haoocai.jscheduler.core.task.TaskDescriptor;
 
 import java.util.List;

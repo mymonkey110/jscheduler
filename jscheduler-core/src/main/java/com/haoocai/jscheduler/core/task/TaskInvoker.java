@@ -1,9 +1,9 @@
 package com.haoocai.jscheduler.core.task;
 
-import com.haoocai.jscheduler.core.SchedulerUnit;
+import com.haoocai.jscheduler.core.scheduler.SchedulerUnit;
 
 /**
- * Task invoker
+ * Job invoker
  * @author mymonkey110@gmail.com on 16/3/16.
  */
 public interface TaskInvoker {

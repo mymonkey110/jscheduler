@@ -1,6 +1,6 @@
 package com.haoocai.jscheduler.core.trigger.impl;
 
-import com.haoocai.jscheduler.core.SchedulerUnit;
+import com.haoocai.jscheduler.core.scheduler.SchedulerUnit;
 import com.haoocai.jscheduler.core.trigger.Picker;
 import org.springframework.stereotype.Service;
 

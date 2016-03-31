@@ -8,7 +8,7 @@ import java.io.Serializable;
 import java.util.Map;
 
 /**
- * Task Description
+ * Job Description
  *
  * @author mymonkey110@gmail.com on 16/3/16.
  */
