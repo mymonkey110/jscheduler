@@ -11,7 +11,7 @@
     <modules>
         <module>jscheduler-client</module>
         <module>jscheduler-core</module>
-        <module>jscheduler-console</module>
+        <module>jscheduler-web</module>
     </modules>
 
     <parent>

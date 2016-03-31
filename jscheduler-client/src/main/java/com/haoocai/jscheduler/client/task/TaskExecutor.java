@@ -9,5 +9,7 @@ import java.util.concurrent.Executors;
 public class TaskExecutor {
     private static Executor executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
 
+    public static void main(String[] args) {
 
+    }
 }
