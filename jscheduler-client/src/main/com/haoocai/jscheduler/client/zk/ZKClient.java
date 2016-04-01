@@ -1,10 +1,12 @@
 package com.haoocai.jscheduler.client.zk;
 
-import com.haoocai.jscheduler.client.util.StringUtils;
+import com.haoocai.jscheduler.client.task.InvokeHandler;
 import com.haoocai.jscheduler.client.util.Validate;
+import com.haoocai.jscheduler.client.util.StringUtils;
 import org.apache.zookeeper.*;
 import org.apache.zookeeper.data.ACL;
 import org.apache.zookeeper.data.Id;
+import org.apache.zookeeper.data.Stat;
 import org.apache.zookeeper.server.auth.DigestAuthenticationProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +15,7 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static com.haoocai.jscheduler.client.Constants.ID;
 
@@ -26,10 +29,10 @@ public class ZKClient {
     private final String username;
     private final String password;
     private final int sessionTimeout;
-    private final String prefixPath;
-    private List<ACL> acl = new ArrayList<ACL>();
+    protected final String prefixPath;
+    private List<ACL> acl = new ArrayList<>();
 
-    private static Logger LOG = LoggerFactory.getLogger(ZKClient.class);
+    protected static Logger LOG = LoggerFactory.getLogger(ZKClient.class);
 
     public ZKClient(String root, String connectStr, String username, String password, int sessionTimeout) throws Exception {
         Validate.checkArguments(StringUtils.isNotBlank(root), "root is blank");
@@ -86,11 +89,54 @@ public class ZKClient {
         }
     }
 
-    public void createNode(String path, Watcher watcher) throws ZKException {
+    public void createNode(String path) throws ZKException {
         try {
             zooKeeper.create(prefixPath + path, "ready".getBytes(), acl, CreateMode.EPHEMERAL);
         } catch (KeeperException | InterruptedException e) {
             throw new ZKException(e);
+        }
+    }
+
+
+    //FIXME need to judge event type
+    public void listenNodeOnDateChange(final String path, final InvokeHandler invokeHandler) throws ZKException {
+        try {
+            byte[] data = zooKeeper.getData(prefixPath + path, new Watcher() {
+                @Override
+                public void process(WatchedEvent event) {
+                    LOG.debug("zk path:{} receive event:{}.", event.getPath(), event);
+                }
+            }, new Stat());
+            invokeHandler.handler(data);
+        } catch (KeeperException | InterruptedException e) {
+            throw new ZKException(e);
+        }
+    }
+
+    public String clientIdentify() {
+        if (!zooKeeper.getState().isConnected()) {
+            throw new RuntimeException("zookeep is not connected!");
+        }
+
+        zooKeeper.getSaslClient()
+    }
+
+    class DataChangeWatcher implements Watcher {
+        private ZooKeeper zooKeeper;
+        private InvokeHandler invokeHandler;
+
+        public DataChangeWatcher(ZooKeeper zooKeeper, InvokeHandler invokeHandler) {
+            Objects.requireNonNull(zooKeeper);
+            Objects.requireNonNull(invokeHandler);
+            this.zooKeeper = zooKeeper;
+            this.invokeHandler = invokeHandler;
+        }
+
+        @Override
+        public void process(WatchedEvent event) {
+            LOG.debug("zk path:{} receive event:{}.", event.getPath(), event);
+            if (event.getType() == Event.EventType.NodeDataChanged) {
+            }
         }
     }
 }
