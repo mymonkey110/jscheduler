@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.net.SocketAddress;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +32,7 @@ public class ZKClient {
     private final int sessionTimeout;
     protected final String prefixPath;
     private List<ACL> acl = new ArrayList<>();
+    private SocketAddress localSocketAddress;
 
     protected static Logger LOG = LoggerFactory.getLogger(ZKClient.class);
 
@@ -113,12 +115,13 @@ public class ZKClient {
         }
     }
 
+    //TODO get zookeeper client local socket address
     public String clientIdentify() {
         if (!zooKeeper.getState().isConnected()) {
             throw new RuntimeException("zookeep is not connected!");
         }
 
-        zooKeeper.getSaslClient()
+        return "ip:port";
     }
 
     class DataChangeWatcher implements Watcher {
