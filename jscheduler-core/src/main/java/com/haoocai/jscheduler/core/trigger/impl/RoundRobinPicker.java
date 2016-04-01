@@ -12,27 +12,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Random;
 
 /**
- * Random picker will random choose one server
- * to execute the job.
- *
- * @author Michael Jiang on 16/3/16.
+ * @author Michael Jiang on 16/4/1.
  */
-@Component("randomPicker")
-public class RandomPicker implements Picker {
+@Component("rrPicker")
+public class RoundRobinPicker implements Picker {
     @Autowired
     private ZKManager zkManager;
 
-    private static Logger LOG = LoggerFactory.getLogger(RandomPicker.class);
-    private static Random random = new Random(System.currentTimeMillis());
+    private static Logger LOG = LoggerFactory.getLogger(RoundRobinPicker.class);
 
     @Override
     public PickStrategy identify() {
-        return PickStrategy.RANDOM;
+        return PickStrategy.ROUND_ROBIN;
     }
 
+    //todo
     @Override
     public SchedulerUnit assign(TaskDescriptor taskDescriptor) {
         String taskNodePath = taskDescriptor.getApp() + "/" + taskDescriptor.getName();
@@ -42,11 +38,6 @@ public class RandomPicker implements Picker {
             return null;
         }
 
-        String schedulerNode = children.get(random.nextInt(children.size()));
-        String[] addr = schedulerNode.split(":");
-        String ip = addr[0];
-        int port = Integer.parseInt(addr[1]);
-
-        return new SchedulerUnit(ip, port);
+        return null;
     }
 }

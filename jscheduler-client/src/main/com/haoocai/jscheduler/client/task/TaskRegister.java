@@ -18,7 +18,6 @@ public class TaskRegister {
 
     private final String app;
     private final ZKClient zkClient;
-    private static TaskRegister instance;
 
     private static Logger LOG = LoggerFactory.getLogger(TaskRegister.class);
 
@@ -26,15 +25,6 @@ public class TaskRegister {
         this.zkClient = zkClient;
         this.app = app;
     }
-
-    /*public synchronized static TaskRegister getInstance(String app) {
-        Validate.checkArguments(StringUtils.isNotBlank(app), "app name can't be blank");
-
-        if (instance == null) {
-            instance = new TaskRegister(app);
-        }
-        return instance;
-    }*/
 
     public synchronized <T extends Task> void register(T job) {
         Validate.checkNotNull(job);

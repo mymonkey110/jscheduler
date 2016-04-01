@@ -126,28 +126,10 @@ public class ZKClient {
     //TODO get zookeeper client local socket address
     public String clientIdentify() {
         if (!zooKeeper.getState().isConnected()) {
-            throw new RuntimeException("zookeep is not connected!");
+            throw new RuntimeException("zookeeper is not connected!");
         }
 
         return "ip:port";
     }
 
-    class DataChangeWatcher implements Watcher {
-        private ZooKeeper zooKeeper;
-        private TriggerHandler triggerHandler;
-
-        public DataChangeWatcher(ZooKeeper zooKeeper, TriggerHandler triggerHandler) {
-            Objects.requireNonNull(zooKeeper);
-            Objects.requireNonNull(triggerHandler);
-            this.zooKeeper = zooKeeper;
-            this.triggerHandler = triggerHandler;
-        }
-
-        @Override
-        public void process(WatchedEvent event) {
-            LOG.debug("zk path:{} receive event:{}.", event.getPath(), event);
-            if (event.getType() == Event.EventType.NodeDataChanged) {
-            }
-        }
-    }
 }
