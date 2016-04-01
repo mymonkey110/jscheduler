@@ -4,7 +4,7 @@ import com.haoocai.jscheduler.core.scheduler.SchedulerUnit;
 
 /**
  * Job invoker
- * @author mymonkey110@gmail.com on 16/3/16.
+ * @author Michael Jiang on 16/3/16.
  */
 public interface TaskInvoker {
 

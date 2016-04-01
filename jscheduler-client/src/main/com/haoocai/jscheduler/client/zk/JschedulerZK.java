@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.net.SocketAddress;
 
 /**
- * @author mymonkey110@gmail.com on 16/4/1.
+ * @author Michael Jiang on 16/4/1.
  */
 public class JschedulerZK extends ZooKeeper {
 

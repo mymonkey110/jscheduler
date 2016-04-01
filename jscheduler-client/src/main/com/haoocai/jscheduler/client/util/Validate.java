@@ -1,7 +1,7 @@
 package com.haoocai.jscheduler.client.util;
 
 /**
- * @author mymonkey110@gmail.com on 16/3/31.
+ * @author Michael Jiang on 16/3/31.
  */
 public class Validate {
     public static <T> T checkNotNull(T o) {

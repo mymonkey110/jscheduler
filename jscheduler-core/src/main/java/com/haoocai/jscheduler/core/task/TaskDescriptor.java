@@ -10,7 +10,7 @@ import java.util.Map;
 /**
  * Job Description
  *
- * @author mymonkey110@gmail.com on 16/3/16.
+ * @author Michael Jiang on 16/3/16.
  */
 public class TaskDescriptor implements Serializable {
     private static final long serialVersionUID = 5224933468107682449L;

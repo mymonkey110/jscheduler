@@ -8,7 +8,7 @@ import com.haoocai.jscheduler.client.util.StringUtils;
 import static com.haoocai.jscheduler.client.util.Validate.checkArguments;
 
 /**
- * @author mymonkey110@gmail.com on 16/3/31.
+ * @author Michael Jiang on 16/3/31.
  */
 public class TaskWatcher implements InvokeHandler {
     private final ZKClient zkClient;
@@ -23,8 +23,10 @@ public class TaskWatcher implements InvokeHandler {
         this.app = app;
     }
 
+    //todo to be write
     public void start() {
-        zkClient.createNode();
+
+        //zkClient.createNode();
     }
 
     @Override

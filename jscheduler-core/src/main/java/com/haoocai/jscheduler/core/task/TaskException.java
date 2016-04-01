@@ -1,7 +1,7 @@
 package com.haoocai.jscheduler.core.task;
 
 /**
- * @author mymonkey110@gmail.com on 16/3/25.
+ * @author Michael Jiang on 16/3/25.
  */
 public class TaskException extends Exception {
     private static final long serialVersionUID = -7059596686748306753L;

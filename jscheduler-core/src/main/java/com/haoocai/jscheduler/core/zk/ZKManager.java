@@ -22,7 +22,7 @@ import static com.haoocai.jscheduler.core.Constants.ID;
 import static com.haoocai.jscheduler.core.Constants.VERSION;
 
 /**
- * @author mymonkey110@gmail.com on 16/3/16.
+ * @author Michael Jiang on 16/3/16.
  */
 @Repository
 public class ZKManager {

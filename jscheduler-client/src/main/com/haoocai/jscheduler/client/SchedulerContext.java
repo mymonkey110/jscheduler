@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * Scheduler Context
  *
- * @author mymonkey110@gmail.com on 16/3/16.
+ * @author Michael Jiang on 16/3/16.
  */
 public class SchedulerContext implements Serializable {
     private static final long serialVersionUID = -4629236096395980429L;

@@ -1,7 +1,7 @@
 package com.haoocai.jscheduler.core.zk;
 
 /**
- * @author mymonkey110@gmail.com on 16/3/25.
+ * @author Michael Jiang on 16/3/25.
  */
 public class ZKRuntimeException extends RuntimeException {
     private static final long serialVersionUID = -7952890645635888751L;

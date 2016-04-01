@@ -21,7 +21,7 @@ import java.util.Objects;
 import static com.haoocai.jscheduler.client.Constants.ID;
 
 /**
- * @author mymonkey110@gmail.com on 16/3/31.
+ * @author Michael Jiang on 16/3/31.
  */
 public class ZKClient {
     private ZooKeeper zooKeeper;

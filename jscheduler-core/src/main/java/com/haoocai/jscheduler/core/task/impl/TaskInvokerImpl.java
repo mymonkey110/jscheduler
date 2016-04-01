@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 
 /**
- * @author mymonkey110@gmail.com on 16/3/16.
+ * @author Michael Jiang on 16/3/16.
  */
 @Service
 public class TaskInvokerImpl implements TaskInvoker {

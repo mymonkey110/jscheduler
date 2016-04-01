@@ -4,7 +4,7 @@ import org.apache.commons.lang3.Validate;
 import org.apache.commons.validator.routines.InetAddressValidator;
 
 /**
- * @author mymonkey110@gmail.com on 16/3/16.
+ * @author Michael Jiang on 16/3/16.
  */
 public class SchedulerUnit {
     private String ip;

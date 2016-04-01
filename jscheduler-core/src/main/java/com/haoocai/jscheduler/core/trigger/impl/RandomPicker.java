@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
  * Random picker will random choose one server
  * to execute the job.
  *
- * @author mymonkey110@gmail.com on 16/3/16.
+ * @author Michael Jiang on 16/3/16.
  */
 @Service
 public class RandomPicker implements Picker {
