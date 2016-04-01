@@ -34,7 +34,7 @@ public class ZKTaskManager implements TaskManager {
         try {
             zkManager.createNode(path, taskDescriptor);
         } catch (ZKException e) {
-            LOG.error("register task:{} for app:{} error:{}.", taskDescriptor.getName(), taskDescriptor.getApp(), e.getMessage(), e);
+            LOG.error("register name:{} for app:{} error:{}.", taskDescriptor.getName(), taskDescriptor.getApp(), e.getMessage(), e);
             throw new TaskException(e);
         }
     }
@@ -65,7 +65,7 @@ public class ZKTaskManager implements TaskManager {
     @Override
     public TaskDescriptor getSpecTaskDescriptor(String app, String taskName) {
         Preconditions.checkArgument(StringUtils.isNotBlank(app), "app name can't be blank!");
-        Preconditions.checkArgument(StringUtils.isNotBlank(taskName), "task name can't be blank!");
+        Preconditions.checkArgument(StringUtils.isNotBlank(taskName), "name name can't be blank!");
 
         return zkManager.getNodeData(app + "/" + taskName, TaskDescriptor.class);
     }

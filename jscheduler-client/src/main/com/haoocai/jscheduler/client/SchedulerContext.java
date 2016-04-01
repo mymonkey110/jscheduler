@@ -32,7 +32,7 @@ public class SchedulerContext implements Serializable {
 
     private void setTaskName(String taskName) {
         if (StringUtils.isBlank(taskName)) {
-            throw new IllegalArgumentException("task name can't be blank");
+            throw new IllegalArgumentException("name name can't be blank");
         }
         this.taskName = taskName;
     }

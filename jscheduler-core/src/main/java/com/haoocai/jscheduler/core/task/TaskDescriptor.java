@@ -8,7 +8,7 @@ import java.io.Serializable;
 import java.util.Map;
 
 /**
- * Job Description
+ * Task Description
  *
  * @author Michael Jiang on 16/3/16.
  */
@@ -29,7 +29,7 @@ public class TaskDescriptor implements Serializable {
 
     public TaskDescriptor(String app, String name, String cronExpression, Map extraParams) {
         Validate.isTrue(StringUtils.isNotBlank(app), "app name can't be blank");
-        Validate.isTrue(StringUtils.isNotBlank(name), "task name can't be blank");
+        Validate.isTrue(StringUtils.isNotBlank(name), "name name can't be blank");
         Validate.isTrue(CronExpression.isValidExpression(cronExpression), "cron expression is not valid,please refer to 'https://en.wikipedia.org/wiki/Cron'");
 
         this.app = app;

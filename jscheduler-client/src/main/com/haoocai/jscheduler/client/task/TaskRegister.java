@@ -1,6 +1,5 @@
 package com.haoocai.jscheduler.client.task;
 
-import com.haoocai.jscheduler.client.util.StringUtils;
 import com.haoocai.jscheduler.client.util.Validate;
 import com.haoocai.jscheduler.client.zk.ZKClient;
 import org.slf4j.Logger;
@@ -10,7 +9,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * task register
+ * name register
  *
  * @author Michael Jiang on 16/3/31.
  */
@@ -37,14 +36,14 @@ public class TaskRegister {
         return instance;
     }*/
 
-    public synchronized <T extends Job> void register(T job) {
+    public synchronized <T extends Task> void register(T job) {
         Validate.checkNotNull(job);
 
-        if (taskWatcherMap.containsKey(job.task())) {
-            throw new RuntimeException("task:" + job.task() + " has already registered!");
+        if (taskWatcherMap.containsKey(job.name())) {
+            throw new RuntimeException("name:" + job.name() + " has already registered!");
         }
 
-        taskWatcherMap.put(job.task(), new TaskWatcher(zkClient, app, job));
+        taskWatcherMap.put(job.name(), new TaskWatcher(zkClient, app, job));
     }
 
     /**
@@ -62,13 +61,13 @@ public class TaskRegister {
     }
 
     /**
-     * start all the registered task watcher
+     * start all the registered name watcher
      */
     public synchronized void init() {
-        LOG.debug("starting registered task watcher...");
+        LOG.debug("starting registered name watcher...");
 
         for (String task : taskWatcherMap.keySet()) {
-            LOG.debug("start task:{} watcher.", task);
+            LOG.debug("start name:{} watcher.", task);
             TaskWatcher taskWatcher = taskWatcherMap.get(task);
             taskWatcher.start();
         }

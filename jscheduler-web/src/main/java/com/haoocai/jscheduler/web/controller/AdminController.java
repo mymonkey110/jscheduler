@@ -1,4 +1,4 @@
-package com.haoocai.jscheduler.console.controller;
+package com.haoocai.jscheduler.web.controller;
 
 import org.springframework.web.bind.annotation.RestController;
 

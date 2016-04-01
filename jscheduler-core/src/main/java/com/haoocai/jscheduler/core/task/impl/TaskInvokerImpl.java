@@ -36,7 +36,7 @@ public class TaskInvokerImpl implements TaskInvoker {
         try {
             zkManager.writeNodeData(invokePath, context);
         } catch (Exception e) {
-            LOG.error("try to invoke task:{} on {} encounter error,code:{}.", taskDescriptor.getName(), schedulerUnit.identify(), e.getMessage());
+            LOG.error("try to invoke name:{} on {} encounter error,code:{}.", taskDescriptor.getName(), schedulerUnit.identify(), e.getMessage());
         }
     }
 

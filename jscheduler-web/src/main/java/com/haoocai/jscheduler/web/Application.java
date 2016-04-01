@@ -1,4 +1,4 @@
-package com.haoocai.jscheduler.console;
+package com.haoocai.jscheduler.web;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

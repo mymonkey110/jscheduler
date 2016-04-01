@@ -5,18 +5,18 @@ import com.haoocai.jscheduler.client.SchedulerContext;
 /**
  * @author Michael Jiang on 16/3/31.
  */
-public interface Job {
+public interface Task {
     /**
-     * task name for job
+     * name name for job
      *
-     * @return task name
+     * @return name name
      */
-    String task();
+    String name();
 
     /**
      * execute specific job
      *
      * @param context schedule context
      */
-    void doJob(SchedulerContext context);
+    void run(SchedulerContext context);
 }

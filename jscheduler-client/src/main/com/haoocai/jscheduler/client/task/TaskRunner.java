@@ -7,17 +7,17 @@ import static com.haoocai.jscheduler.client.util.Validate.checkNotNull;
 /**
  * @author Michael Jiang on 16/4/1.
  */
-public class JobRunner implements Runnable {
+class TaskRunner implements Runnable {
     private final SchedulerContext context;
-    private final Job job;
+    private final Task task;
 
-    JobRunner(Job job, SchedulerContext context) {
-        this.job = checkNotNull(job);
+    TaskRunner(Task task, SchedulerContext context) {
+        this.task = checkNotNull(task);
         this.context = context;
     }
 
     @Override
     public void run() {
-        job.doJob(context);
+        task.run(context);
     }
 }

@@ -1,6 +1,6 @@
 package com.haoocai.jscheduler.client.zk;
 
-import com.haoocai.jscheduler.client.task.InvokeHandler;
+import com.haoocai.jscheduler.client.task.TriggerHandler;
 import com.haoocai.jscheduler.client.util.Validate;
 import com.haoocai.jscheduler.client.util.StringUtils;
 import org.apache.zookeeper.*;
@@ -30,11 +30,11 @@ public class ZKClient {
     private final String username;
     private final String password;
     private final int sessionTimeout;
-    protected final String prefixPath;
+    private final String prefixPath;
     private List<ACL> acl = new ArrayList<>();
     private SocketAddress localSocketAddress;
 
-    protected static Logger LOG = LoggerFactory.getLogger(ZKClient.class);
+    private static Logger LOG = LoggerFactory.getLogger(ZKClient.class);
 
     public ZKClient(String root, String connectStr, String username, String password, int sessionTimeout) throws Exception {
         Validate.checkArguments(StringUtils.isNotBlank(root), "root is blank");
@@ -91,9 +91,17 @@ public class ZKClient {
         }
     }
 
-    public void createNode(String path) throws ZKException {
+    public void createListenNode(String path) throws Exception {
+        zooKeeper.create(prefixPath + path, "ready".getBytes(), acl, CreateMode.EPHEMERAL);
+    }
+
+    public void createNode(String path, boolean ephemeral) throws ZKException {
         try {
-            zooKeeper.create(prefixPath + path, "ready".getBytes(), acl, CreateMode.EPHEMERAL);
+            if (ephemeral) {
+                zooKeeper.create(prefixPath + path, "ready".getBytes(), acl, CreateMode.EPHEMERAL);
+            } else {
+                zooKeeper.create(prefixPath + path, "ready".getBytes(), acl, CreateMode.PERSISTENT);
+            }
         } catch (KeeperException | InterruptedException e) {
             throw new ZKException(e);
         }
@@ -101,7 +109,7 @@ public class ZKClient {
 
 
     //FIXME need to judge event type
-    public void listenNodeOnDateChange(final String path, final InvokeHandler invokeHandler) throws ZKException {
+    public void listenNodeOnDateChange(final String path, final TriggerHandler triggerHandler) throws ZKException {
         try {
             byte[] data = zooKeeper.getData(prefixPath + path, new Watcher() {
                 @Override
@@ -109,7 +117,7 @@ public class ZKClient {
                     LOG.debug("zk path:{} receive event:{}.", event.getPath(), event);
                 }
             }, new Stat());
-            invokeHandler.handler(data);
+            triggerHandler.handler(data);
         } catch (KeeperException | InterruptedException e) {
             throw new ZKException(e);
         }
@@ -126,13 +134,13 @@ public class ZKClient {
 
     class DataChangeWatcher implements Watcher {
         private ZooKeeper zooKeeper;
-        private InvokeHandler invokeHandler;
+        private TriggerHandler triggerHandler;
 
-        public DataChangeWatcher(ZooKeeper zooKeeper, InvokeHandler invokeHandler) {
+        public DataChangeWatcher(ZooKeeper zooKeeper, TriggerHandler triggerHandler) {
             Objects.requireNonNull(zooKeeper);
-            Objects.requireNonNull(invokeHandler);
+            Objects.requireNonNull(triggerHandler);
             this.zooKeeper = zooKeeper;
-            this.invokeHandler = invokeHandler;
+            this.triggerHandler = triggerHandler;
         }
 
         @Override
