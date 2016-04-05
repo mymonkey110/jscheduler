@@ -185,6 +185,14 @@ public class ZKManager {
         }
     }
 
+    public List<String> getAbsNodeChildrenWithRoot(String path) {
+        try {
+            return zk.getChildren(rootPath + "/" + path, false);
+        } catch (Exception e) {
+            throw new ZKRuntimeException(e);
+        }
+    }
+
     public <T> T getNodeData(String path, Class T) {
         Preconditions.checkArgument(StringUtils.isNotBlank(path), "path is blank");
         Preconditions.checkNotNull(T);

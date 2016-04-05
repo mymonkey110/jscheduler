@@ -10,5 +10,7 @@ public interface Picker {
 
     PickStrategy identify();
 
+    void init(TaskDescriptor taskDescriptor);
+
     SchedulerUnit assign(TaskDescriptor taskDescriptor);
 }

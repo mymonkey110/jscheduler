@@ -28,6 +28,11 @@ public class RoundRobinPicker implements Picker {
         return PickStrategy.ROUND_ROBIN;
     }
 
+    @Override
+    public void init() {
+
+    }
+
     //todo
     @Override
     public SchedulerUnit assign(TaskDescriptor taskDescriptor) {

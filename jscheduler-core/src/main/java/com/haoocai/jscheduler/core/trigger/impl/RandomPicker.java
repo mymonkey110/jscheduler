@@ -21,7 +21,7 @@ import java.util.Random;
  * @author Michael Jiang on 16/3/16.
  */
 @Component("randomPicker")
-public class RandomPicker implements Picker {
+class RandomPicker implements Picker {
     @Autowired
     private ZKManager zkManager;
 
@@ -31,6 +31,11 @@ public class RandomPicker implements Picker {
     @Override
     public PickStrategy identify() {
         return PickStrategy.RANDOM;
+    }
+
+    @Override
+    public void init(TaskDescriptor taskDescriptor) {
+        //do nothing
     }
 
     @Override

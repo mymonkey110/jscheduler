@@ -16,7 +16,7 @@ import java.util.List;
  * @author Michael Jiang on 16/3/16.
  */
 @Service
-public class ZKSchedulerService implements SchedulerService {
+class ZKSchedulerService implements SchedulerService {
 
     @Resource
     private ZKManager zkManager;
@@ -54,11 +54,18 @@ public class ZKSchedulerService implements SchedulerService {
 
     }
 
+    //todo
+    private List<String> getAllTasks() {
+        List<String> tasks = zkManager.getAbsNodeChildrenWithRoot(null);
+        return null;
+    }
+
     class SchedulerStarter extends Thread {
 
         @Override
         public void run() {
-            super.run();
+
+
         }
     }
 
