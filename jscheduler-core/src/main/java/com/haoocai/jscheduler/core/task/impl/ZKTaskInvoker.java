@@ -1,6 +1,5 @@
 package com.haoocai.jscheduler.core.task.impl;
 
-import com.google.common.base.Preconditions;
 import com.haoocai.jscheduler.client.SchedulerContext;
 import com.haoocai.jscheduler.core.scheduler.SchedulerUnit;
 import com.haoocai.jscheduler.core.task.TaskDescriptor;
@@ -8,22 +7,19 @@ import com.haoocai.jscheduler.core.task.TaskInvoker;
 import com.haoocai.jscheduler.core.zk.ZKManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-
-import javax.annotation.Resource;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * @author Michael Jiang on 16/3/16.
  */
-public class ZKTaskInvoker implements TaskInvoker {
+class ZKTaskInvoker implements TaskInvoker {
     private ZKManager zkManager;
 
     private static Logger LOG = LoggerFactory.getLogger(ZKTaskInvoker.class);
     private final static String INVOKE_PATH_TEMPLATE = "%s/%s/%s";
 
-    public ZKTaskInvoker(ZKManager zkManager) {
+    ZKTaskInvoker(ZKManager zkManager) {
         this.zkManager=checkNotNull(zkManager);
     }
 

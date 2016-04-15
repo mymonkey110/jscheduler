@@ -2,6 +2,8 @@ package com.haoocai.jscheduler.core.scheduler;
 
 import com.google.common.base.Preconditions;
 import com.haoocai.jscheduler.core.task.TaskDescriptor;
+import com.haoocai.jscheduler.core.task.TaskTracker;
+import com.haoocai.jscheduler.core.task.impl.ZKTaskTracker;
 import com.haoocai.jscheduler.core.zk.ZKManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,18 +56,32 @@ class ZKSchedulerService implements SchedulerService {
 
     }
 
-    //todo
-    private List<String> getAllTasks() {
-        List<String> tasks = zkManager.getAbsNodeChildrenWithRoot(null);
-        return null;
+
+    private List<TaskDescriptor> getAllTasks() {
+        List<TaskDescriptor> taskDescriptors = new ArrayList<>();
+        List<String> apps = zkManager.getAbsNodeChildrenWithRoot(null);
+        LOG.info("found apps:{}.", apps);
+        for (String app : apps) {
+            List<String> tasks = zkManager.getAbsNodeChildrenWithRoot(app);
+            LOG.info("found app:{} tasks:{}.", app, tasks);
+            for (String task : tasks) {
+                TaskDescriptor taskDescriptor = zkManager.getNodeData(app + "/" + task, TaskDescriptor.class);
+                taskDescriptors.add(taskDescriptor);
+            }
+        }
+
+        return taskDescriptors;
     }
 
     class SchedulerStarter extends Thread {
 
         @Override
         public void run() {
-
-
+            List<TaskDescriptor> taskDescriptorList = getAllTasks();
+            for (TaskDescriptor taskDescriptor : taskDescriptorList) {
+                TaskTracker taskTracker = new ZKTaskTracker(zkManager, taskDescriptor);
+                taskTracker.track();
+            }
         }
     }
 

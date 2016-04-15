@@ -9,7 +9,6 @@ import com.haoocai.jscheduler.core.task.TaskTracker;
 import com.haoocai.jscheduler.core.trigger.Picker;
 import com.haoocai.jscheduler.core.trigger.PickerFactory;
 import com.haoocai.jscheduler.core.zk.ZKManager;
-import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +24,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @author Michael Jiang on 16/4/5.
  */
-class ZKTaskTracker extends TimerTask implements TaskTracker {
+public class ZKTaskTracker extends TimerTask implements TaskTracker {
     private final ZKManager zkManager;
     private final TaskDescriptor taskDescriptor;
     private Picker picker;
@@ -33,13 +32,15 @@ class ZKTaskTracker extends TimerTask implements TaskTracker {
 
     private static Logger LOG = LoggerFactory.getLogger(ZKTaskManager.class);
 
-    private ZKTaskTracker(ZKManager zkManager, TaskDescriptor taskDescriptor) {
+    public ZKTaskTracker(ZKManager zkManager, TaskDescriptor taskDescriptor) {
         this.zkManager = checkNotNull(zkManager);
         this.taskDescriptor = checkNotNull(taskDescriptor);
     }
 
     @Override
     public void track() {
+        LOG.info("start tacker for app:{} 's task:{}.", taskDescriptor.getApp(), taskDescriptor.getName());
+
         picker = PickerFactory.createPicker(taskDescriptor, zkManager);
         taskInvoker = new ZKTaskInvoker(zkManager);
 
@@ -51,7 +52,7 @@ class ZKTaskTracker extends TimerTask implements TaskTracker {
     public void run() {
         SchedulerUnit schedulerUnit = picker.assign();
         LOG.info("app:{} task:{} this time scheduler unit is:{}.", taskDescriptor.getApp(), taskDescriptor.getName(), schedulerUnit);
-        taskInvoker.invoke(taskDescriptor,schedulerUnit);
+        taskInvoker.invoke(taskDescriptor, schedulerUnit);
 
         Date nextRunTime = calcNextRunTime();
         new Timer(taskDescriptor.getApp() + "-" + taskDescriptor.getName() + "-" + "tracker").schedule(this, nextRunTime);

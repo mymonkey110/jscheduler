@@ -10,6 +10,11 @@ import java.util.Map;
 
 /**
  * Task Description
+ * <p>
+ * Task description include meta data for a task.
+ * Every task should belong to an app. App is the basic business logic unit, it could have many
+ * time scheduler tasks.
+ * </p>
  *
  * @author Michael Jiang on 16/3/16.
  */
