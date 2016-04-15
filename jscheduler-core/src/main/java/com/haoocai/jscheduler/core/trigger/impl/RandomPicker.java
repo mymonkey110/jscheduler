@@ -8,11 +8,11 @@ import com.haoocai.jscheduler.core.zk.ZKManager;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Random;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Random picker will random choose one server
@@ -20,13 +20,17 @@ import java.util.Random;
  *
  * @author Michael Jiang on 16/3/16.
  */
-@Component("randomPicker")
-class RandomPicker implements Picker {
-    @Autowired
+public class RandomPicker implements Picker {
     private ZKManager zkManager;
+    private TaskDescriptor taskDescriptor;
 
     private static Logger LOG = LoggerFactory.getLogger(RandomPicker.class);
     private static Random random = new Random(System.currentTimeMillis());
+
+    public RandomPicker(TaskDescriptor taskDescriptor, ZKManager zkManager) {
+        this.zkManager = checkNotNull(zkManager);
+        this.taskDescriptor = checkNotNull(taskDescriptor);
+    }
 
     @Override
     public PickStrategy identify() {
@@ -34,12 +38,7 @@ class RandomPicker implements Picker {
     }
 
     @Override
-    public void init(TaskDescriptor taskDescriptor) {
-        //do nothing
-    }
-
-    @Override
-    public SchedulerUnit assign(TaskDescriptor taskDescriptor) {
+    public SchedulerUnit assign() {
         String taskNodePath = taskDescriptor.getApp() + "/" + taskDescriptor.getName();
         List<String> children = zkManager.getNodeChildren(taskNodePath);
         if (CollectionUtils.isEmpty(children)) {

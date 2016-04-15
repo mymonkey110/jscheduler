@@ -12,22 +12,25 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * @author Michael Jiang on 16/3/16.
  */
-@Service
-public class TaskInvokerImpl implements TaskInvoker {
-    @Resource
+public class ZKTaskInvoker implements TaskInvoker {
     private ZKManager zkManager;
 
-    private static Logger LOG = LoggerFactory.getLogger(TaskInvokerImpl.class);
-
+    private static Logger LOG = LoggerFactory.getLogger(ZKTaskInvoker.class);
     private final static String INVOKE_PATH_TEMPLATE = "%s/%s/%s";
+
+    public ZKTaskInvoker(ZKManager zkManager) {
+        this.zkManager=checkNotNull(zkManager);
+    }
 
     @Override
     public void invoke(TaskDescriptor taskDescriptor, SchedulerUnit schedulerUnit) {
-        Preconditions.checkNotNull(taskDescriptor);
-        Preconditions.checkNotNull(schedulerUnit);
+        checkNotNull(taskDescriptor);
+        checkNotNull(schedulerUnit);
 
         String invokePath = String.format(INVOKE_PATH_TEMPLATE, taskDescriptor.getApp(), taskDescriptor.getName(), schedulerUnit.identify());
 

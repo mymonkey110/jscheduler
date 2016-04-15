@@ -8,34 +8,33 @@ import com.haoocai.jscheduler.core.zk.ZKManager;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * @author Michael Jiang on 16/4/1.
  */
-@Component("rrPicker")
 public class RoundRobinPicker implements Picker {
-    @Autowired
     private ZKManager zkManager;
+    private TaskDescriptor taskDescriptor;
 
     private static Logger LOG = LoggerFactory.getLogger(RoundRobinPicker.class);
+
+    public RoundRobinPicker(TaskDescriptor taskDescriptor, ZKManager zkManager) {
+        zkManager = checkNotNull(zkManager);
+        taskDescriptor = checkNotNull(taskDescriptor);
+    }
 
     @Override
     public PickStrategy identify() {
         return PickStrategy.ROUND_ROBIN;
     }
 
-    @Override
-    public void init() {
-
-    }
-
     //todo
     @Override
-    public SchedulerUnit assign(TaskDescriptor taskDescriptor) {
+    public SchedulerUnit assign() {
         String taskNodePath = taskDescriptor.getApp() + "/" + taskDescriptor.getName();
         List<String> children = zkManager.getNodeChildren(taskNodePath);
         if (CollectionUtils.isEmpty(children)) {

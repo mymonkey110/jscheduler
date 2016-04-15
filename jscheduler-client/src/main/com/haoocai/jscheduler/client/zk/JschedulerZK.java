@@ -9,9 +9,9 @@ import java.net.SocketAddress;
 /**
  * @author Michael Jiang on 16/4/1.
  */
-public class JschedulerZK extends ZooKeeper {
+public class JSchedulerZK extends ZooKeeper {
 
-    public JschedulerZK(String connectString, int sessionTimeout, Watcher watcher) throws IOException {
+    public JSchedulerZK(String connectString, int sessionTimeout, Watcher watcher) throws IOException {
         super(connectString, sessionTimeout, watcher);
     }
 
