@@ -62,6 +62,11 @@
                 <artifactId>zookeeper</artifactId>
                 <version>3.4.6</version>
             </dependency>
+            <dependency>
+                <groupId>org.apache.curator</groupId>
+                <artifactId>curator-recipes</artifactId>
+                <version>3.1.0</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 

@@ -19,11 +19,21 @@ import java.util.List;
  * @author Michael Jiang on 16/3/16.
  */
 @Service
-public class ZKTaskManager implements TaskManager {
+class ZKTaskManager implements TaskManager {
     @Resource
     private ZKManager zkManager;
 
     private static Logger LOG = LoggerFactory.getLogger(ZKTaskManager.class);
+
+    @Override
+    public void create(String namespace, String app, String taskName, String cronExpression) {
+
+    }
+
+    @Override
+    public void delete(TaskDescriptor taskDescriptor) {
+
+    }
 
     @Override
     public void register(TaskDescriptor taskDescriptor) throws TaskException {

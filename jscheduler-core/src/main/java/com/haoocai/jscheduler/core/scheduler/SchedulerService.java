@@ -14,11 +14,13 @@ import java.util.List;
  *
  * @author Michael Jiang on 16/3/16.
  */
-public interface SchedulerService {
+interface SchedulerService {
+
+    void startTask(TaskDescriptor taskDescriptor);
+
+    void stopTask(TaskDescriptor taskDescriptor);
 
     void reloadSpecTask(TaskDescriptor taskDescriptor);
 
     List<SchedulerUnit> getAllSchedulerUnits(TaskDescriptor taskDescriptor);
-
-    void start();
 }

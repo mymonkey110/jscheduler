@@ -7,6 +7,10 @@ import java.util.List;
  */
 public interface TaskManager {
 
+    void create(String namespace,String app,String taskName,String cronExpression);
+
+    void delete(TaskDescriptor taskDescriptor);
+
     void register(TaskDescriptor taskDescriptor) throws TaskException;
 
     void unregister(TaskDescriptor taskDescriptor);

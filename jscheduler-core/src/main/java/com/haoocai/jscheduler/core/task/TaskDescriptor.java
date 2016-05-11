@@ -20,6 +20,11 @@ import java.util.Map;
  */
 public class TaskDescriptor implements Serializable {
     private static final long serialVersionUID = 5224933468107682449L;
+
+    /**
+     * namespace
+     */
+    private String namespace;
     /**
      * app name
      */
@@ -41,16 +46,17 @@ public class TaskDescriptor implements Serializable {
      */
     private Map extraParams;
 
-    public TaskDescriptor(String app, String name, String cronExpression) {
-        this(app, name, cronExpression, PickStrategy.RANDOM, null);
+    public TaskDescriptor(String namespace, String app, String name, String cronExpression) {
+        this(namespace, app, name, cronExpression, PickStrategy.RANDOM, null);
     }
 
-    public TaskDescriptor(String app, String name, String cronExpression, PickStrategy pickStrategy, Map extraParams) {
+    public TaskDescriptor(String namespace, String app, String name, String cronExpression, PickStrategy pickStrategy, Map extraParams) {
         Validate.isTrue(StringUtils.isNotBlank(app), "app name can't be blank");
         Validate.isTrue(StringUtils.isNotBlank(name), "name name can't be blank");
         Validate.isTrue(CronExpression.isValidExpression(cronExpression), "cron expression is not valid,please refer to 'https://en.wikipedia.org/wiki/Cron'");
         Validate.notNull(pickStrategy, "please specified the pick strategy");
 
+        this.namespace = namespace;
         this.app = app;
         this.name = name;
         this.cronExpression = cronExpression;
@@ -58,6 +64,10 @@ public class TaskDescriptor implements Serializable {
         if (extraParams != null && !extraParams.isEmpty()) {
             this.extraParams = extraParams;
         }
+    }
+
+    public String getNamespace() {
+        return namespace;
     }
 
     public String getApp() {
@@ -80,10 +90,15 @@ public class TaskDescriptor implements Serializable {
         return extraParams;
     }
 
+    public String taskPath() {
+        return "/" + namespace + app + "/" + name;
+    }
+
     @Override
     public String toString() {
         return "TaskDescriptor{" +
-                "app='" + app + '\'' +
+                "namespace='" + namespace + '\'' +
+                ", app='" + app + '\'' +
                 ", name='" + name + '\'' +
                 ", cronExpression='" + cronExpression + '\'' +
                 ", pickStrategy=" + pickStrategy +

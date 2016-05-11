@@ -7,8 +7,7 @@ import com.haoocai.jscheduler.core.task.TaskDescriptor;
 import com.haoocai.jscheduler.core.task.TaskInvoker;
 import com.haoocai.jscheduler.core.task.TaskTracker;
 import com.haoocai.jscheduler.core.trigger.Picker;
-import com.haoocai.jscheduler.core.trigger.PickerFactory;
-import com.haoocai.jscheduler.core.zk.ZKManager;
+import org.apache.curator.framework.CuratorFramework;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,15 +24,16 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author Michael Jiang on 16/4/5.
  */
 public class ZKTaskTracker extends TimerTask implements TaskTracker {
-    private final ZKManager zkManager;
+    private final CuratorFramework client;
     private final TaskDescriptor taskDescriptor;
     private Picker picker;
     private TaskInvoker taskInvoker;
+    private Timer innerTimer;
 
     private static Logger LOG = LoggerFactory.getLogger(ZKTaskManager.class);
 
-    public ZKTaskTracker(ZKManager zkManager, TaskDescriptor taskDescriptor) {
-        this.zkManager = checkNotNull(zkManager);
+    public ZKTaskTracker(CuratorFramework client, TaskDescriptor taskDescriptor) {
+        this.client = checkNotNull(client);
         this.taskDescriptor = checkNotNull(taskDescriptor);
     }
 
@@ -41,21 +41,28 @@ public class ZKTaskTracker extends TimerTask implements TaskTracker {
     public void track() {
         LOG.info("start tacker for app:{} 's task:{}.", taskDescriptor.getApp(), taskDescriptor.getName());
 
-        picker = PickerFactory.createPicker(taskDescriptor, zkManager);
-        taskInvoker = new ZKTaskInvoker(zkManager);
+        taskInvoker = new ZKTaskInvoker(client);
 
         Date nextRunTime = calcNextRunTime();
-        new Timer(taskDescriptor.getApp() + "-" + taskDescriptor.getName() + "-" + "tracker").schedule(this, nextRunTime);
+        innerTimer = new Timer(taskDescriptor.getApp() + "-" + taskDescriptor.getName() + "-" + "tracker");
+        innerTimer.schedule(this, nextRunTime);
+    }
+
+    @Override
+    public void untrack() {
+        innerTimer.cancel();
     }
 
     @Override
     public void run() {
+        //todo add pick later
         SchedulerUnit schedulerUnit = picker.assign();
         LOG.info("app:{} task:{} this time scheduler unit is:{}.", taskDescriptor.getApp(), taskDescriptor.getName(), schedulerUnit);
         taskInvoker.invoke(taskDescriptor, schedulerUnit);
 
         Date nextRunTime = calcNextRunTime();
-        new Timer(taskDescriptor.getApp() + "-" + taskDescriptor.getName() + "-" + "tracker").schedule(this, nextRunTime);
+        innerTimer = new Timer(taskDescriptor.getApp() + "-" + taskDescriptor.getName() + "-" + "tracker");
+        innerTimer.schedule(this, nextRunTime);
     }
 
     private Date calcNextRunTime() {

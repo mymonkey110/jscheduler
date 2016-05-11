@@ -3,8 +3,10 @@ package com.haoocai.jscheduler.core.scheduler;
 import com.google.common.base.Preconditions;
 import com.haoocai.jscheduler.core.task.TaskDescriptor;
 import com.haoocai.jscheduler.core.task.TaskTracker;
-import com.haoocai.jscheduler.core.task.impl.ZKTaskTracker;
+import com.haoocai.jscheduler.core.task.TaskTrackerFactory;
 import com.haoocai.jscheduler.core.zk.ZKManager;
+import org.apache.curator.framework.recipes.nodes.PersistentNode;
+import org.apache.zookeeper.CreateMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -31,8 +33,38 @@ class ZKSchedulerService implements SchedulerService {
     }
 
     @Override
-    public void reloadSpecTask(TaskDescriptor taskDescriptor) {
+    public void startTask(TaskDescriptor taskDescriptor) {
+        String taskPath = taskDescriptor.taskPath();
+        //reset start flag to zk
+        PersistentNode persistentNode = new PersistentNode(zkManager.getClient(), CreateMode.EPHEMERAL, true, taskPath + "/status", "RUNNING".getBytes());
+        persistentNode.start();
+        //start task tracker
+        TaskTracker taskTracker = TaskTrackerFactory.getTaskTracker(taskDescriptor, zkManager.getClient());
+        taskTracker.track();
 
+        LOG.info("started task:{} successfully.", taskDescriptor);
+    }
+
+    @Override
+    public void stopTask(TaskDescriptor taskDescriptor) {
+        String taskPath = taskDescriptor.taskPath();
+        TaskTracker taskTracker = TaskTrackerFactory.getTaskTracker(taskDescriptor, zkManager.getClient());
+        if (taskTracker == null) {
+            throw new RuntimeException("local has no task tracker.");
+        }
+        //cancel local task tracker
+        taskTracker.untrack();
+        //set untrack flag to zk
+        try {
+            zkManager.getClient().delete().forPath(taskPath + "/status");
+        } catch (Exception e) {
+            LOG.info("delete node:{} error:{}", taskPath + "/status", e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void reloadSpecTask(TaskDescriptor taskDescriptor) {
+        throw new UnsupportedOperationException("un support yet");
     }
 
     @Override
@@ -51,9 +83,8 @@ class ZKSchedulerService implements SchedulerService {
         return schedulerUnitList;
     }
 
-    @Override
-    public void start() {
-
+    private void start() {
+        new SchedulerStarter().start();
     }
 
 
@@ -73,14 +104,13 @@ class ZKSchedulerService implements SchedulerService {
         return taskDescriptors;
     }
 
-    class SchedulerStarter extends Thread {
+    private class SchedulerStarter extends Thread {
 
         @Override
         public void run() {
             List<TaskDescriptor> taskDescriptorList = getAllTasks();
-            for (TaskDescriptor taskDescriptor : taskDescriptorList) {
-                TaskTracker taskTracker = new ZKTaskTracker(zkManager, taskDescriptor);
-                taskTracker.track();
+            for (TaskDescriptor ignored : taskDescriptorList) {
+
             }
         }
     }

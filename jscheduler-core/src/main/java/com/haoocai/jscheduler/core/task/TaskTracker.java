@@ -13,4 +13,6 @@ package com.haoocai.jscheduler.core.task;
 public interface TaskTracker {
 
     void track();
+
+    void untrack();
 }

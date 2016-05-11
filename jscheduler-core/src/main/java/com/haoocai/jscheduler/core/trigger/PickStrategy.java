@@ -6,9 +6,7 @@ package com.haoocai.jscheduler.core.trigger;
 public enum PickStrategy {
     RANDOM("randomPicker"),
 
-    ROUND_ROBIN("rrPicker"),
-
-    UNKNOWN("unknown");
+    ROUND_ROBIN("rrPicker");
 
     private String identify;
 

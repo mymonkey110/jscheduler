@@ -3,11 +3,15 @@ package com.haoocai.jscheduler.core.zk;
 import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.curator.RetryPolicy;
+import org.apache.curator.framework.CuratorFrameworkFactory;
+import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.zookeeper.*;
 import org.apache.zookeeper.data.ACL;
 import org.apache.zookeeper.data.Id;
 import org.apache.zookeeper.data.Stat;
 import org.apache.zookeeper.server.auth.DigestAuthenticationProvider;
+import org.apache.curator.framework.CuratorFramework;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
@@ -31,19 +35,25 @@ public class ZKManager {
     private List<ACL> acl = new ArrayList<>();
     private boolean isCheckParentPath = true;
 
-    private String rootPath;
+    private String namespace;
     private String connectString;
     private String username;
     private String password;
     private int sessionTimeout;
     private String prefixPath;
+    private CuratorFramework client;
 
     @PostConstruct
     public void init() throws Exception {
         connect();
-        this.prefixPath = rootPath + "/" + ID + "/";
+        this.prefixPath = namespace + "/" + ID + "/";
+        RetryPolicy retryPolicy = new ExponentialBackoffRetry(1000, 3);
+        client = CuratorFrameworkFactory.newClient(connectString, retryPolicy);
     }
 
+    public CuratorFramework getClient() {
+        return this.client;
+    }
 
     /**
      * reConnect to zookeeper
@@ -130,16 +140,16 @@ public class ZKManager {
         this.sessionTimeout = sessionTimeout;
     }
 
-    public void setRootPath(String rootPath) {
-        this.rootPath = rootPath;
+    public void setNamespace(String namespace) {
+        this.namespace = namespace;
     }
 
     public void setCheckParentPath(boolean checkParentPath) {
         isCheckParentPath = checkParentPath;
     }
 
-    public String getRootPath() {
-        return rootPath;
+    public String getNamespace() {
+        return namespace;
     }
 
     public boolean exist(String path) {
@@ -187,7 +197,7 @@ public class ZKManager {
 
     public List<String> getAbsNodeChildrenWithRoot(String path) {
         try {
-            return zk.getChildren(rootPath + "/" + path, false);
+            return zk.getChildren(namespace + "/" + path, false);
         } catch (Exception e) {
             throw new ZKRuntimeException(e);
         }
@@ -222,21 +232,21 @@ public class ZKManager {
 
     public void initial() throws Exception {
         //当zk状态正常后才能调用
-        if (zk.exists(rootPath, false) == null) {
-            ZKTools.createPath(zk, rootPath, CreateMode.PERSISTENT, acl);
+        if (zk.exists(namespace, false) == null) {
+            ZKTools.createPath(zk, namespace, CreateMode.PERSISTENT, acl);
             if (isCheckParentPath) {
-                checkParent(zk, rootPath);
+                checkParent(zk, namespace);
             }
             //设置版本信息
-            zk.setData(rootPath, VERSION.getBytes(), -1);
+            zk.setData(namespace, VERSION.getBytes(), -1);
         } else {
             //先校验父亲节点，本身是否已经是schedule的目录
             if (isCheckParentPath) {
-                checkParent(zk, rootPath);
+                checkParent(zk, namespace);
             }
-            byte[] value = zk.getData(rootPath, false, null);
+            byte[] value = zk.getData(namespace, false, null);
             if (value == null) {
-                zk.setData(rootPath, VERSION.getBytes(), -1);
+                zk.setData(namespace, VERSION.getBytes(), -1);
             }
         }
     }
