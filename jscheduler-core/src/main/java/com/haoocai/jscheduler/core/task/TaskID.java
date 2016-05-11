@@ -3,12 +3,12 @@ package com.haoocai.jscheduler.core.task;
 /**
  * @author Michael Jiang on 16/5/11.
  */
-public class TaskID {
+class TaskID {
     private String namespace;
     private String app;
     private String path;
 
-    public TaskID(TaskDescriptor taskDescriptor) {
+    TaskID(TaskDescriptor taskDescriptor) {
         this(taskDescriptor.getNamespace(), taskDescriptor.getApp(), taskDescriptor.getName());
     }
 

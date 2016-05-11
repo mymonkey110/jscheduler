@@ -66,7 +66,7 @@ public class TaskDescriptor implements Serializable {
         }
     }
 
-    public String getNamespace() {
+    String getNamespace() {
         return namespace;
     }
 
@@ -91,7 +91,7 @@ public class TaskDescriptor implements Serializable {
     }
 
     public String taskPath() {
-        return "/" + namespace + app + "/" + name;
+        return "/" + namespace + "/" + app + "/" + name;
     }
 
     @Override

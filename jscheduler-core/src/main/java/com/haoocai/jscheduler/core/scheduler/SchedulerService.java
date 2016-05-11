@@ -20,7 +20,5 @@ interface SchedulerService {
 
     void stopTask(TaskDescriptor taskDescriptor);
 
-    void reloadSpecTask(TaskDescriptor taskDescriptor);
-
     List<SchedulerUnit> getAllSchedulerUnits(TaskDescriptor taskDescriptor);
 }

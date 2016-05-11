@@ -10,6 +10,8 @@ import org.slf4j.LoggerFactory;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
+ * Task invoker with zookeeper implementation
+ *
  * @author Michael Jiang on 16/3/16.
  */
 class ZKTaskInvoker implements TaskInvoker {

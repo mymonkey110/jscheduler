@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Scheduler Service with Zookeeper implementation
+ *
  * @author Michael Jiang on 16/3/16.
  */
 @Service
@@ -34,6 +36,8 @@ class ZKSchedulerService implements SchedulerService {
 
     @Override
     public void startTask(TaskDescriptor taskDescriptor) {
+        LOG.trace("trying start task:{}.", taskDescriptor);
+
         String taskPath = taskDescriptor.taskPath();
         //reset start flag to zk
         PersistentNode persistentNode = new PersistentNode(zkManager.getClient(), CreateMode.EPHEMERAL, true, taskPath + "/status", "RUNNING".getBytes());
@@ -58,13 +62,8 @@ class ZKSchedulerService implements SchedulerService {
         try {
             zkManager.getClient().delete().forPath(taskPath + "/status");
         } catch (Exception e) {
-            LOG.info("delete node:{} error:{}", taskPath + "/status", e.getMessage(), e);
+            LOG.error("delete node:{} error:{}", taskPath + "/status", e.getMessage(), e);
         }
-    }
-
-    @Override
-    public void reloadSpecTask(TaskDescriptor taskDescriptor) {
-        throw new UnsupportedOperationException("un support yet");
     }
 
     @Override
@@ -109,8 +108,8 @@ class ZKSchedulerService implements SchedulerService {
         @Override
         public void run() {
             List<TaskDescriptor> taskDescriptorList = getAllTasks();
-            for (TaskDescriptor ignored : taskDescriptorList) {
-
+            for (TaskDescriptor taskDescriptor : taskDescriptorList) {
+                startTask(taskDescriptor);
             }
         }
     }
