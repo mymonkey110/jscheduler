@@ -6,22 +6,26 @@ package com.haoocai.jscheduler.core.task;
 public class TaskException extends Exception {
     private static final long serialVersionUID = -7059596686748306753L;
 
-    public TaskException() {
+    private int errorCode;
+    private String errorMsg;
+
+    public TaskException(int errorCode, String errorMsg) {
+        this.errorCode=errorCode;
+        this.errorMsg=errorMsg;
     }
 
-    public TaskException(String message) {
-        super(message);
-    }
-
-    public TaskException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public TaskException(Throwable cause) {
+    public TaskException(Throwable cause, int errorCode, String errorMsg) {
         super(cause);
+        this.errorCode = errorCode;
+        this.errorMsg = errorMsg;
     }
 
-    public TaskException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
+    public int getErrorCode() {
+        return errorCode;
     }
+
+    public String getErrorMsg() {
+        return errorMsg;
+    }
+
 }

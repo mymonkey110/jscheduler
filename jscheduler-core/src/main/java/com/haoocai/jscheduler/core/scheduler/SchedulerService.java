@@ -1,6 +1,6 @@
 package com.haoocai.jscheduler.core.scheduler;
 
-import com.haoocai.jscheduler.core.task.TaskDescriptor;
+import com.haoocai.jscheduler.core.task.TaskID;
 
 import java.util.List;
 
@@ -14,11 +14,26 @@ import java.util.List;
  *
  * @author Michael Jiang on 16/3/16.
  */
-interface SchedulerService {
+public interface SchedulerService {
+    /**
+     * Start the specified task
+     *
+     * @param taskID task identify
+     */
+    void startTask(TaskID taskID);
 
-    void startTask(TaskDescriptor taskDescriptor);
+    /**
+     * stop the specified task
+     *
+     * @param taskID task identify
+     */
+    void stopTask(TaskID taskID);
 
-    void stopTask(TaskDescriptor taskDescriptor);
-
-    List<SchedulerUnit> getAllSchedulerUnits(TaskDescriptor taskDescriptor);
+    /**
+     * get all available schedule unit by specifiy task
+     *
+     * @param taskID task identify
+     * @return scheduler units
+     */
+    List<SchedulerUnit> getAllSchedulerUnits(TaskID taskID) throws SchedulerException;
 }

@@ -7,6 +7,8 @@ import org.apache.curator.framework.CuratorFramework;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static com.haoocai.jscheduler.core.Constants.ENCODING;
+
 /**
  * @author Michael Jiang on 16/5/11.
  */
@@ -14,12 +16,13 @@ public class TaskTrackerFactory {
 
     private static Map<TaskID, TaskTracker> taskTrackerRegMap = new ConcurrentHashMap<>();
 
-    public synchronized static TaskTracker getTaskTracker(TaskDescriptor taskDescriptor, CuratorFramework client) {
-        Preconditions.checkNotNull(taskDescriptor);
+    public synchronized static TaskTracker getTaskTracker(TaskID taskID, CuratorFramework client) throws Exception {
+        Preconditions.checkNotNull(taskID);
 
-        TaskID taskID = new TaskID(taskDescriptor);
         TaskTracker taskTracker = taskTrackerRegMap.get(taskID);
         if (taskTracker == null) {
+            byte[] data = client.getData().forPath(taskID.identify() + "/config/cronExpression");
+            TaskDescriptor taskDescriptor = new TaskDescriptor(taskID.getNamespace(), taskID.getApp(), taskID.getName(), new String(data, ENCODING));
             taskTracker = new ZKTaskTracker(client, taskDescriptor);
             taskTrackerRegMap.put(taskID, taskTracker);
         }

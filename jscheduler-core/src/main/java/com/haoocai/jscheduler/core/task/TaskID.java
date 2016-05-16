@@ -3,23 +3,23 @@ package com.haoocai.jscheduler.core.task;
 /**
  * @author Michael Jiang on 16/5/11.
  */
-class TaskID {
+public class TaskID {
     private String namespace;
     private String app;
-    private String path;
+    private String name;
 
     TaskID(TaskDescriptor taskDescriptor) {
         this(taskDescriptor.getNamespace(), taskDescriptor.getApp(), taskDescriptor.getName());
     }
 
-    private TaskID(String namespace, String app, String path) {
+    private TaskID(String namespace, String app, String name) {
         this.namespace = namespace;
         this.app = app;
-        this.path = path;
+        this.name = name;
     }
 
     public String identify() {
-        return "/" + namespace + "/" + app + "/" + path;
+        return "/" + namespace + "/" + app + "/" + name;
     }
 
     @Override
@@ -29,15 +29,27 @@ class TaskID {
 
         TaskID taskID = (TaskID) o;
 
-        return namespace.equals(taskID.namespace) && app.equals(taskID.app) && path.equals(taskID.path);
+        return namespace.equals(taskID.namespace) && app.equals(taskID.app) && name.equals(taskID.name);
 
+    }
+
+    public String getNamespace() {
+        return namespace;
+    }
+
+    public String getApp() {
+        return app;
+    }
+
+    public String getName() {
+        return name;
     }
 
     @Override
     public int hashCode() {
         int result = namespace.hashCode();
         result = 31 * result + app.hashCode();
-        result = 31 * result + path.hashCode();
+        result = 31 * result + name.hashCode();
         return result;
     }
 
@@ -46,7 +58,7 @@ class TaskID {
         return "TaskID{" +
                 "namespace='" + namespace + '\'' +
                 ", app='" + app + '\'' +
-                ", path='" + path + '\'' +
+                ", name='" + name + '\'' +
                 '}';
     }
 }

@@ -233,7 +233,7 @@ public class ZKManager {
     public void initial() throws Exception {
         //当zk状态正常后才能调用
         if (zk.exists(namespace, false) == null) {
-            ZKTools.createPath(zk, namespace, CreateMode.PERSISTENT, acl);
+            ZKTool.createPath(zk, namespace, CreateMode.PERSISTENT, acl);
             if (isCheckParentPath) {
                 checkParent(zk, namespace);
             }

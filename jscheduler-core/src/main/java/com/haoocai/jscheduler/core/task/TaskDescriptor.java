@@ -46,6 +46,7 @@ public class TaskDescriptor implements Serializable {
      */
     private Map extraParams;
 
+
     public TaskDescriptor(String namespace, String app, String name, String cronExpression) {
         this(namespace, app, name, cronExpression, PickStrategy.RANDOM, null);
     }

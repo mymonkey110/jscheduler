@@ -6,19 +6,19 @@ package com.haoocai.jscheduler.web;
  * @author Michael Jiang on 16/5/12.
  */
 public class CommonResult<T> {
-    private String code;
+    private int code;
     private T data;
 
-    public CommonResult(String code, T data) {
+    public CommonResult(int code, T data) {
         this.code = code;
         this.data = data;
     }
 
-    public String getCode() {
+    public int getCode() {
         return code;
     }
 
-    public void setCode(String code) {
+    public void setCode(int code) {
         this.code = code;
     }
 
@@ -33,7 +33,7 @@ public class CommonResult<T> {
     @Override
     public String toString() {
         return "CommonResult{" +
-                "code='" + code + '\'' +
+                "code=" + code +
                 ", data=" + data +
                 '}';
     }
