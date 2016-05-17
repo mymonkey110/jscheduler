@@ -230,47 +230,6 @@ public class ZKManager {
         return zk != null && zk.getState() == ZooKeeper.States.CONNECTED;
     }
 
-    public void initial() throws Exception {
-        //当zk状态正常后才能调用
-        if (zk.exists(namespace, false) == null) {
-            ZKTool.createPath(zk, namespace, CreateMode.PERSISTENT, acl);
-            if (isCheckParentPath) {
-                checkParent(zk, namespace);
-            }
-            //设置版本信息
-            zk.setData(namespace, VERSION.getBytes(), -1);
-        } else {
-            //先校验父亲节点，本身是否已经是schedule的目录
-            if (isCheckParentPath) {
-                checkParent(zk, namespace);
-            }
-            byte[] value = zk.getData(namespace, false, null);
-            if (value == null) {
-                zk.setData(namespace, VERSION.getBytes(), -1);
-            }
-        }
-    }
-
-    private static void checkParent(ZooKeeper zk, String path) throws Exception {
-        String[] list = path.split("/");
-        String zkPath = "";
-        for (int i = 0; i < list.length - 1; i++) {
-            String str = list[i];
-            if (!str.equals("")) {
-                zkPath = zkPath + "/" + str;
-                if (zk.exists(zkPath, false) != null) {
-                    byte[] value = zk.getData(zkPath, false, null);
-                    if (value != null) {
-                        String tmpVersion = new String(value);
-                        if (tmpVersion.contains("taobao-pamirs-schedule-")) {
-                            throw new Exception("\"" + zkPath + "\"  is already a schedule instance's root directory, its any subdirectory cannot as the root directory of others");
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     public ZooKeeper getZooKeeper() throws Exception {
         if (!this.checkZookeeperState()) {
             reConnection();

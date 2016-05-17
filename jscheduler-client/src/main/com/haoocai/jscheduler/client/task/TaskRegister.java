@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author Michael Jiang on 16/3/31.
  */
-public class TaskRegister {
+class TaskRegister {
     private final Map<String, TaskWatcher> taskWatcherMap = new ConcurrentHashMap<>();
 
     private final String app;
