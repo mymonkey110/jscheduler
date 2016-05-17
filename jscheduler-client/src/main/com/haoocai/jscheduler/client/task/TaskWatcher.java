@@ -52,7 +52,7 @@ class TaskWatcher implements TriggerHandler {
         }
     }
 
-    @Override
+
     public void handler(Object event) {
         if (event instanceof SchedulerContext) {
 

@@ -18,5 +18,5 @@ public interface TaskManager {
 
     List<TaskDescriptor> getAppTasks(String namespace, String app);
 
-    TaskDescriptor getSpecTaskDescriptor(String app, String taskName);
+    TaskDescriptor getSpecTaskDescriptor(TaskID taskID);
 }

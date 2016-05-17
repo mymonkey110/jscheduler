@@ -8,11 +8,11 @@ public class TaskID {
     private String app;
     private String name;
 
-    TaskID(TaskDescriptor taskDescriptor) {
+    public TaskID(TaskDescriptor taskDescriptor) {
         this(taskDescriptor.getNamespace(), taskDescriptor.getApp(), taskDescriptor.getName());
     }
 
-    private TaskID(String namespace, String app, String name) {
+    public TaskID(String namespace, String app, String name) {
         this.namespace = namespace;
         this.app = app;
         this.name = name;

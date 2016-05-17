@@ -10,5 +10,5 @@ public interface Picker {
 
     PickStrategy identify();
 
-    SchedulerUnit assign();
+    SchedulerUnit assign() throws Exception;
 }

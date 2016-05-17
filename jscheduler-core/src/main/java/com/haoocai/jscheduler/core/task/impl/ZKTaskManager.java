@@ -7,6 +7,7 @@ import com.haoocai.jscheduler.core.task.TaskID;
 import com.haoocai.jscheduler.core.task.TaskManager;
 import com.haoocai.jscheduler.core.zk.ZKManager;
 import com.haoocai.jscheduler.core.zk.ZKTool;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.curator.framework.recipes.nodes.PersistentNode;
 import org.apache.zookeeper.CreateMode;
@@ -14,10 +15,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.haoocai.jscheduler.core.Constants.ENCODING;
 import static com.haoocai.jscheduler.core.ErrorCode.*;
 
 /**
@@ -27,10 +28,13 @@ import static com.haoocai.jscheduler.core.ErrorCode.*;
  */
 @Service
 class ZKTaskManager implements TaskManager {
-    @Resource
-    private ZKManager zkManager;
+    private final ZKManager zkManager;
 
     private static Logger LOG = LoggerFactory.getLogger(ZKTaskManager.class);
+
+    public ZKTaskManager(ZKManager zkManager) {
+        this.zkManager = zkManager;
+    }
 
     @Override
     public void create(String namespace, String app, String taskName, String cronExpression) throws TaskException {
@@ -69,21 +73,32 @@ class ZKTaskManager implements TaskManager {
     public List<TaskDescriptor> getAppTasks(String namespace, String app) {
         Preconditions.checkArgument(StringUtils.isNotBlank(app), "app name can't be blank!");
 
-        List<String> children = zkManager.getNodeChildren(app);
+        List<String> children;
+        try {
+            children = zkManager.getClient().getChildren().forPath("/" + namespace + "/" + app);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
 
         List<TaskDescriptor> taskList = new ArrayList<>();
-        for (String taskName : children) {
-            taskList.add(getSpecTaskDescriptor(app, taskName));
+        if (CollectionUtils.isNotEmpty(children)) {
+            for (String taskName : children) {
+                taskList.add(getSpecTaskDescriptor(new TaskID(namespace, app, taskName)));
+            }
         }
 
         return taskList;
     }
 
     @Override
-    public TaskDescriptor getSpecTaskDescriptor(String app, String taskName) {
-        Preconditions.checkArgument(StringUtils.isNotBlank(app), "app name can't be blank!");
-        Preconditions.checkArgument(StringUtils.isNotBlank(taskName), "name name can't be blank!");
+    public TaskDescriptor getSpecTaskDescriptor(TaskID taskID) {
+        String taskPath = taskID.identify();
 
-        return zkManager.getNodeData(app + "/" + taskName, TaskDescriptor.class);
+        try {
+            String cronExpression = new String(zkManager.getClient().getData().forPath(taskPath + "/config/cronExpression"), ENCODING);
+            return new TaskDescriptor(taskID.getNamespace(), taskID.getApp(), taskID.getName(), cronExpression);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

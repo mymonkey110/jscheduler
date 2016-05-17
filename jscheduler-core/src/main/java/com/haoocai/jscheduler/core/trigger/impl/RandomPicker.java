@@ -38,9 +38,9 @@ public class RandomPicker implements Picker {
     }
 
     @Override
-    public SchedulerUnit assign() {
+    public SchedulerUnit assign() throws Exception {
         String taskNodePath = taskDescriptor.getApp() + "/" + taskDescriptor.getName();
-        List<String> children = zkManager.getNodeChildren(taskNodePath);
+        List<String> children = zkManager.getClient().getChildren().forPath(taskNodePath);
         if (CollectionUtils.isEmpty(children)) {
             LOG.warn("not found available scheduler unit.");
             return null;
