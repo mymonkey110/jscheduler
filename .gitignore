@@ -17,6 +17,7 @@ hs_err_pid*
 
 *.iml
 *.properties
+*.sh
 
 ## Directory-based project format:
 .idea/
