@@ -9,10 +9,9 @@ import com.haoocai.jscheduler.core.zk.ZKManager;
 import com.haoocai.jscheduler.core.zk.ZKTool;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.curator.framework.recipes.nodes.PersistentNode;
-import org.apache.zookeeper.CreateMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -32,6 +31,7 @@ class ZKTaskManager implements TaskManager {
 
     private static Logger LOG = LoggerFactory.getLogger(ZKTaskManager.class);
 
+    @Autowired
     public ZKTaskManager(ZKManager zkManager) {
         this.zkManager = zkManager;
     }
@@ -50,9 +50,7 @@ class ZKTaskManager implements TaskManager {
         }
 
         try {
-            zkManager.getClient().create().forPath(taskPath + "/config");
-            PersistentNode persistentNode = new PersistentNode(zkManager.getClient(), CreateMode.EPHEMERAL, true, taskPath + "/config/cronExpression", cronExpression.getBytes());
-            persistentNode.start();
+            zkManager.getClient().create().forPath(taskPath + "/config/cronExpression",cronExpression.getBytes());
         } catch (Exception e) {
             throw new TaskException(e, ZK_ERROR, "zookeeper access error");
         }

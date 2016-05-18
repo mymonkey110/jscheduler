@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 /**
  * @author Michael Jiang on 16/3/16.
  */
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = {"com.haoocai.jscheduler"})
 public class Application {
 
     public static void main(String[] args) {

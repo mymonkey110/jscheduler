@@ -3,9 +3,9 @@ package com.haoocai.jscheduler.core.scheduler.impl;
 import com.haoocai.jscheduler.core.scheduler.SchedulerException;
 import com.haoocai.jscheduler.core.scheduler.SchedulerManager;
 import com.haoocai.jscheduler.core.zk.ZKManager;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -13,8 +13,12 @@ import java.util.List;
  */
 @Service
 public class ZKSchedulerManager implements SchedulerManager {
-    @Resource
-    private ZKManager zkManager;
+    private final ZKManager zkManager;
+
+    @Autowired
+    public ZKSchedulerManager(ZKManager zkManager) {
+        this.zkManager = zkManager;
+    }
 
     @Override
     public List<String> getAppsUnderNamespace(String namespace) {

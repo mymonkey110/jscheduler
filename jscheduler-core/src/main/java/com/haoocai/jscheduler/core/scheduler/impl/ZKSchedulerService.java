@@ -11,7 +11,6 @@ import com.haoocai.jscheduler.core.task.TaskTracker;
 import com.haoocai.jscheduler.core.task.TaskTrackerFactory;
 import com.haoocai.jscheduler.core.task.impl.ZKTaskTracker;
 import com.haoocai.jscheduler.core.zk.ZKManager;
-import org.apache.curator.framework.recipes.nodes.PersistentNode;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.data.Stat;
 import org.slf4j.Logger;
@@ -50,8 +49,8 @@ class ZKSchedulerService implements SchedulerService {
         String taskPath = taskID.identify();
         try {
             //reset start flag to zk
-            PersistentNode persistentNode = new PersistentNode(zkManager.getClient(), CreateMode.EPHEMERAL, true, taskPath + "/status", "RUNNING".getBytes());
-            persistentNode.start();
+            zkManager.getClient().create().withMode(CreateMode.EPHEMERAL).forPath(taskPath + "/status", "RUNNING".getBytes());
+
             //start task tracker
             TaskTracker taskTracker = TaskTrackerFactory.getTaskTracker(taskID, zkManager.getClient());
             taskTracker.track();
@@ -145,8 +144,7 @@ class ZKSchedulerService implements SchedulerService {
             Stat stat = zkManager.getClient().checkExists().forPath(namespacePath);
             if (stat == null) {
                 LOG.trace("namespace:{} doesn't exist,going to create node.", namespace);
-                PersistentNode persistentNode = new PersistentNode(zkManager.getClient(), CreateMode.EPHEMERAL, true, namespacePath, "".getBytes());
-                persistentNode.start();
+                zkManager.getClient().create().withMode(CreateMode.EPHEMERAL).forPath("/namespacePath", new byte[0]);
             } else {
                 LOG.info("namespace:{} exist.", namespace);
             }
