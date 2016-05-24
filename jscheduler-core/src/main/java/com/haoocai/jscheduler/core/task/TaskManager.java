@@ -11,12 +11,37 @@ import java.util.List;
  * @author Michael Jiang on 16/3/16.
  */
 public interface TaskManager {
-
+    /**
+     * create task
+     *
+     * @param namespace      namespace
+     * @param app            app name the task belong to
+     * @param taskName       task name
+     * @param cronExpression task cronExpression
+     * @throws TaskException task exception
+     */
     void create(String namespace, String app, String taskName, String cronExpression) throws TaskException;
 
+    /**
+     * delete task by task id
+     *
+     * @param taskID task id
+     */
     void delete(TaskID taskID);
 
+    /**
+     * get app all the tasks
+     *
+     * @param namespace namespace
+     * @param app       app
+     * @return all the task descriptors
+     */
     List<TaskDescriptor> getAppTasks(String namespace, String app);
 
+    /**
+     * get the specified task descriptor by task id
+     * @param taskID task id
+     * @return task descriptor
+     */
     TaskDescriptor getSpecTaskDescriptor(TaskID taskID);
 }

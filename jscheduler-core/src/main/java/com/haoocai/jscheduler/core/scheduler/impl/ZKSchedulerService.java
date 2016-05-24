@@ -15,10 +15,10 @@ import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.data.Stat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,16 +31,20 @@ import static com.haoocai.jscheduler.core.Constants.ENCODING;
  */
 @Service
 class ZKSchedulerService implements SchedulerService {
-    @Resource
-    private ZKManager zkManager;
-    @Resource
-    private JschedulerConfig jschedulerConfig;
+    private final ZKManager zkManager;
+    private final JschedulerConfig jschedulerConfig;
 
     private static Logger LOG = LoggerFactory.getLogger(ZKSchedulerService.class);
 
+    @Autowired
+    public ZKSchedulerService(ZKManager zkManager, JschedulerConfig jschedulerConfig) {
+        this.zkManager = zkManager;
+        this.jschedulerConfig = jschedulerConfig;
+    }
+
     @PostConstruct
     public void init() {
-        start();
+        new SchedulerStarter().start();
     }
 
     @Override
@@ -99,10 +103,6 @@ class ZKSchedulerService implements SchedulerService {
         return schedulerUnitList;
     }
 
-    private void start() {
-        new SchedulerStarter().start();
-    }
-
     private class SchedulerStarter extends Thread {
 
         @Override
@@ -137,14 +137,14 @@ class ZKSchedulerService implements SchedulerService {
          * </p>
          *
          * @param namespace namespace
-         * @throws Exception
+         * @throws Exception exception
          */
         private void initNamespace(String namespace) throws Exception {
             String namespacePath = "/" + namespace;
             Stat stat = zkManager.getClient().checkExists().forPath(namespacePath);
             if (stat == null) {
                 LOG.trace("namespace:{} doesn't exist,going to create node.", namespace);
-                zkManager.getClient().create().withMode(CreateMode.EPHEMERAL).forPath("/namespacePath", new byte[0]);
+                zkManager.getClient().create().withMode(CreateMode.PERSISTENT).forPath(namespacePath, new byte[0]);
             } else {
                 LOG.info("namespace:{} exist.", namespace);
             }

@@ -4,6 +4,8 @@ package com.haoocai.jscheduler.core;
  * @author Michael Jiang on 16/5/16.
  */
 public class ErrorCode {
+    public final static int SUCCESS = 1000;
+
     public final static int ZK_ERROR = 1001;
     public final static int NODE_NOT_EXIST = 1002;
     public final static int NODE_ALREADY_EXIST = 1003;

@@ -9,6 +9,10 @@ public class CommonResult<T> {
     private int code;
     private T data;
 
+    public CommonResult(int code) {
+        this.code = code;
+    }
+
     public CommonResult(int code, T data) {
         this.code = code;
         this.data = data;
