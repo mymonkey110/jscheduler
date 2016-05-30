@@ -32,11 +32,11 @@ public class ZKManager {
     @PostConstruct
     public void init() throws Exception {
         String zkConnectStr = jschedulerConfig.getConnectStr();
-        LOG.trace("trying to connect to zookeeper:{}.", zkConnectStr);
+        LOG.info("trying to connect to zookeeper:{}", zkConnectStr);
         RetryPolicy retryPolicy = new ExponentialBackoffRetry(1000, 3);
         client = CuratorFrameworkFactory.newClient(zkConnectStr, retryPolicy);
         client.start();
-        LOG.info("connected to zookeeper:{}.", zkConnectStr);
+        LOG.info("connected to zookeeper:{}", zkConnectStr);
     }
 
     public CuratorFramework getClient() {

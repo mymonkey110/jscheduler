@@ -22,7 +22,7 @@ public interface AppService {
      * @param namespace namespace
      * @param app       app
      */
-    void create(String namespace, String app);
+    void create(String namespace, String app) throws NamespaceNotExistException, AppExistException;
 
 
     /**

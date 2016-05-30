@@ -49,7 +49,7 @@ class ZKSchedulerService implements SchedulerService {
 
     @Override
     public void startTask(TaskID taskID) {
-        LOG.trace("trying start task:{}.", taskID);
+        LOG.info("trying start task:{}.", taskID);
         String taskPath = taskID.identify();
         try {
             //reset start flag to zk
@@ -143,7 +143,7 @@ class ZKSchedulerService implements SchedulerService {
             String namespacePath = "/" + namespace;
             Stat stat = zkManager.getClient().checkExists().forPath(namespacePath);
             if (stat == null) {
-                LOG.trace("namespace:{} doesn't exist,going to create node.", namespace);
+                LOG.info("namespace:{} doesn't exist,going to create node.", namespace);
                 zkManager.getClient().create().withMode(CreateMode.PERSISTENT).forPath(namespacePath, new byte[0]);
             } else {
                 LOG.info("namespace:{} exist.", namespace);

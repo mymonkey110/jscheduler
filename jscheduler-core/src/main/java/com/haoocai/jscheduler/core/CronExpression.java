@@ -22,53 +22,53 @@ import java.util.*;
  * <th align="left">Allowed Special Characters</th>
  * </tr>
  * <tr>
- * <td align="left"><code>Seconds</code></td>
+ * <td align="left"><errorCode>Seconds</errorCode></td>
  * <td align="left">&nbsp;</th>
- * <td align="left"><code>0-59</code></td>
+ * <td align="left"><errorCode>0-59</errorCode></td>
  * <td align="left">&nbsp;</th>
- * <td align="left"><code>, - * /</code></td>
+ * <td align="left"><errorCode>, - * /</errorCode></td>
  * </tr>
  * <tr>
- * <td align="left"><code>Minutes</code></td>
+ * <td align="left"><errorCode>Minutes</errorCode></td>
  * <td align="left">&nbsp;</th>
- * <td align="left"><code>0-59</code></td>
+ * <td align="left"><errorCode>0-59</errorCode></td>
  * <td align="left">&nbsp;</th>
- * <td align="left"><code>, - * /</code></td>
+ * <td align="left"><errorCode>, - * /</errorCode></td>
  * </tr>
  * <tr>
- * <td align="left"><code>Hours</code></td>
+ * <td align="left"><errorCode>Hours</errorCode></td>
  * <td align="left">&nbsp;</th>
- * <td align="left"><code>0-23</code></td>
+ * <td align="left"><errorCode>0-23</errorCode></td>
  * <td align="left">&nbsp;</th>
- * <td align="left"><code>, - * /</code></td>
+ * <td align="left"><errorCode>, - * /</errorCode></td>
  * </tr>
  * <tr>
- * <td align="left"><code>Day-of-month</code></td>
+ * <td align="left"><errorCode>Day-of-month</errorCode></td>
  * <td align="left">&nbsp;</th>
- * <td align="left"><code>1-31</code></td>
+ * <td align="left"><errorCode>1-31</errorCode></td>
  * <td align="left">&nbsp;</th>
- * <td align="left"><code>, - * ? / L W</code></td>
+ * <td align="left"><errorCode>, - * ? / L W</errorCode></td>
  * </tr>
  * <tr>
- * <td align="left"><code>Month</code></td>
+ * <td align="left"><errorCode>Month</errorCode></td>
  * <td align="left">&nbsp;</th>
- * <td align="left"><code>1-12 or JAN-DEC</code></td>
+ * <td align="left"><errorCode>1-12 or JAN-DEC</errorCode></td>
  * <td align="left">&nbsp;</th>
- * <td align="left"><code>, - * /</code></td>
+ * <td align="left"><errorCode>, - * /</errorCode></td>
  * </tr>
  * <tr>
- * <td align="left"><code>Day-of-Week</code></td>
+ * <td align="left"><errorCode>Day-of-Week</errorCode></td>
  * <td align="left">&nbsp;</th>
- * <td align="left"><code>1-7 or SUN-SAT</code></td>
+ * <td align="left"><errorCode>1-7 or SUN-SAT</errorCode></td>
  * <td align="left">&nbsp;</th>
- * <td align="left"><code>, - * ? / L #</code></td>
+ * <td align="left"><errorCode>, - * ? / L #</errorCode></td>
  * </tr>
  * <tr>
- * <td align="left"><code>Year (Optional)</code></td>
+ * <td align="left"><errorCode>Year (Optional)</errorCode></td>
  * <td align="left">&nbsp;</th>
- * <td align="left"><code>empty, 1970-2199</code></td>
+ * <td align="left"><errorCode>empty, 1970-2199</errorCode></td>
  * <td align="left">&nbsp;</th>
- * <td align="left"><code>, - * /</code></td>
+ * <td align="left"><errorCode>, - * /</errorCode></td>
  * </tr>
  * </table>
  * <P>
@@ -323,7 +323,7 @@ public class CronExpression implements Serializable, Cloneable {
 	}
 
 	/**
-	 * Returns the time zone for which this <code>CronExpression</code>
+	 * Returns the time zone for which this <errorCode>CronExpression</errorCode>
 	 * will be resolved.
 	 */
 	public TimeZone getTimeZone() {
@@ -335,7 +335,7 @@ public class CronExpression implements Serializable, Cloneable {
 	}
 
 	/**
-	 * Sets the time zone for which  this <code>CronExpression</code>
+	 * Sets the time zone for which  this <errorCode>CronExpression</errorCode>
 	 * will be resolved.
 	 */
 	public void setTimeZone(TimeZone timeZone) {
@@ -1636,7 +1636,7 @@ public class CronExpression implements Serializable, Cloneable {
 
 	/**
 	 * NOT YET IMPLEMENTED: Returns the time before the given time
-	 * that the <code>CronExpression</code> matches.
+	 * that the <errorCode>CronExpression</errorCode> matches.
 	 */
 	protected Date getTimeBefore(Date endTime) {
 		// TODO: implement QUARTZ-423
@@ -1645,7 +1645,7 @@ public class CronExpression implements Serializable, Cloneable {
 
 	/**
 	 * NOT YET IMPLEMENTED: Returns the final time that the 
-	 * <code>CronExpression</code> will match.
+	 * <errorCode>CronExpression</errorCode> will match.
 	 */
 	public Date getFinalFireTime() {
 		// TODO: implement QUARTZ-423

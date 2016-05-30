@@ -1,7 +1,9 @@
 package com.haoocai.jscheduler.core.app.impl;
 
 import com.google.common.base.Preconditions;
+import com.haoocai.jscheduler.core.app.AppExistException;
 import com.haoocai.jscheduler.core.app.AppService;
+import com.haoocai.jscheduler.core.app.NamespaceNotExistException;
 import com.haoocai.jscheduler.core.zk.ZKManager;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,8 +33,16 @@ public class AppServiceImpl implements AppService {
     }
 
     @Override
-    public void create(String namespace, String app) {
+    public void create(String namespace, String app) throws NamespaceNotExistException, AppExistException {
         Preconditions.checkArgument(StringUtils.isNotBlank(namespace) && StringUtils.isNotBlank(app));
+
+        if (!zkManager.checkNodeExist("/" + namespace)) {
+            throw new NamespaceNotExistException();
+        }
+
+        if (zkManager.checkNodeExist("/" + namespace + "/" + app)) {
+            throw new AppExistException();
+        }
 
         zkManager.create("/" + namespace + "/" + app, new byte[0]);
     }
