@@ -14,5 +14,22 @@ public interface AppService {
      * @param namespace namespace
      * @return apps' name
      */
-    public List<String> getNamespaceApps(String namespace);
+    List<String> getNamespaceApps(String namespace);
+
+    /**
+     * create app within namespace
+     *
+     * @param namespace namespace
+     * @param app       app
+     */
+    void create(String namespace, String app);
+
+
+    /**
+     * delete app
+     *
+     * @param namespace namespace
+     * @param app       app
+     */
+    void delete(String namespace, String app);
 }

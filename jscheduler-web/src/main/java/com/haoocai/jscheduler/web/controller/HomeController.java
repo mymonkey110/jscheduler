@@ -1,6 +1,5 @@
 package com.haoocai.jscheduler.web.controller;
 
-import com.google.common.collect.Lists;
 import com.haoocai.jscheduler.core.ErrorCode;
 import com.haoocai.jscheduler.core.app.AppService;
 import com.haoocai.jscheduler.web.CommonResult;
