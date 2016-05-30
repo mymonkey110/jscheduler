@@ -6,7 +6,6 @@ import com.haoocai.jscheduler.core.task.TaskException;
 import com.haoocai.jscheduler.core.task.TaskID;
 import com.haoocai.jscheduler.core.task.TaskManager;
 import com.haoocai.jscheduler.core.zk.ZKManager;
-import com.haoocai.jscheduler.core.zk.ZKTool;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -26,7 +25,7 @@ import static com.haoocai.jscheduler.core.ErrorCode.*;
  * @author Michael Jiang on 16/3/16.
  */
 @Service
-class ZKTaskManager implements TaskManager {
+public class ZKTaskManager implements TaskManager {
     private final ZKManager zkManager;
 
     private static Logger LOG = LoggerFactory.getLogger(ZKTaskManager.class);
@@ -38,33 +37,25 @@ class ZKTaskManager implements TaskManager {
 
     @Override
     public void create(String namespace, String app, String taskName, String cronExpression) throws TaskException {
-        if (!ZKTool.checkNodeExist(zkManager.getClient(), "/" + namespace)) {
+        if (!zkManager.checkNodeExist("/" + namespace)) {
             throw new TaskException(NAMESPACE_NOT_FOUND, "namespace not found");
         }
-        if (!ZKTool.checkNodeExist(zkManager.getClient(), "/" + namespace + "/" + app)) {
+        if (!zkManager.checkNodeExist("/" + namespace + "/" + app)) {
             throw new TaskException(APP_NOT_FOUND, "app not found");
         }
         String taskPath = "/" + namespace + "/" + app + "/" + taskName;
-        if (ZKTool.checkNodeExist(zkManager.getClient(), taskPath)) {
+        if (zkManager.checkNodeExist(taskPath)) {
             throw new TaskException(TASK_ALREADY_EXIST, "task:" + taskName + " already exist.");
         }
 
-        try {
-            zkManager.getClient().create().forPath(taskPath + "/config/cronExpression",cronExpression.getBytes());
-        } catch (Exception e) {
-            throw new TaskException(e, ZK_ERROR, "zookeeper access error");
-        }
+        zkManager.create(taskPath + "/config/cronExpression", cronExpression.getBytes());
     }
 
     @Override
     public void delete(TaskID taskID) {
         LOG.trace("deleting the task:{}.", taskID);
-        try {
-            zkManager.getClient().delete().forPath(taskID.identify());
-            LOG.info("deleted the task:{} node.", taskID.identify());
-        } catch (Exception e) {
-            LOG.error("delete task:{} error:{}.", taskID, e.getMessage(), e);
-        }
+        zkManager.delete(taskID.identify());
+        LOG.info("deleted the task:{} node.", taskID.identify());
     }
 
     @Override

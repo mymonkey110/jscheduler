@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.PostConstruct;
+import java.util.List;
 
 /**
  * @author Michael Jiang on 16/3/16.
@@ -40,5 +41,37 @@ public class ZKManager {
 
     public CuratorFramework getClient() {
         return this.client;
+    }
+
+    public boolean checkNodeExist(String path) throws ZKRuntimeException {
+        try {
+            return client.checkExists().forPath(path) != null;
+        } catch (Exception e) {
+            throw new ZKRuntimeException(e);
+        }
+    }
+
+    public void create(String path, byte[] content) throws ZKRuntimeException {
+        try {
+            client.create().forPath(path, content);
+        } catch (Exception e) {
+            throw new ZKRuntimeException(e);
+        }
+    }
+
+    public void delete(String path) throws ZKRuntimeException {
+        try {
+            client.create().forPath(path);
+        } catch (Exception e) {
+            throw new ZKRuntimeException(e);
+        }
+    }
+
+    public List<String> getChildren(String path) throws ZKRuntimeException {
+        try {
+            return client.getChildren().forPath(path);
+        } catch (Exception e) {
+            throw new ZKRuntimeException(e);
+        }
     }
 }
