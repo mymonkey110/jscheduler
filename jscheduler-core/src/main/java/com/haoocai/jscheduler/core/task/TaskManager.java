@@ -1,5 +1,8 @@
 package com.haoocai.jscheduler.core.task;
 
+import com.haoocai.jscheduler.core.app.AppNotFoundException;
+import com.haoocai.jscheduler.core.exception.NamespaceNotExistException;
+
 import java.util.List;
 
 /**
@@ -18,9 +21,9 @@ public interface TaskManager {
      * @param app            app name the task belong to
      * @param taskName       task name
      * @param cronExpression task cronExpression
-     * @throws TaskException task exception
+     * @throws AppNotFoundException task exception
      */
-    void create(String namespace, String app, String taskName, String cronExpression) throws TaskException;
+    void create(String namespace, String app, String taskName, String cronExpression) throws NamespaceNotExistException, AppNotFoundException, TaskExistException;
 
     /**
      * delete task by task id
@@ -40,6 +43,7 @@ public interface TaskManager {
 
     /**
      * get the specified task descriptor by task id
+     *
      * @param taskID task id
      * @return task descriptor
      */

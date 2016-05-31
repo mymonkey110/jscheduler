@@ -1,8 +1,11 @@
 package com.haoocai.jscheduler.web.controller;
 
 import com.haoocai.jscheduler.core.ErrorCode;
+import com.haoocai.jscheduler.core.exception.AbstractCheckedException;
+import com.haoocai.jscheduler.core.exception.NamespaceNotExistException;
 import com.haoocai.jscheduler.core.task.TaskDescriptor;
-import com.haoocai.jscheduler.core.task.TaskException;
+import com.haoocai.jscheduler.core.app.AppNotFoundException;
+import com.haoocai.jscheduler.core.task.TaskExistException;
 import com.haoocai.jscheduler.core.task.TaskID;
 import com.haoocai.jscheduler.core.task.TaskManager;
 import com.haoocai.jscheduler.web.CommonResult;
@@ -32,7 +35,7 @@ class TaskController {
     public CommonResult listTask(@PathVariable String namespace,
                                  @PathVariable String app) {
         List<TaskDescriptor> taskDescriptorList = taskManager.getAppTasks(namespace, app);
-        return new CommonResult<>(ErrorCode.SUCCESS, taskDescriptorList);
+        return new CommonResult<>(taskDescriptorList);
     }
 
     @RequestMapping(value = "/create/{namespace}/{app}/{name}/{cron}", method = RequestMethod.POST)
@@ -42,10 +45,10 @@ class TaskController {
                                    @PathVariable String cron) {
         try {
             taskManager.create(namespace, app, name, cron);
-            return new CommonResult(ErrorCode.SUCCESS);
-        } catch (TaskException e) {
-            LOG.error("create task:{} error:{}.", name, e.getErrorCode(), e);
-            return new CommonResult<>(e.getErrorCode(), "create task error");
+            return CommonResult.successRet();
+        } catch (AbstractCheckedException e) {
+            LOG.error("create task error,namespace:{} app:{} name:{},code:{},error:{}.", namespace, app, name, e.code(), e);
+            return CommonResult.errorOf(e);
         }
     }
 
@@ -54,7 +57,7 @@ class TaskController {
                                 @PathVariable String app,
                                 @PathVariable String name) {
         TaskDescriptor taskDescriptor = taskManager.getSpecTaskDescriptor(new TaskID(namespace, app, name));
-        return new CommonResult<>(ErrorCode.SUCCESS, taskDescriptor);
+        return new CommonResult<>(taskDescriptor);
     }
 
     @RequestMapping(value = "/delete/{namespace}/{app}/{name}", method = RequestMethod.DELETE)
@@ -62,8 +65,6 @@ class TaskController {
                                    @PathVariable String app,
                                    @PathVariable String name) {
         taskManager.delete(new TaskID(namespace, app, name));
-        return new CommonResult(ErrorCode.SUCCESS);
+        return CommonResult.successRet();
     }
-
-
 }

@@ -1,8 +1,10 @@
 package com.haoocai.jscheduler.core.task.impl;
 
 import com.google.common.base.Preconditions;
+import com.haoocai.jscheduler.core.exception.NamespaceNotExistException;
 import com.haoocai.jscheduler.core.task.TaskDescriptor;
-import com.haoocai.jscheduler.core.task.TaskException;
+import com.haoocai.jscheduler.core.app.AppNotFoundException;
+import com.haoocai.jscheduler.core.task.TaskExistException;
 import com.haoocai.jscheduler.core.task.TaskID;
 import com.haoocai.jscheduler.core.task.TaskManager;
 import com.haoocai.jscheduler.core.zk.ZKManager;
@@ -36,16 +38,16 @@ public class ZKTaskManager implements TaskManager {
     }
 
     @Override
-    public void create(String namespace, String app, String taskName, String cronExpression) throws TaskException {
+    public void create(String namespace, String app, String taskName, String cronExpression) throws NamespaceNotExistException, AppNotFoundException, TaskExistException {
         if (!zkManager.checkNodeExist("/" + namespace)) {
-            throw new TaskException(NAMESPACE_NOT_FOUND, "namespace not found");
+            throw new NamespaceNotExistException();
         }
         if (!zkManager.checkNodeExist("/" + namespace + "/" + app)) {
-            throw new TaskException(APP_NOT_FOUND, "app not found");
+            throw new AppNotFoundException();
         }
         String taskPath = "/" + namespace + "/" + app + "/" + taskName;
         if (zkManager.checkNodeExist(taskPath)) {
-            throw new TaskException(TASK_ALREADY_EXIST, "task:" + taskName + " already exist.");
+            throw new TaskExistException();
         }
 
         zkManager.create(taskPath + "/config/cronExpression", cronExpression.getBytes());

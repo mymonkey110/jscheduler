@@ -1,4 +1,4 @@
-package com.haoocai.jscheduler.core;
+package com.haoocai.jscheduler.core.exception;
 
 /**
  * Abstract Base Checked Exception

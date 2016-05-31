@@ -2,7 +2,7 @@ package com.haoocai.jscheduler.web.controller;
 
 import com.haoocai.jscheduler.core.app.AppExistException;
 import com.haoocai.jscheduler.core.app.AppService;
-import com.haoocai.jscheduler.core.app.NamespaceNotExistException;
+import com.haoocai.jscheduler.core.exception.NamespaceNotExistException;
 import com.haoocai.jscheduler.web.CommonResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;

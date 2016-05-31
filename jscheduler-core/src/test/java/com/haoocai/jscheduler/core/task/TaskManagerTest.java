@@ -1,10 +1,10 @@
 package com.haoocai.jscheduler.core.task;
 
 import com.haoocai.jscheduler.core.AbstractBaseTest;
-import com.haoocai.jscheduler.core.ErrorCode;
+import com.haoocai.jscheduler.core.app.AppNotFoundException;
+import com.haoocai.jscheduler.core.exception.NamespaceNotExistException;
 import com.haoocai.jscheduler.core.task.impl.ZKTaskManager;
 import com.haoocai.jscheduler.core.zk.ZKManager;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -44,8 +44,8 @@ public class TaskManagerTest extends AbstractBaseTest {
         try {
             taskManager.create(T_NAMESPACE, T_APP, T_TASK, cronExpression);
             fail("should report T_NAMESPACE not exist!");
-        } catch (TaskException e) {
-            Assert.assertEquals(ErrorCode.NAMESPACE_NOT_FOUND, e.getErrorCode());
+        } catch (NamespaceNotExistException ignored) {
+
         }
 
         verify(zkManager).checkNodeExist(eq("/" + T_NAMESPACE));
@@ -61,8 +61,8 @@ public class TaskManagerTest extends AbstractBaseTest {
         try {
             taskManager.create(T_NAMESPACE, T_APP, T_TASK, cronExpression);
             fail("should report APP not exist!");
-        } catch (TaskException e) {
-            Assert.assertEquals(ErrorCode.APP_NOT_FOUND, e.getErrorCode());
+        } catch (AppNotFoundException ignored) {
+
         }
 
         verify(zkManager).checkNodeExist(eq("/" + T_NAMESPACE));

@@ -1,7 +1,7 @@
 package com.haoocai.jscheduler.web;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.haoocai.jscheduler.core.AbstractCheckedException;
+import com.haoocai.jscheduler.core.exception.AbstractCheckedException;
 
 /**
  * Common Result Encapsulation
