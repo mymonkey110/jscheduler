@@ -6,6 +6,7 @@ import com.haoocai.jscheduler.core.scheduler.SchedulerUnit;
 import com.haoocai.jscheduler.core.task.TaskDescriptor;
 import com.haoocai.jscheduler.core.task.TaskInvoker;
 import com.haoocai.jscheduler.core.task.TaskTracker;
+import com.haoocai.jscheduler.core.zk.ZKManager;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.curator.framework.CuratorFramework;
 import org.slf4j.Logger;
@@ -22,7 +23,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author Michael Jiang on 16/4/5.
  */
 public class ZKTaskTracker extends TimerTask implements TaskTracker {
-    private final CuratorFramework client;
+    private final ZKManager zkManager;
     private final TaskDescriptor taskDescriptor;
     private TaskInvoker taskInvoker;
     private Timer innerTimer;
@@ -30,15 +31,15 @@ public class ZKTaskTracker extends TimerTask implements TaskTracker {
 
     private static Logger LOG = LoggerFactory.getLogger(ZKTaskManager.class);
 
-    public ZKTaskTracker(CuratorFramework client, TaskDescriptor taskDescriptor) {
-        this.client = checkNotNull(client);
+    public ZKTaskTracker(ZKManager zkManager, TaskDescriptor taskDescriptor) {
+        this.zkManager = checkNotNull(zkManager);
         this.taskDescriptor = checkNotNull(taskDescriptor);
     }
 
     @Override
     public void track() {
         LOG.info("start a tacker for app:{} 's task:{}.", taskDescriptor.getApp(), taskDescriptor.getName());
-        taskInvoker = new ZKTaskInvoker(client);
+        taskInvoker = new ZKTaskInvoker(zkManager);
         Date nextRunTime = calcNextRunTime();
         innerTimer = new Timer(taskDescriptor.getApp() + "-" + taskDescriptor.getName() + "-" + "tracker");
         innerTimer.schedule(this, nextRunTime);
@@ -78,7 +79,7 @@ public class ZKTaskTracker extends TimerTask implements TaskTracker {
      */
     private SchedulerUnit choseSchedulerUnit() throws Exception {
         String taskPath = taskDescriptor.taskPath();
-        List<String> servers = client.getChildren().forPath(taskPath + "/servers");
+        List<String> servers = zkManager.getChildren(taskPath + "/servers");
         if (CollectionUtils.isNotEmpty(servers)) {
             String chosenServer = servers.get(random.nextInt(servers.size()));
             String[] ipAddr = chosenServer.split(":");

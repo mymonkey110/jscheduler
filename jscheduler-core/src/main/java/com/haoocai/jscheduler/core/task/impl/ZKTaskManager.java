@@ -86,7 +86,7 @@ public class ZKTaskManager implements TaskManager {
         String taskPath = taskID.identify();
 
         try {
-            String cronExpression = new String(zkManager.getClient().getData().forPath(taskPath + "/config/cronExpression"), UTF8_CHARSET);
+            String cronExpression = new String(zkManager.getClient().getData().forPath(taskPath + "/config/cron"), UTF8_CHARSET);
             return new TaskDescriptor(taskID.getNamespace(), taskID.getApp(), taskID.getName(), cronExpression);
         } catch (Exception e) {
             throw new RuntimeException(e);

@@ -11,7 +11,6 @@ import com.haoocai.jscheduler.core.task.TaskTracker;
 import com.haoocai.jscheduler.core.task.TaskTrackerFactory;
 import com.haoocai.jscheduler.core.task.impl.ZKTaskTracker;
 import com.haoocai.jscheduler.core.zk.ZKManager;
-import org.apache.zookeeper.CreateMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,10 +51,10 @@ class ZKSchedulerService implements SchedulerService {
         String taskPath = taskID.identify();
         try {
             //reset start flag to zk
-            zkManager.getClient().create().withMode(CreateMode.EPHEMERAL).forPath(taskPath + "/status", "RUNNING".getBytes());
+            zkManager.createEphemeralNode(taskPath + "/status", "RUNNING".getBytes());
 
             //start task tracker
-            TaskTracker taskTracker = TaskTrackerFactory.getTaskTracker(taskID, zkManager.getClient());
+            TaskTracker taskTracker = TaskTrackerFactory.getTaskTracker(taskID, zkManager);
             taskTracker.track();
             LOG.info("started task:{} successfully.", taskID);
         } catch (Exception e) {
@@ -68,7 +67,7 @@ class ZKSchedulerService implements SchedulerService {
         LOG.trace("trying to stop task:{}.", taskID);
         String taskPath = taskID.identify();
         try {
-            TaskTracker taskTracker = TaskTrackerFactory.getTaskTracker(taskID, zkManager.getClient());
+            TaskTracker taskTracker = TaskTrackerFactory.getTaskTracker(taskID, zkManager);
             if (taskTracker == null) {
                 throw new RuntimeException("local has no task tracker.");
             }
@@ -117,7 +116,7 @@ class ZKSchedulerService implements SchedulerService {
                     for (String app : apps) {
                         List<TaskDescriptor> taskDescriptorList = getTask(namespace, app);
                         for (TaskDescriptor taskDescriptor : taskDescriptorList) {
-                            TaskTracker taskTracker = new ZKTaskTracker(zkManager.getClient(), taskDescriptor);
+                            TaskTracker taskTracker = new ZKTaskTracker(zkManager, taskDescriptor);
                             taskTracker.track();
                         }
                     }
