@@ -3,7 +3,7 @@ package com.haoocai.jscheduler.core.trigger.impl;
 import com.haoocai.jscheduler.core.task.TaskDescriptor;
 import com.haoocai.jscheduler.core.trigger.PickStrategy;
 import com.haoocai.jscheduler.core.trigger.PickerService;
-import com.haoocai.jscheduler.core.zk.ZKManager;
+import com.haoocai.jscheduler.core.zk.ZKAccessor;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -14,13 +14,13 @@ import javax.annotation.Resource;
 @Service
 public class PickerServiceImpl implements PickerService {
     @Resource
-    private ZKManager zkManager;
+    private ZKAccessor zkAccessor;
 
     @Override
     public void setPickStrategy(TaskDescriptor taskDescriptor, PickStrategy pickStrategy) {
         String taskPath = taskDescriptor.taskPath();
         try {
-            zkManager.getClient().setData().forPath(taskPath+"/config/pickStrategy",pickStrategy.getIdentify().getBytes());
+            zkAccessor.getClient().setData().forPath(taskPath+"/config/pickStrategy",pickStrategy.getIdentify().getBytes());
         } catch (Exception e) {
             e.printStackTrace();
         }

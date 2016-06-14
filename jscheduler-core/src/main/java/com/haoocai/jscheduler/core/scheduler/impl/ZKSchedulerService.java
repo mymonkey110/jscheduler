@@ -10,7 +10,7 @@ import com.haoocai.jscheduler.core.task.TaskID;
 import com.haoocai.jscheduler.core.task.TaskTracker;
 import com.haoocai.jscheduler.core.task.TaskTrackerFactory;
 import com.haoocai.jscheduler.core.task.impl.ZKTaskTracker;
-import com.haoocai.jscheduler.core.zk.ZKManager;
+import com.haoocai.jscheduler.core.zk.ZKAccessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,14 +29,14 @@ import static com.haoocai.jscheduler.core.Constants.UTF8_CHARSET;
  */
 @Service
 class ZKSchedulerService implements SchedulerService {
-    private final ZKManager zkManager;
+    private final ZKAccessor zkAccessor;
     private final JschedulerConfig jschedulerConfig;
 
     private static Logger LOG = LoggerFactory.getLogger(ZKSchedulerService.class);
 
     @Autowired
-    public ZKSchedulerService(ZKManager zkManager, JschedulerConfig jschedulerConfig) {
-        this.zkManager = zkManager;
+    public ZKSchedulerService(ZKAccessor zkAccessor, JschedulerConfig jschedulerConfig) {
+        this.zkAccessor = zkAccessor;
         this.jschedulerConfig = jschedulerConfig;
     }
 
@@ -51,10 +51,10 @@ class ZKSchedulerService implements SchedulerService {
         String taskPath = taskID.identify();
         try {
             //reset start flag to zk
-            zkManager.createEphemeralNode(taskPath + "/status", "RUNNING".getBytes());
+            zkAccessor.createEphemeralNode(taskPath + "/status", "RUNNING".getBytes());
 
             //start task tracker
-            TaskTracker taskTracker = TaskTrackerFactory.getTaskTracker(taskID, zkManager);
+            TaskTracker taskTracker = TaskTrackerFactory.getTaskTracker(taskID, zkAccessor);
             taskTracker.track();
             LOG.info("started task:{} successfully.", taskID);
         } catch (Exception e) {
@@ -67,14 +67,14 @@ class ZKSchedulerService implements SchedulerService {
         LOG.trace("trying to stop task:{}.", taskID);
         String taskPath = taskID.identify();
         try {
-            TaskTracker taskTracker = TaskTrackerFactory.getTaskTracker(taskID, zkManager);
+            TaskTracker taskTracker = TaskTrackerFactory.getTaskTracker(taskID, zkAccessor);
             if (taskTracker == null) {
                 throw new RuntimeException("local has no task tracker.");
             }
             //cancel local task tracker
             taskTracker.untrack();
             //set untrack flag to zk
-            zkManager.getClient().delete().forPath(taskPath + "/status");
+            zkAccessor.getClient().delete().forPath(taskPath + "/status");
         } catch (Exception e) {
             LOG.error("stop task:{} error:{}.", taskID, e.getMessage(), e);
         }
@@ -87,7 +87,7 @@ class ZKSchedulerService implements SchedulerService {
         List<SchedulerUnit> schedulerUnitList = new ArrayList<>();
         List<String> children;
         try {
-            children = zkManager.getClient().getChildren().forPath(taskID.identify() + "/servers");
+            children = zkAccessor.getClient().getChildren().forPath(taskID.identify() + "/servers");
         } catch (Exception e) {
             throw new SchedulerException(e);
         }
@@ -111,12 +111,12 @@ class ZKSchedulerService implements SchedulerService {
             for (String namespace : namespaces) {
                 try {
                     initNamespace(namespace);
-                    List<String> apps = zkManager.getChildren("/" + namespace);
+                    List<String> apps = zkAccessor.getChildren("/" + namespace);
                     LOG.info("namespace:{} has apps:{}.", namespace, apps);
                     for (String app : apps) {
                         List<TaskDescriptor> taskDescriptorList = getTask(namespace, app);
                         for (TaskDescriptor taskDescriptor : taskDescriptorList) {
-                            TaskTracker taskTracker = new ZKTaskTracker(zkManager, taskDescriptor);
+                            TaskTracker taskTracker = new ZKTaskTracker(zkAccessor, taskDescriptor);
                             taskTracker.track();
                         }
                     }
@@ -139,9 +139,9 @@ class ZKSchedulerService implements SchedulerService {
          */
         private void initNamespace(String namespace) throws Exception {
             String namespacePath = "/" + namespace;
-            if (!zkManager.checkNodeExist(namespacePath)) {
+            if (!zkAccessor.checkNodeExist(namespacePath)) {
                 LOG.info("namespace:{} doesn't exist,going to create node.", namespace);
-                zkManager.create(namespacePath, new byte[0]);
+                zkAccessor.create(namespacePath, new byte[0]);
             } else {
                 LOG.info("namespace:{} exist.", namespace);
             }
@@ -151,11 +151,11 @@ class ZKSchedulerService implements SchedulerService {
 
     private List<TaskDescriptor> getTask(String namespace, String app) {
         List<TaskDescriptor> taskDescriptors = new ArrayList<>();
-        List<String> tasks = zkManager.getChildren("/" + namespace + "/" + app);
+        List<String> tasks = zkAccessor.getChildren("/" + namespace + "/" + app);
         LOG.info("namespace:{} app:{} tasks:{}.", namespace, app, tasks);
         for (String taskName : tasks) {
-            byte[] data = zkManager.getData("/" + namespace + "/" + app + "/" + taskName + "/config/cron");
-            new TaskDescriptor(namespace, app, taskName, new String(data, UTF8_CHARSET));
+            byte[] data = zkAccessor.getData("/" + namespace + "/" + app + "/" + taskName + "/config/cron");
+            taskDescriptors.add(new TaskDescriptor(namespace, app, taskName, new String(data, UTF8_CHARSET)));
         }
         return taskDescriptors;
     }

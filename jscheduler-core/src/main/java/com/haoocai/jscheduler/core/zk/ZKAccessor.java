@@ -19,15 +19,15 @@ import java.util.List;
  * @author Michael Jiang on 16/3/16.
  */
 @Repository
-public class ZKManager {
+public class ZKAccessor {
     private final JschedulerConfig jschedulerConfig;
 
     private CuratorFramework client;
 
-    private static Logger LOG = LoggerFactory.getLogger(ZKManager.class);
+    private static Logger LOG = LoggerFactory.getLogger(ZKAccessor.class);
 
     @Autowired
-    public ZKManager(JschedulerConfig jschedulerConfig) {
+    public ZKAccessor(JschedulerConfig jschedulerConfig) {
         this.jschedulerConfig = jschedulerConfig;
     }
 

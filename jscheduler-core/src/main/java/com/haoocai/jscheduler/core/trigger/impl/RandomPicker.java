@@ -4,7 +4,7 @@ import com.haoocai.jscheduler.core.scheduler.SchedulerUnit;
 import com.haoocai.jscheduler.core.task.TaskDescriptor;
 import com.haoocai.jscheduler.core.trigger.PickStrategy;
 import com.haoocai.jscheduler.core.trigger.Picker;
-import com.haoocai.jscheduler.core.zk.ZKManager;
+import com.haoocai.jscheduler.core.zk.ZKAccessor;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,14 +21,14 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author Michael Jiang on 16/3/16.
  */
 public class RandomPicker implements Picker {
-    private ZKManager zkManager;
+    private ZKAccessor zkAccessor;
     private TaskDescriptor taskDescriptor;
 
     private static Logger LOG = LoggerFactory.getLogger(RandomPicker.class);
     private static Random random = new Random(System.currentTimeMillis());
 
-    public RandomPicker(TaskDescriptor taskDescriptor, ZKManager zkManager) {
-        this.zkManager = checkNotNull(zkManager);
+    public RandomPicker(TaskDescriptor taskDescriptor, ZKAccessor zkAccessor) {
+        this.zkAccessor = checkNotNull(zkAccessor);
         this.taskDescriptor = checkNotNull(taskDescriptor);
     }
 
@@ -40,7 +40,7 @@ public class RandomPicker implements Picker {
     @Override
     public SchedulerUnit assign() throws Exception {
         String taskNodePath = taskDescriptor.getApp() + "/" + taskDescriptor.getName();
-        List<String> children = zkManager.getClient().getChildren().forPath(taskNodePath);
+        List<String> children = zkAccessor.getClient().getChildren().forPath(taskNodePath);
         if (CollectionUtils.isEmpty(children)) {
             LOG.warn("not found available scheduler unit.");
             return null;

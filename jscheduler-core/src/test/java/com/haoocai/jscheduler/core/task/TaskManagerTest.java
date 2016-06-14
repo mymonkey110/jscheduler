@@ -4,7 +4,7 @@ import com.haoocai.jscheduler.core.AbstractBaseTest;
 import com.haoocai.jscheduler.core.app.AppNotFoundException;
 import com.haoocai.jscheduler.core.exception.NamespaceNotExistException;
 import com.haoocai.jscheduler.core.task.impl.ZKTaskManager;
-import com.haoocai.jscheduler.core.zk.ZKManager;
+import com.haoocai.jscheduler.core.zk.ZKAccessor;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -21,7 +21,7 @@ import static org.mockito.Mockito.*;
  */
 public class TaskManagerTest extends AbstractBaseTest {
     @Mock
-    private ZKManager zkManager;
+    private ZKAccessor zkAccessor;
 
     @InjectMocks
     private ZKTaskManager taskManager;
@@ -39,7 +39,7 @@ public class TaskManagerTest extends AbstractBaseTest {
 
     @Test
     public void createWithNamespaceNotExist() throws Exception {
-        when(zkManager.checkNodeExist(anyString())).thenReturn(false);
+        when(zkAccessor.checkNodeExist(anyString())).thenReturn(false);
 
         try {
             taskManager.create(T_NAMESPACE, T_APP, T_TASK, cronExpression);
@@ -48,15 +48,15 @@ public class TaskManagerTest extends AbstractBaseTest {
 
         }
 
-        verify(zkManager).checkNodeExist(eq("/" + T_NAMESPACE));
-        verify(zkManager, never()).checkNodeExist(eq("/" + T_NAMESPACE + "/" + T_APP));
+        verify(zkAccessor).checkNodeExist(eq("/" + T_NAMESPACE));
+        verify(zkAccessor, never()).checkNodeExist(eq("/" + T_NAMESPACE + "/" + T_APP));
     }
 
 
     @Test
     public void createWithAppNotExist() throws Exception {
-        when(zkManager.checkNodeExist("/" + T_NAMESPACE)).thenReturn(true);
-        when(zkManager.checkNodeExist("/" + T_NAMESPACE + "/" + T_APP)).thenReturn(false);
+        when(zkAccessor.checkNodeExist("/" + T_NAMESPACE)).thenReturn(true);
+        when(zkAccessor.checkNodeExist("/" + T_NAMESPACE + "/" + T_APP)).thenReturn(false);
 
         try {
             taskManager.create(T_NAMESPACE, T_APP, T_TASK, cronExpression);
@@ -65,33 +65,33 @@ public class TaskManagerTest extends AbstractBaseTest {
 
         }
 
-        verify(zkManager).checkNodeExist(eq("/" + T_NAMESPACE));
-        verify(zkManager).checkNodeExist("/" + T_NAMESPACE + "/" + T_APP);
+        verify(zkAccessor).checkNodeExist(eq("/" + T_NAMESPACE));
+        verify(zkAccessor).checkNodeExist("/" + T_NAMESPACE + "/" + T_APP);
     }
 
     @Test
     public void create() throws Exception {
-        when(zkManager.checkNodeExist("/" + T_NAMESPACE)).thenReturn(true);
-        when(zkManager.checkNodeExist("/" + T_NAMESPACE + "/" + T_APP)).thenReturn(true);
-        when(zkManager.checkNodeExist(T_ID)).thenReturn(false);
-        doNothing().when(zkManager).create(T_ID + "/config/cronExpression", cronExpression.getBytes());
+        when(zkAccessor.checkNodeExist("/" + T_NAMESPACE)).thenReturn(true);
+        when(zkAccessor.checkNodeExist("/" + T_NAMESPACE + "/" + T_APP)).thenReturn(true);
+        when(zkAccessor.checkNodeExist(T_ID)).thenReturn(false);
+        doNothing().when(zkAccessor).create(T_ID + "/config/cronExpression", cronExpression.getBytes());
 
         taskManager.create(T_NAMESPACE, T_APP, T_TASK, cronExpression);
 
-        verify(zkManager).checkNodeExist(eq("/" + T_NAMESPACE));
-        verify(zkManager).checkNodeExist("/" + T_NAMESPACE + "/" + T_APP);
-        verify(zkManager).checkNodeExist(T_ID);
-        verify(zkManager).create(T_ID + "/config/cronExpression", cronExpression.getBytes());
+        verify(zkAccessor).checkNodeExist(eq("/" + T_NAMESPACE));
+        verify(zkAccessor).checkNodeExist("/" + T_NAMESPACE + "/" + T_APP);
+        verify(zkAccessor).checkNodeExist(T_ID);
+        verify(zkAccessor).create(T_ID + "/config/cronExpression", cronExpression.getBytes());
     }
 
     @Test
     public void delete() throws Exception {
         TaskID taskID = new TaskID(T_NAMESPACE, T_APP, T_TASK);
-        doNothing().when(zkManager).delete(T_ID);
+        doNothing().when(zkAccessor).delete(T_ID);
 
         taskManager.delete(taskID);
 
-        verify(zkManager).delete(T_ID);
+        verify(zkAccessor).delete(T_ID);
     }
 
     @Test

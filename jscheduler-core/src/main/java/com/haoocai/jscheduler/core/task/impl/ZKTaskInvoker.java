@@ -3,7 +3,7 @@ package com.haoocai.jscheduler.core.task.impl;
 import com.haoocai.jscheduler.core.scheduler.SchedulerUnit;
 import com.haoocai.jscheduler.core.task.TaskDescriptor;
 import com.haoocai.jscheduler.core.task.TaskInvoker;
-import com.haoocai.jscheduler.core.zk.ZKManager;
+import com.haoocai.jscheduler.core.zk.ZKAccessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,12 +15,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author Michael Jiang on 16/3/16.
  */
 class ZKTaskInvoker implements TaskInvoker {
-    private final ZKManager zkManager;
+    private final ZKAccessor zkAccessor;
 
     private static Logger LOG = LoggerFactory.getLogger(ZKTaskInvoker.class);
 
-    ZKTaskInvoker(ZKManager zkManager) {
-        this.zkManager = zkManager;
+    ZKTaskInvoker(ZKAccessor zkAccessor) {
+        this.zkAccessor = zkAccessor;
     }
 
     //todo add failure & success scenario handler
@@ -31,7 +31,7 @@ class ZKTaskInvoker implements TaskInvoker {
 
         LOG.trace("invoke task:{} on scheduler unit:{}.", taskDescriptor, schedulerUnit);
         try {
-            zkManager.setData(taskDescriptor.taskPath() + "/" + schedulerUnit.identify(), Long.toHexString(System.currentTimeMillis()).getBytes());
+            zkAccessor.setData(taskDescriptor.taskPath() + "/" + schedulerUnit.identify(), Long.toHexString(System.currentTimeMillis()).getBytes());
             //todo success handler
         } catch (Exception e) {
             LOG.info("invoke error:{}.", e.getMessage(), e);
