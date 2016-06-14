@@ -6,6 +6,7 @@ import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.curator.utils.ZKPaths;
+import org.apache.zookeeper.CreateMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,13 +54,13 @@ public class ZKManager {
     }
 
     /**
-     * create the specify node
+     * create permanent node with specify path
      *
      * @param path    node absolute path
      * @param content node data
      * @throws ZKRuntimeException
      */
-    public void create(String path, byte[] content) throws ZKRuntimeException {
+    public void create(String path, byte[] content) {
         try {
             client.create().forPath(path, content);
         } catch (Exception e) {
@@ -68,9 +69,23 @@ public class ZKManager {
     }
 
     /**
-     * create node with parent path
+     * create ephemeral node with specify path
+     *
+     * @param path    node absolute path
+     * @param content node data
+     */
+    public void createEphemeralNode(String path, byte[] content) {
+        try {
+            client.create().withMode(CreateMode.EPHEMERAL).forPath(path, content);
+        } catch (Exception e) {
+            throw new ZKRuntimeException(e);
+        }
+    }
+
+    /**
+     * create permanent node with parent path
      * <p>
-     * auto create parent path when parent path is not exist.
+     * If parent path is not exist, automatic create it.
      * </p>
      *
      * @param parentPath parent path

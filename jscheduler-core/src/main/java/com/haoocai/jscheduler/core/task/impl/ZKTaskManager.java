@@ -2,9 +2,9 @@ package com.haoocai.jscheduler.core.task.impl;
 
 import com.google.common.base.Preconditions;
 import com.haoocai.jscheduler.core.CronExpression;
+import com.haoocai.jscheduler.core.app.AppNotFoundException;
 import com.haoocai.jscheduler.core.exception.NamespaceNotExistException;
 import com.haoocai.jscheduler.core.task.*;
-import com.haoocai.jscheduler.core.app.AppNotFoundException;
 import com.haoocai.jscheduler.core.zk.ZKManager;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.haoocai.jscheduler.core.Constants.ENCODING;
-import static com.haoocai.jscheduler.core.ErrorCode.*;
 
 /**
  * Zookeeper Task Manager
@@ -39,7 +38,8 @@ public class ZKTaskManager implements TaskManager {
     }
 
     @Override
-    public void create(String namespace, String app, String taskName, String cronExpression) throws NamespaceNotExistException, AppNotFoundException, TaskExistException, CronExpressionException {
+    public void create(String namespace, String app, String taskName, String cronExpression)
+            throws NamespaceNotExistException, AppNotFoundException, TaskExistException, CronExpressionException {
         if (!CronExpression.isValidExpression(cronExpression)) {
             throw new CronExpressionException();
         }
@@ -54,13 +54,13 @@ public class ZKTaskManager implements TaskManager {
             throw new TaskExistException();
         }
 
-        //zkManager.create(taskPath + "/config/cronExpression", cronExpression.getBytes());
         zkManager.mkdirAndCreate(taskPath + "/config", "cron", cronExpression.getBytes(CHARSET));
+        LOG.info("create task:{} with cron:{} success.", taskName, cronExpression);
     }
 
     @Override
     public void delete(TaskID taskID) {
-        LOG.trace("deleting the task:{}.", taskID);
+        LOG.info("deleting the task:{}.", taskID);
         zkManager.delete(taskID.identify());
         LOG.info("deleted the task:{} node.", taskID.identify());
     }
@@ -69,12 +69,7 @@ public class ZKTaskManager implements TaskManager {
     public List<TaskDescriptor> getAppTasks(String namespace, String app) {
         Preconditions.checkArgument(StringUtils.isNotBlank(app), "app name can't be blank!");
 
-        List<String> children;
-        try {
-            children = zkManager.getClient().getChildren().forPath("/" + namespace + "/" + app);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        List<String> children = zkManager.getChildren("/" + namespace + "/" + app);
 
         List<TaskDescriptor> taskList = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(children)) {

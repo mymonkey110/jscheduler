@@ -113,7 +113,7 @@ class ZKSchedulerService implements SchedulerService {
             for (String namespace : namespaces) {
                 try {
                     initNamespace(namespace);
-                    List<String> apps = zkManager.getClient().getChildren().forPath("/" + namespace);
+                    List<String> apps = zkManager.getChildren("/" + namespace);
                     LOG.info("namespace:{} has apps:{}.", namespace, apps);
                     for (String app : apps) {
                         List<TaskDescriptor> taskDescriptorList = getTask(namespace, app);
