@@ -38,11 +38,11 @@ class TaskController {
         return new CommonResult<>(taskDescriptorList);
     }
 
-    @RequestMapping(value = "/create/{namespace}/{app}/{name}/{cron}", method = RequestMethod.POST)
+    @RequestMapping(value = "/create/{namespace}/{app}/{name}", method = RequestMethod.POST)
     public CommonResult createTask(@PathVariable String namespace,
                                    @PathVariable String app,
                                    @PathVariable String name,
-                                   @PathVariable String cron) {
+                                   @RequestParam String cron) {
         try {
             taskManager.create(namespace, app, name, cron);
             return CommonResult.successRet();

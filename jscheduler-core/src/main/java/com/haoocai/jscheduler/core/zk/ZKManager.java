@@ -5,6 +5,7 @@ import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.ExponentialBackoffRetry;
+import org.apache.curator.utils.ZKPaths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +52,13 @@ public class ZKManager {
         }
     }
 
+    /**
+     * create the specify node
+     *
+     * @param path    node absolute path
+     * @param content node data
+     * @throws ZKRuntimeException
+     */
     public void create(String path, byte[] content) throws ZKRuntimeException {
         try {
             client.create().forPath(path, content);
@@ -59,7 +67,32 @@ public class ZKManager {
         }
     }
 
-    public void delete(String path) throws ZKRuntimeException {
+    /**
+     * create node with parent path
+     * <p>
+     * auto create parent path when parent path is not exist.
+     * </p>
+     *
+     * @param parentPath parent path
+     * @param node       node name
+     * @param content    node data
+     */
+    public void mkdirAndCreate(String parentPath, String node, byte[] content) {
+        try {
+            ZKPaths.mkdirs(client.getZookeeperClient().getZooKeeper(), parentPath);
+            create(parentPath + "/" + node, content);
+        } catch (Exception e) {
+            throw new ZKRuntimeException(e);
+        }
+    }
+
+    /**
+     * delete the specify node
+     *
+     * @param path node absolute path
+     * @throws ZKRuntimeException
+     */
+    public void delete(String path) {
         try {
             client.create().forPath(path);
         } catch (Exception e) {
@@ -67,7 +100,14 @@ public class ZKManager {
         }
     }
 
-    public List<String> getChildren(String path) throws ZKRuntimeException {
+    /**
+     * get the specify node children
+     *
+     * @param path node absolute path
+     * @return children
+     * @throws ZKRuntimeException
+     */
+    public List<String> getChildren(String path) {
         try {
             return client.getChildren().forPath(path);
         } catch (Exception e) {

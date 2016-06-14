@@ -23,7 +23,7 @@ public interface TaskManager {
      * @param cronExpression task cronExpression
      * @throws AppNotFoundException task exception
      */
-    void create(String namespace, String app, String taskName, String cronExpression) throws NamespaceNotExistException, AppNotFoundException, TaskExistException;
+    void create(String namespace, String app, String taskName, String cronExpression) throws NamespaceNotExistException, AppNotFoundException, TaskExistException, CronExpressionException;
 
     /**
      * delete task by task id

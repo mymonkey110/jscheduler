@@ -1,12 +1,10 @@
 package com.haoocai.jscheduler.core.task.impl;
 
 import com.google.common.base.Preconditions;
+import com.haoocai.jscheduler.core.CronExpression;
 import com.haoocai.jscheduler.core.exception.NamespaceNotExistException;
-import com.haoocai.jscheduler.core.task.TaskDescriptor;
+import com.haoocai.jscheduler.core.task.*;
 import com.haoocai.jscheduler.core.app.AppNotFoundException;
-import com.haoocai.jscheduler.core.task.TaskExistException;
-import com.haoocai.jscheduler.core.task.TaskID;
-import com.haoocai.jscheduler.core.task.TaskManager;
 import com.haoocai.jscheduler.core.zk.ZKManager;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -15,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,13 +31,18 @@ public class ZKTaskManager implements TaskManager {
 
     private static Logger LOG = LoggerFactory.getLogger(ZKTaskManager.class);
 
+    private final static Charset CHARSET = Charset.forName("UTF-8");
+
     @Autowired
     public ZKTaskManager(ZKManager zkManager) {
         this.zkManager = zkManager;
     }
 
     @Override
-    public void create(String namespace, String app, String taskName, String cronExpression) throws NamespaceNotExistException, AppNotFoundException, TaskExistException {
+    public void create(String namespace, String app, String taskName, String cronExpression) throws NamespaceNotExistException, AppNotFoundException, TaskExistException, CronExpressionException {
+        if (!CronExpression.isValidExpression(cronExpression)) {
+            throw new CronExpressionException();
+        }
         if (!zkManager.checkNodeExist("/" + namespace)) {
             throw new NamespaceNotExistException();
         }
@@ -50,7 +54,8 @@ public class ZKTaskManager implements TaskManager {
             throw new TaskExistException();
         }
 
-        zkManager.create(taskPath + "/config/cronExpression", cronExpression.getBytes());
+        //zkManager.create(taskPath + "/config/cronExpression", cronExpression.getBytes());
+        zkManager.mkdirAndCreate(taskPath + "/config", "cron", cronExpression.getBytes(CHARSET));
     }
 
     @Override

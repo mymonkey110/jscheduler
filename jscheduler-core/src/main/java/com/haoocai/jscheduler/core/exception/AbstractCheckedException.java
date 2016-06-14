@@ -15,22 +15,6 @@ public abstract class AbstractCheckedException extends Exception {
     public AbstractCheckedException() {
     }
 
-    public AbstractCheckedException(String message) {
-        super(message);
-    }
-
-    public AbstractCheckedException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public AbstractCheckedException(Throwable cause) {
-        super(cause);
-    }
-
-    public AbstractCheckedException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
-    }
-
     protected abstract ErrorCode errorCode();
 
     public int code() {
@@ -42,7 +26,7 @@ public abstract class AbstractCheckedException extends Exception {
     }
 
     protected enum ErrorCode {
-        SUCCESS(1001, "success"),
+        SUCCESS(1000, "success"),
         PARAM_ERROR(1001, "parameter error"),
         ILLEGAL_REQUEST(1002, "illegal request"),
         SYS_ERROR(1003, "system error"),
@@ -52,6 +36,7 @@ public abstract class AbstractCheckedException extends Exception {
         APP_ALREADY_EXIST(2004, "app already exist"),
         TASK_NOT_FOUND(2005, "task not found"),
         TASK_ALREADY_EXIST(2006, "task already exist"),
+        CRON_EXPRESSION_ERROR(2007, "cron expression error"),
         ZOOKEEPER_ERROR(3001, "zookeeper error"),
         NODE_NOT_EXIST(3002, "node not exist"),
         NODE_ALREADY_EXIST(3003, "node already exist"),
