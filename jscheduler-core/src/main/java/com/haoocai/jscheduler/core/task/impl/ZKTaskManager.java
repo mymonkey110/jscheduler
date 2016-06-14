@@ -17,7 +17,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.haoocai.jscheduler.core.Constants.ENCODING;
+import static com.haoocai.jscheduler.core.Constants.UTF8_CHARSET;
 
 /**
  * Zookeeper Task Manager
@@ -86,7 +86,7 @@ public class ZKTaskManager implements TaskManager {
         String taskPath = taskID.identify();
 
         try {
-            String cronExpression = new String(zkManager.getClient().getData().forPath(taskPath + "/config/cronExpression"), ENCODING);
+            String cronExpression = new String(zkManager.getClient().getData().forPath(taskPath + "/config/cronExpression"), UTF8_CHARSET);
             return new TaskDescriptor(taskID.getNamespace(), taskID.getApp(), taskID.getName(), cronExpression);
         } catch (Exception e) {
             throw new RuntimeException(e);

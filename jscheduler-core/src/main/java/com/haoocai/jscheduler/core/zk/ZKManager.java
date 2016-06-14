@@ -129,4 +129,18 @@ public class ZKManager {
             throw new ZKRuntimeException(e);
         }
     }
+
+    /**
+     * get the specify node data
+     *
+     * @param path node absolute path
+     * @return node data
+     */
+    public byte[] getData(String path) {
+        try {
+            return client.getData().forPath(path);
+        } catch (Exception e) {
+            throw new ZKRuntimeException(e);
+        }
+    }
 }

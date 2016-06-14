@@ -12,7 +12,6 @@ import com.haoocai.jscheduler.core.task.TaskTrackerFactory;
 import com.haoocai.jscheduler.core.task.impl.ZKTaskTracker;
 import com.haoocai.jscheduler.core.zk.ZKManager;
 import org.apache.zookeeper.CreateMode;
-import org.apache.zookeeper.data.Stat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +21,7 @@ import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.haoocai.jscheduler.core.Constants.ENCODING;
+import static com.haoocai.jscheduler.core.Constants.UTF8_CHARSET;
 
 /**
  * Scheduler Service with Zookeeper implementation
@@ -141,10 +140,9 @@ class ZKSchedulerService implements SchedulerService {
          */
         private void initNamespace(String namespace) throws Exception {
             String namespacePath = "/" + namespace;
-            Stat stat = zkManager.getClient().checkExists().forPath(namespacePath);
-            if (stat == null) {
+            if (!zkManager.checkNodeExist(namespacePath)) {
                 LOG.info("namespace:{} doesn't exist,going to create node.", namespace);
-                zkManager.getClient().create().withMode(CreateMode.PERSISTENT).forPath(namespacePath, new byte[0]);
+                zkManager.create(namespacePath, new byte[0]);
             } else {
                 LOG.info("namespace:{} exist.", namespace);
             }
@@ -152,14 +150,13 @@ class ZKSchedulerService implements SchedulerService {
     }
 
 
-    private List<TaskDescriptor> getTask(String namespace, String app) throws Exception {
+    private List<TaskDescriptor> getTask(String namespace, String app) {
         List<TaskDescriptor> taskDescriptors = new ArrayList<>();
-        List<String> tasks;
-        tasks = zkManager.getClient().getChildren().forPath("/" + namespace + "/" + app);
+        List<String> tasks = zkManager.getChildren("/" + namespace + "/" + app);
         LOG.info("namespace:{} app:{} tasks:{}.", namespace, app, tasks);
         for (String taskName : tasks) {
-            byte[] data = zkManager.getClient().getData().forPath("/" + namespace + "/" + app + "/" + taskName + "/config/cronExpression");
-            new TaskDescriptor(namespace, app, taskName, new String(data, ENCODING));
+            byte[] data = zkManager.getData("/" + namespace + "/" + app + "/" + taskName + "/config/cron");
+            new TaskDescriptor(namespace, app, taskName, new String(data, UTF8_CHARSET));
         }
         return taskDescriptors;
     }
