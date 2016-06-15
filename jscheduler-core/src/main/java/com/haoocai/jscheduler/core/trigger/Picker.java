@@ -8,7 +8,5 @@ import com.haoocai.jscheduler.core.task.TaskDescriptor;
  */
 public interface Picker {
 
-    PickStrategy identify();
-
     SchedulerUnit assign() throws Exception;
 }

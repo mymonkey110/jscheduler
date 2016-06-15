@@ -1,6 +1,4 @@
-package com.haoocai.jscheduler.core.app;
-
-import com.haoocai.jscheduler.core.exception.AbstractCheckedException;
+package com.haoocai.jscheduler.core.exception;
 
 /**
  * @author Michael Jiang on 16/3/25.

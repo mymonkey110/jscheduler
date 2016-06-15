@@ -1,6 +1,4 @@
-package com.haoocai.jscheduler.core.task;
-
-import com.haoocai.jscheduler.core.exception.AbstractCheckedException;
+package com.haoocai.jscheduler.core.exception;
 
 /**
  * Cron Expression Error Exception

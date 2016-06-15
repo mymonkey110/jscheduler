@@ -2,8 +2,10 @@ package com.haoocai.jscheduler.core.task.impl;
 
 import com.google.common.base.Preconditions;
 import com.haoocai.jscheduler.core.CronExpression;
-import com.haoocai.jscheduler.core.app.AppNotFoundException;
+import com.haoocai.jscheduler.core.exception.AppNotFoundException;
+import com.haoocai.jscheduler.core.exception.CronExpressionException;
 import com.haoocai.jscheduler.core.exception.NamespaceNotExistException;
+import com.haoocai.jscheduler.core.exception.TaskExistException;
 import com.haoocai.jscheduler.core.task.*;
 import com.haoocai.jscheduler.core.zk.ZKAccessor;
 import org.apache.commons.collections.CollectionUtils;

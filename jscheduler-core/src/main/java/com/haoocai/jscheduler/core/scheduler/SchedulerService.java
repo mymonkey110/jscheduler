@@ -35,5 +35,5 @@ public interface SchedulerService {
      * @param taskID task identify
      * @return scheduler units
      */
-    List<SchedulerUnit> getAllSchedulerUnits(TaskID taskID) throws SchedulerException;
+    List<SchedulerUnit> getAllSchedulerUnits(TaskID taskID);
 }

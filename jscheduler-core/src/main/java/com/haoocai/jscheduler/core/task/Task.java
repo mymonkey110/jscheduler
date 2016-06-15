@@ -1,39 +1,70 @@
 package com.haoocai.jscheduler.core.task;
 
+import com.haoocai.jscheduler.core.exception.TaskNotFoundException;
+import com.haoocai.jscheduler.core.trigger.PickStrategy;
 import com.haoocai.jscheduler.core.zk.ZKAccessor;
-import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Service;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
+import javax.annotation.Resource;
 
 /**
  * Task Domain Object
  *
  * @author Michael Jiang on 16/6/14.
  */
+@Service
 public class Task {
-    private final ZKAccessor zkAccessor;
-    private final String namespace;
-    private final String app;
-    private final String name;
 
-    Task(ZKAccessor zkAccessor, String namespace, String app, String name) {
-        checkArgument(StringUtils.isNotBlank(namespace) && StringUtils.isNotBlank(app) && StringUtils.isNotBlank(name));
+    @Resource
+    private ZKAccessor zkAccessor;
 
-        this.zkAccessor = checkNotNull(zkAccessor);
-        this.namespace = namespace;
-        this.app = app;
-        this.name = name;
+    private TaskID taskID;
+
+    private ConfigNode configNode;
+
+    private ServerNode serverNode;
+
+    public Task() {
+    }
+
+    Task(TaskID taskID, String cronExpression) {
+        this(taskID, cronExpression, PickStrategy.RANDOM);
+    }
+
+    Task(TaskID taskID, String cronExpression, PickStrategy pickStrategy) {
+        this.taskID = taskID;
+        this.serverNode = new ServerNode(zkAccessor, taskID);
+        this.configNode = new ConfigNode(zkAccessor, taskID, cronExpression, pickStrategy);
+    }
+
+    public void setZkAccessor(ZKAccessor zkAccessor) {
+        this.zkAccessor = zkAccessor;
+    }
+
+    public TaskID getTaskID() {
+        return taskID;
     }
 
     public void init() {
+        //create task node first
+        zkAccessor.create(taskID.identify(), new byte[0]);
+
+        configNode.init();
+        serverNode.init();
+    }
+
+    public Task load(TaskID taskID) throws TaskNotFoundException {
+        if (!zkAccessor.checkNodeExist(taskID.identify())) {
+            throw new TaskNotFoundException();
+        }
+
 
     }
 
-    public void updateCron(String newCronExpression) {
-
+    //todo set task tracker cron expression
+    public void setCronExpr(String newCronExpression) {
+        configNode.setCronExpr(newCronExpression);
     }
-
 
 
 }

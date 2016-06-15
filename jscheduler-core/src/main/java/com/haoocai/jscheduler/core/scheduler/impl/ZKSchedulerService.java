@@ -2,14 +2,13 @@ package com.haoocai.jscheduler.core.scheduler.impl;
 
 import com.google.common.base.Preconditions;
 import com.haoocai.jscheduler.core.JschedulerConfig;
-import com.haoocai.jscheduler.core.scheduler.SchedulerException;
 import com.haoocai.jscheduler.core.scheduler.SchedulerService;
 import com.haoocai.jscheduler.core.scheduler.SchedulerUnit;
 import com.haoocai.jscheduler.core.task.TaskDescriptor;
 import com.haoocai.jscheduler.core.task.TaskID;
-import com.haoocai.jscheduler.core.task.TaskTracker;
-import com.haoocai.jscheduler.core.task.TaskTrackerFactory;
-import com.haoocai.jscheduler.core.task.impl.ZKTaskTracker;
+import com.haoocai.jscheduler.core.tracker.TaskTracker;
+import com.haoocai.jscheduler.core.tracker.TaskTrackerFactory;
+import com.haoocai.jscheduler.core.tracker.ZKTaskTracker;
 import com.haoocai.jscheduler.core.zk.ZKAccessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,12 +84,7 @@ class ZKSchedulerService implements SchedulerService {
         Preconditions.checkNotNull(taskID);
 
         List<SchedulerUnit> schedulerUnitList = new ArrayList<>();
-        List<String> children;
-        try {
-            children = zkAccessor.getClient().getChildren().forPath(taskID.identify() + "/servers");
-        } catch (Exception e) {
-            throw new SchedulerException(e);
-        }
+        List<String> children = zkAccessor.getChildren(taskID.identify() + "/servers");
 
         for (String child : children) {
             String[] addr = child.split(":");

@@ -1,7 +1,8 @@
-package com.haoocai.jscheduler.core.task;
+package com.haoocai.jscheduler.core.tracker;
 
 import com.google.common.base.Preconditions;
-import com.haoocai.jscheduler.core.task.impl.ZKTaskTracker;
+import com.haoocai.jscheduler.core.task.TaskDescriptor;
+import com.haoocai.jscheduler.core.task.TaskID;
 import com.haoocai.jscheduler.core.zk.ZKAccessor;
 
 import java.util.Map;

@@ -1,4 +1,4 @@
-package com.haoocai.jscheduler.core.task;
+package com.haoocai.jscheduler.core.exception;
 
 import com.haoocai.jscheduler.core.exception.AbstractCheckedException;
 

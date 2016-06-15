@@ -1,11 +1,7 @@
 package com.haoocai.jscheduler.web.controller;
 
-import com.haoocai.jscheduler.core.ErrorCode;
 import com.haoocai.jscheduler.core.exception.AbstractCheckedException;
-import com.haoocai.jscheduler.core.exception.NamespaceNotExistException;
 import com.haoocai.jscheduler.core.task.TaskDescriptor;
-import com.haoocai.jscheduler.core.app.AppNotFoundException;
-import com.haoocai.jscheduler.core.task.TaskExistException;
 import com.haoocai.jscheduler.core.task.TaskID;
 import com.haoocai.jscheduler.core.task.TaskManager;
 import com.haoocai.jscheduler.web.CommonResult;

@@ -2,6 +2,8 @@ package com.haoocai.jscheduler.core.trigger.impl;
 
 import com.haoocai.jscheduler.core.scheduler.SchedulerUnit;
 import com.haoocai.jscheduler.core.task.TaskDescriptor;
+import com.haoocai.jscheduler.core.task.TaskID;
+import com.haoocai.jscheduler.core.trigger.AbstractPickStrategy;
 import com.haoocai.jscheduler.core.trigger.PickStrategy;
 import com.haoocai.jscheduler.core.trigger.Picker;
 import com.haoocai.jscheduler.core.zk.ZKAccessor;
@@ -16,15 +18,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * @author Michael Jiang on 16/4/1.
  */
-public class RoundRobinPicker implements Picker {
-    private ZKAccessor zkAccessor;
-    private TaskDescriptor taskDescriptor;
+public class RoundRobinPicker extends AbstractPickStrategy {
+
 
     private static Logger LOG = LoggerFactory.getLogger(RoundRobinPicker.class);
 
-    public RoundRobinPicker(TaskDescriptor taskDescriptor, ZKAccessor zkAccessor) {
-        zkAccessor = checkNotNull(zkAccessor);
-        taskDescriptor = checkNotNull(taskDescriptor);
+    public RoundRobinPicker(ZKAccessor zkAccessor, TaskID taskID) {
+        super(zkAccessor, taskID);
     }
 
     @Override
@@ -35,8 +35,8 @@ public class RoundRobinPicker implements Picker {
     //todo
     @Override
     public SchedulerUnit assign() throws Exception {
-        String taskNodePath = taskDescriptor.getApp() + "/" + taskDescriptor.getName();
-        List<String> children = zkAccessor.getClient().getChildren().forPath(taskNodePath);
+        String taskNodePath = taskID.identify();
+        List<String> children = zkAccessor.getChildren(taskNodePath);
         if (CollectionUtils.isEmpty(children)) {
             LOG.warn("not found available scheduler unit.");
             return null;

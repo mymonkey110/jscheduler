@@ -1,5 +1,6 @@
 package com.haoocai.jscheduler.core.app;
 
+import com.haoocai.jscheduler.core.exception.AppExistException;
 import com.haoocai.jscheduler.core.exception.NamespaceNotExistException;
 
 import java.util.List;

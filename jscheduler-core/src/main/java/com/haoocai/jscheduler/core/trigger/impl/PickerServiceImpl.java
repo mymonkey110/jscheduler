@@ -20,7 +20,7 @@ public class PickerServiceImpl implements PickerService {
     public void setPickStrategy(TaskDescriptor taskDescriptor, PickStrategy pickStrategy) {
         String taskPath = taskDescriptor.taskPath();
         try {
-            zkAccessor.getClient().setData().forPath(taskPath+"/config/pickStrategy",pickStrategy.getIdentify().getBytes());
+            zkAccessor.setData(taskPath+"/config/pickStrategy",pickStrategy.getIdentify().getBytes());
         } catch (Exception e) {
             e.printStackTrace();
         }
