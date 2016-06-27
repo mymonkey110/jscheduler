@@ -24,7 +24,7 @@ public interface TaskManager {
      * @throws NamespaceNotExistException namespace not found
      * @throws AppNotFoundException       task exception
      */
-    void create(TaskID taskID, String cronExpression) throws NamespaceNotExistException,
+    void create(TaskID taskID, Cron cron) throws NamespaceNotExistException,
             AppNotFoundException, TaskExistException, CronExpressionException;
 
     /**

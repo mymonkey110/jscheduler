@@ -28,7 +28,7 @@ public class Task {
         this.zkAccessor = checkNotNull(zkAccessor);
     }
 
-    Task(TaskID taskID, Cron cron, ZKAccessor zkAccessor) {
+    public Task(TaskID taskID, Cron cron, ZKAccessor zkAccessor) {
         this(taskID, cron, PickStrategy.RANDOM, zkAccessor);
     }
 

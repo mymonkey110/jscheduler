@@ -105,11 +105,23 @@ public class ZKAccessor {
      * delete the specify node
      *
      * @param path node absolute path
-     * @throws ZKRuntimeException
      */
     public void delete(String path) {
         try {
-            client.create().forPath(path);
+            client.delete().forPath(path);
+        } catch (Exception e) {
+            throw new ZKRuntimeException(e);
+        }
+    }
+
+    /**
+     * recursively delete path
+     *
+     * @param path node absolute path
+     */
+    public void deleteRecursive(String path) {
+        try {
+            ZKPaths.deleteChildren(client.getZookeeperClient().getZooKeeper(), path, true);
         } catch (Exception e) {
             throw new ZKRuntimeException(e);
         }

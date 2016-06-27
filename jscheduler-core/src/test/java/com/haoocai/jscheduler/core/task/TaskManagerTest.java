@@ -31,7 +31,7 @@ public class TaskManagerTest extends AbstractBaseTest {
     private final static String T_TASK = "t_task";
     private final static String T_ID = "/" + T_NAMESPACE + "/" + T_APP + "/" + T_TASK;
     private final static String cronExpression = "0 1 * * * ?";
-    private final static TaskID taskID = new TaskID(T_NAMESPACE,T_APP,T_TASK);
+    private final static TaskID taskID = new TaskID(T_NAMESPACE, T_APP, T_TASK);
 
     @Before
     public void setUp() throws Exception {
@@ -43,7 +43,7 @@ public class TaskManagerTest extends AbstractBaseTest {
         when(zkAccessor.checkNodeExist(anyString())).thenReturn(false);
 
         try {
-            taskManager.create(taskID, cronExpression);
+            taskManager.create(taskID, new Cron(cronExpression));
             fail("should report T_NAMESPACE not exist!");
         } catch (NamespaceNotExistException ignored) {
 
@@ -60,7 +60,7 @@ public class TaskManagerTest extends AbstractBaseTest {
         when(zkAccessor.checkNodeExist("/" + T_NAMESPACE + "/" + T_APP)).thenReturn(false);
 
         try {
-            taskManager.create(taskID, cronExpression);
+            taskManager.create(taskID, new Cron(cronExpression));
             fail("should report APP not exist!");
         } catch (AppNotFoundException ignored) {
 
@@ -77,7 +77,7 @@ public class TaskManagerTest extends AbstractBaseTest {
         when(zkAccessor.checkNodeExist(T_ID)).thenReturn(false);
         doNothing().when(zkAccessor).create(T_ID + "/config/cronExpression", cronExpression.getBytes());
 
-        taskManager.create(taskID, cronExpression);
+        taskManager.create(taskID, new Cron(cronExpression));
 
         verify(zkAccessor).checkNodeExist(eq("/" + T_NAMESPACE));
         verify(zkAccessor).checkNodeExist("/" + T_NAMESPACE + "/" + T_APP);

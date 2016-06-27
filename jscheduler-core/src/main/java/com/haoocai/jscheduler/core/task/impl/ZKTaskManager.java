@@ -1,15 +1,11 @@
 package com.haoocai.jscheduler.core.task.impl;
 
 import com.google.common.base.Preconditions;
-import com.haoocai.jscheduler.core.CronExpression;
 import com.haoocai.jscheduler.core.exception.AppNotFoundException;
 import com.haoocai.jscheduler.core.exception.CronExpressionException;
 import com.haoocai.jscheduler.core.exception.NamespaceNotExistException;
 import com.haoocai.jscheduler.core.exception.TaskExistException;
-import com.haoocai.jscheduler.core.task.Task;
-import com.haoocai.jscheduler.core.task.TaskDescriptor;
-import com.haoocai.jscheduler.core.task.TaskID;
-import com.haoocai.jscheduler.core.task.TaskManager;
+import com.haoocai.jscheduler.core.task.*;
 import com.haoocai.jscheduler.core.zk.ZKAccessor;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -20,8 +16,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.haoocai.jscheduler.core.Constants.UTF8_CHARSET;
 
 /**
  * Zookeeper Task Manager
@@ -40,11 +34,8 @@ public class ZKTaskManager implements TaskManager {
     }
 
     @Override
-    public void create(TaskID taskID, String cronExpression)
+    public void create(TaskID taskID, Cron cron)
             throws NamespaceNotExistException, AppNotFoundException, TaskExistException, CronExpressionException {
-        if (!CronExpression.isValidExpression(cronExpression)) {
-            throw new CronExpressionException();
-        }
         if (!zkAccessor.checkNodeExist("/" + taskID.getNamespace())) {
             throw new NamespaceNotExistException();
         }
@@ -56,14 +47,16 @@ public class ZKTaskManager implements TaskManager {
             throw new TaskExistException();
         }
 
-        zkAccessor.mkdirAndCreate(taskPath + "/config", "cron", cronExpression.getBytes(UTF8_CHARSET));
-        LOG.info("create task:{} with cron:{} success.", taskID.getName(), cronExpression);
+        Task task = new Task(taskID, cron, zkAccessor);
+        task.init();
+
+        LOG.info("create task:{} with cron:{} success.", taskID.getName(), cron);
     }
 
     @Override
     public void delete(TaskID taskID) {
         LOG.info("deleting the task:{}.", taskID);
-        zkAccessor.delete(taskID.identify());
+        zkAccessor.deleteRecursive(taskID.identify());
         LOG.info("deleted the task:{} node.", taskID.identify());
     }
 

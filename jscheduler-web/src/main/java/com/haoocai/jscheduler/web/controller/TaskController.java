@@ -1,6 +1,7 @@
 package com.haoocai.jscheduler.web.controller;
 
 import com.haoocai.jscheduler.core.exception.AbstractCheckedException;
+import com.haoocai.jscheduler.core.task.Cron;
 import com.haoocai.jscheduler.core.task.TaskDescriptor;
 import com.haoocai.jscheduler.core.task.TaskID;
 import com.haoocai.jscheduler.core.task.TaskManager;
@@ -40,7 +41,7 @@ class TaskController {
                                    @PathVariable String name,
                                    @RequestParam String cron) {
         try {
-            taskManager.create(new TaskID(namespace, app, name), cron);
+            taskManager.create(new TaskID(namespace, app, name), new Cron(cron));
             return CommonResult.successRet();
         } catch (AbstractCheckedException e) {
             LOG.error("create task error,namespace:{} app:{} name:{},code:{},error:{}.", namespace, app, name, e.code(), e);

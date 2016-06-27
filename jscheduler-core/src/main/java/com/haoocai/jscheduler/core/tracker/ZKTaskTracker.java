@@ -36,7 +36,7 @@ public class ZKTaskTracker extends TimerTask implements TaskTracker {
 
     @Override
     public void track() {
-        LOG.info("start a tacker for app:{} 's task:{}.", taskDescriptor.getApp(), taskDescriptor.getName());
+        LOG.info("start a tacker for app:{}'s task:{}.", taskDescriptor.getApp(), taskDescriptor.getName());
         taskInvoker = new ZKTaskInvoker(zkAccessor);
         Date nextRunTime = calcNextRunTime();
         innerTimer = new Timer(taskDescriptor.getApp() + "-" + taskDescriptor.getName() + "-" + "tracker");

@@ -8,6 +8,8 @@ import org.apache.commons.lang3.Validate;
 import java.io.Serializable;
 import java.util.Map;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * Task Description
  * <p>
@@ -56,8 +58,7 @@ public class TaskDescriptor implements Serializable {
     }
 
     public TaskDescriptor(TaskID taskID, String cronExpression, PickStrategy pickStrategy, Map extraParams) {
-        Validate.isTrue(StringUtils.isNotBlank(app), "app name can't be blank");
-        Validate.isTrue(StringUtils.isNotBlank(name), "name name can't be blank");
+        checkNotNull(taskID, "task id name can't be blank");
         Validate.isTrue(CronExpression.isValidExpression(cronExpression), "cron expression is not valid,please refer to 'https://en.wikipedia.org/wiki/Cron'");
         Validate.notNull(pickStrategy, "please specified the pick strategy");
 
