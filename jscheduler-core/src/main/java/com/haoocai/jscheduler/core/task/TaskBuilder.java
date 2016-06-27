@@ -10,7 +10,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * @author Michael Jiang on 16/6/14.
  */
-public class TaskBuilder {
+class TaskBuilder {
     private String namespace;
     private String app;
     private String taskName;

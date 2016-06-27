@@ -1,9 +1,7 @@
 package com.haoocai.jscheduler.core.scheduler.impl;
 
-import com.google.common.base.Preconditions;
 import com.haoocai.jscheduler.core.JschedulerConfig;
 import com.haoocai.jscheduler.core.scheduler.SchedulerService;
-import com.haoocai.jscheduler.core.scheduler.SchedulerUnit;
 import com.haoocai.jscheduler.core.task.TaskDescriptor;
 import com.haoocai.jscheduler.core.task.TaskID;
 import com.haoocai.jscheduler.core.tracker.TaskTracker;
@@ -77,22 +75,6 @@ class ZKSchedulerService implements SchedulerService {
         } catch (Exception e) {
             LOG.error("stop task:{} error:{}.", taskID, e.getMessage(), e);
         }
-    }
-
-    @Override
-    public List<SchedulerUnit> getAllSchedulerUnits(TaskID taskID) {
-        Preconditions.checkNotNull(taskID);
-
-        List<SchedulerUnit> schedulerUnitList = new ArrayList<>();
-        List<String> children = zkAccessor.getChildren(taskID.identify() + "/servers");
-
-        for (String child : children) {
-            String[] addr = child.split(":");
-            SchedulerUnit schedulerUnit = new SchedulerUnit(addr[0], Integer.parseInt(addr[1]));
-            schedulerUnitList.add(schedulerUnit);
-        }
-
-        return schedulerUnitList;
     }
 
     private class SchedulerStarter extends Thread {

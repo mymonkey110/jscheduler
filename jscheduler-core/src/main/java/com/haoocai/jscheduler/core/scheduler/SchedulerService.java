@@ -29,11 +29,4 @@ public interface SchedulerService {
      */
     void stopTask(TaskID taskID);
 
-    /**
-     * get all available schedule unit by specifiy task
-     *
-     * @param taskID task identify
-     * @return scheduler units
-     */
-    List<SchedulerUnit> getAllSchedulerUnits(TaskID taskID);
 }
