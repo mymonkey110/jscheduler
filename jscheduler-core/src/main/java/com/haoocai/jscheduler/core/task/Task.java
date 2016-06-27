@@ -23,6 +23,13 @@ public class Task {
 
     private ServerNode serverNode;
 
+    private Status status;
+
+    enum Status {
+        RUNNING,
+        STOP
+    }
+
     public Task(TaskID taskID, ZKAccessor zkAccessor) {
         this.taskID = checkNotNull(taskID);
         this.zkAccessor = checkNotNull(zkAccessor);

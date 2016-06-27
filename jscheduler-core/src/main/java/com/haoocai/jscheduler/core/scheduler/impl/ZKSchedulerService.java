@@ -1,9 +1,12 @@
 package com.haoocai.jscheduler.core.scheduler.impl;
 
 import com.haoocai.jscheduler.core.JschedulerConfig;
+import com.haoocai.jscheduler.core.register.TaskRegisterCenter;
 import com.haoocai.jscheduler.core.scheduler.SchedulerService;
+import com.haoocai.jscheduler.core.task.Task;
 import com.haoocai.jscheduler.core.task.TaskDescriptor;
 import com.haoocai.jscheduler.core.task.TaskID;
+import com.haoocai.jscheduler.core.task.impl.ZKTaskManager;
 import com.haoocai.jscheduler.core.tracker.TaskTracker;
 import com.haoocai.jscheduler.core.tracker.TaskTrackerFactory;
 import com.haoocai.jscheduler.core.tracker.ZKTaskTracker;
@@ -29,12 +32,15 @@ class ZKSchedulerService implements SchedulerService {
     private final ZKAccessor zkAccessor;
     private final JschedulerConfig jschedulerConfig;
 
+    private final ZKTaskManager zkTaskManager;
+
     private static Logger LOG = LoggerFactory.getLogger(ZKSchedulerService.class);
 
     @Autowired
-    public ZKSchedulerService(ZKAccessor zkAccessor, JschedulerConfig jschedulerConfig) {
+    public ZKSchedulerService(ZKAccessor zkAccessor, JschedulerConfig jschedulerConfig, ZKTaskManager zkTaskManager) {
         this.zkAccessor = zkAccessor;
         this.jschedulerConfig = jschedulerConfig;
+        this.zkTaskManager = zkTaskManager;
     }
 
     @PostConstruct
@@ -90,9 +96,12 @@ class ZKSchedulerService implements SchedulerService {
                     List<String> apps = zkAccessor.getChildren("/" + namespace);
                     LOG.info("namespace:{} has apps:{}.", namespace, apps);
                     for (String app : apps) {
-                        List<TaskDescriptor> taskDescriptorList = getTask(namespace, app);
-                        for (TaskDescriptor taskDescriptor : taskDescriptorList) {
-                            TaskTracker taskTracker = new ZKTaskTracker(zkAccessor, taskDescriptor);
+                        List<String> taskNames = zkAccessor.getChildren("/" + namespace + "/" + app);
+                        for (String name : taskNames) {
+                            TaskID taskID = new TaskID(namespace, app, name);
+                            zkTaskManager.load(taskID);
+                            Task task = TaskRegisterCenter.task(taskID);
+                            TaskTracker taskTracker = new ZKTaskTracker(zkAccessor, task);
                             taskTracker.track();
                         }
                     }

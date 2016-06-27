@@ -3,7 +3,9 @@ package com.haoocai.jscheduler.core.tracker;
 
 import com.haoocai.jscheduler.core.CronExpression;
 import com.haoocai.jscheduler.core.scheduler.SchedulerUnit;
+import com.haoocai.jscheduler.core.task.Task;
 import com.haoocai.jscheduler.core.task.TaskDescriptor;
+import com.haoocai.jscheduler.core.task.TaskID;
 import com.haoocai.jscheduler.core.task.impl.ZKTaskManager;
 import com.haoocai.jscheduler.core.zk.ZKAccessor;
 import org.apache.commons.collections.CollectionUtils;
@@ -22,24 +24,25 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class ZKTaskTracker extends TimerTask implements TaskTracker {
     private final ZKAccessor zkAccessor;
-    private final TaskDescriptor taskDescriptor;
+    private final Task task;
     private TaskInvoker taskInvoker;
     private Timer innerTimer;
     private Random random = new Random(System.currentTimeMillis());
 
     private static Logger LOG = LoggerFactory.getLogger(ZKTaskManager.class);
 
-    public ZKTaskTracker(ZKAccessor zkAccessor, TaskDescriptor taskDescriptor) {
+    public ZKTaskTracker(ZKAccessor zkAccessor, Task task) {
         this.zkAccessor = checkNotNull(zkAccessor);
-        this.taskDescriptor = checkNotNull(taskDescriptor);
+        this.task = checkNotNull(task);
     }
 
     @Override
     public void track() {
-        LOG.info("start a tacker for app:{}'s task:{}.", taskDescriptor.getApp(), taskDescriptor.getName());
+        TaskID taskID = task.getTaskID();
+        LOG.info("start a tacker for app:{}'s task:{}.", taskID.getApp(), taskID.getName());
         taskInvoker = new ZKTaskInvoker(zkAccessor);
         Date nextRunTime = calcNextRunTime();
-        innerTimer = new Timer(taskDescriptor.getApp() + "-" + taskDescriptor.getName() + "-" + "tracker");
+        innerTimer = new Timer(taskID.getApp() + "-" + taskID.getName() + "-" + "tracker");
         innerTimer.schedule(this, nextRunTime);
     }
 
@@ -50,21 +53,22 @@ public class ZKTaskTracker extends TimerTask implements TaskTracker {
 
     @Override
     public void run() {
+        TaskID taskID = task.getTaskID();
         SchedulerUnit schedulerUnit;
         try {
             schedulerUnit = choseSchedulerUnit();
             if (schedulerUnit != null) {
-                LOG.trace("app:{} task:{} this time scheduler unit is:{}.", taskDescriptor.getApp(), taskDescriptor.getName(), schedulerUnit);
-                taskInvoker.invoke(taskDescriptor, schedulerUnit);
+                LOG.trace("app:{} task:{} this time scheduler unit is:{}.", taskID.getApp(), taskID.getName(), schedulerUnit);
+                taskInvoker.invoke(taskID, schedulerUnit);
             } else {
-                LOG.trace("not found available server for task:{}.", taskDescriptor.getName());
+                LOG.trace("not found available server for task:{}.", taskID.getName());
             }
         } catch (Exception e) {
             LOG.error("chose scheduler unit error:{}.", e.getMessage(), e);
         } finally {
             Date nextRunTime = calcNextRunTime();
-            LOG.trace("task:{} next run time:{}.", taskDescriptor.getName(), nextRunTime);
-            innerTimer = new Timer(taskDescriptor.getApp() + "-" + taskDescriptor.getName() + "-" + "tracker");
+            LOG.trace("task:{} next run time:{}.", taskID.getName(), nextRunTime);
+            innerTimer = new Timer(taskID.getApp() + "-" + taskID.getName() + "-" + "tracker");
             innerTimer.schedule(this, nextRunTime);
         }
     }
@@ -73,17 +77,17 @@ public class ZKTaskTracker extends TimerTask implements TaskTracker {
      * chose current run scheduler unit
      *
      * @return scheduler unit
-     * @throws Exception
      */
     private SchedulerUnit choseSchedulerUnit() throws Exception {
-        String taskPath = taskDescriptor.taskPath();
+        TaskID taskID = task.getTaskID();
+        String taskPath = taskID.identify();
         List<String> servers = zkAccessor.getChildren(taskPath + "/servers");
         if (CollectionUtils.isNotEmpty(servers)) {
             String chosenServer = servers.get(random.nextInt(servers.size()));
             String[] ipAddr = chosenServer.split(":");
             return new SchedulerUnit(ipAddr[0], Integer.parseInt(ipAddr[1]));
         } else {
-            LOG.info("no available scheduler server for task:{}.", taskDescriptor.getName());
+            LOG.info("no available scheduler server for task:{}.", taskID.getName());
             return null;
         }
     }
@@ -95,7 +99,7 @@ public class ZKTaskTracker extends TimerTask implements TaskTracker {
      */
     private Date calcNextRunTime() {
         try {
-            CronExpression cexp = new CronExpression(taskDescriptor.getCronExpression());
+            CronExpression cexp = new CronExpression(task.getCron());
             return cexp.getNextValidTimeAfter(new Date(System.currentTimeMillis()));
         } catch (ParseException e) {
             throw new RuntimeException(e);

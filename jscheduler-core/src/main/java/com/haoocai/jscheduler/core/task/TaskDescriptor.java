@@ -44,6 +44,10 @@ public class TaskDescriptor implements Serializable {
      */
     private PickStrategy pickStrategy;
     /**
+     * task is running flag
+     */
+    private boolean isRunning;
+    /**
      * extra map
      */
     private Map extraParams;
@@ -59,8 +63,6 @@ public class TaskDescriptor implements Serializable {
 
     public TaskDescriptor(TaskID taskID, String cronExpression, PickStrategy pickStrategy, Map extraParams) {
         checkNotNull(taskID, "task id name can't be blank");
-        Validate.isTrue(CronExpression.isValidExpression(cronExpression), "cron expression is not valid,please refer to 'https://en.wikipedia.org/wiki/Cron'");
-        Validate.notNull(pickStrategy, "please specified the pick strategy");
 
         this.namespace = taskID.getNamespace();
         this.app = taskID.getApp();

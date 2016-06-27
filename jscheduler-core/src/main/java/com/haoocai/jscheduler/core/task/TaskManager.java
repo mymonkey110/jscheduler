@@ -19,8 +19,8 @@ public interface TaskManager {
     /**
      * create task
      *
-     * @param taskID         taskID
-     * @param cronExpression task cronExpression
+     * @param taskID taskID
+     * @param cron   task cronExpression
      * @throws NamespaceNotExistException namespace not found
      * @throws AppNotFoundException       task exception
      */
@@ -33,6 +33,13 @@ public interface TaskManager {
      * @param taskID task id
      */
     void delete(TaskID taskID);
+
+    /**
+     * load task to local
+     *
+     * @param taskID task id
+     */
+    void load(TaskID taskID);
 
     /**
      * get app all the tasks

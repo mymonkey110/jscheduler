@@ -36,7 +36,7 @@ class ConfigNode {
     void init() {
         zkAccessor.create(taskID.identify() + ROOT, new byte[0]);
         zkAccessor.create(taskID.identify() + CRON_EXPRESSION, cron.cron().getBytes(UTF8_CHARSET));
-        zkAccessor.create(taskID.identify() + PICK_STRATEGY, cron.cron().getBytes(UTF8_CHARSET));
+        zkAccessor.create(taskID.identify() + PICK_STRATEGY, pickStrategy.toString().getBytes(UTF8_CHARSET));
     }
 
     public static ConfigNode load(ZKAccessor zkAccessor, TaskID taskID) {

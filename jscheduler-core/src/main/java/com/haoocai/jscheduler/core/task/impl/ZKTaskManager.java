@@ -5,6 +5,7 @@ import com.haoocai.jscheduler.core.exception.AppNotFoundException;
 import com.haoocai.jscheduler.core.exception.CronExpressionException;
 import com.haoocai.jscheduler.core.exception.NamespaceNotExistException;
 import com.haoocai.jscheduler.core.exception.TaskExistException;
+import com.haoocai.jscheduler.core.register.TaskRegisterCenter;
 import com.haoocai.jscheduler.core.task.*;
 import com.haoocai.jscheduler.core.zk.ZKAccessor;
 import org.apache.commons.collections.CollectionUtils;
@@ -58,6 +59,16 @@ public class ZKTaskManager implements TaskManager {
         LOG.info("deleting the task:{}.", taskID);
         zkAccessor.deleteRecursive(taskID.identify());
         LOG.info("deleted the task:{} node.", taskID.identify());
+    }
+
+    @Override
+    public void load(TaskID taskID) {
+        Task task = Task.load(zkAccessor, taskID);
+        if (!TaskRegisterCenter.exist(taskID)) {
+            TaskRegisterCenter.register(taskID, task);
+        } else {
+            throw new RuntimeException("already load task:" + taskID);
+        }
     }
 
     @Override
