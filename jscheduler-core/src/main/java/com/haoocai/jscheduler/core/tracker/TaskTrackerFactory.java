@@ -1,6 +1,8 @@
 package com.haoocai.jscheduler.core.tracker;
 
 import com.google.common.base.Preconditions;
+import com.haoocai.jscheduler.core.register.TaskRegisterCenter;
+import com.haoocai.jscheduler.core.task.Task;
 import com.haoocai.jscheduler.core.task.TaskDescriptor;
 import com.haoocai.jscheduler.core.task.TaskID;
 import com.haoocai.jscheduler.core.zk.ZKAccessor;
@@ -19,12 +21,12 @@ public class TaskTrackerFactory {
 
     public synchronized static TaskTracker getTaskTracker(TaskID taskID, ZKAccessor zkAccessor) throws Exception {
         Preconditions.checkNotNull(taskID);
+        Preconditions.checkNotNull(zkAccessor);
 
+        Task task = TaskRegisterCenter.task(taskID);
         TaskTracker taskTracker = taskTrackerRegMap.get(taskID);
         if (taskTracker == null) {
-            byte[] data = zkAccessor.getData(taskID.identify() + "/config/cron");
-            TaskDescriptor taskDescriptor = new TaskDescriptor(taskID.getNamespace(), taskID.getApp(), taskID.getName(), new String(data, UTF8_CHARSET));
-            taskTracker = new ZKTaskTracker(zkAccessor, taskDescriptor);
+            taskTracker = new ZKTaskTracker(zkAccessor, task);
             taskTrackerRegMap.put(taskID, taskTracker);
         }
 

@@ -8,6 +8,8 @@ import org.apache.commons.lang3.Validate;
 import java.io.Serializable;
 import java.util.Map;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * Task Description
  * <p>
@@ -42,24 +44,29 @@ public class TaskDescriptor implements Serializable {
      */
     private PickStrategy pickStrategy;
     /**
+     * task is running flag
+     */
+    private boolean isRunning;
+    /**
      * extra map
      */
     private Map extraParams;
 
 
-    public TaskDescriptor(String namespace, String app, String name, String cronExpression) {
-        this(namespace, app, name, cronExpression, PickStrategy.RANDOM, null);
+    public TaskDescriptor(TaskID taskID, String cronExpression) {
+        this(taskID, cronExpression, PickStrategy.RANDOM, null);
     }
 
-    public TaskDescriptor(String namespace, String app, String name, String cronExpression, PickStrategy pickStrategy, Map extraParams) {
-        Validate.isTrue(StringUtils.isNotBlank(app), "app name can't be blank");
-        Validate.isTrue(StringUtils.isNotBlank(name), "name name can't be blank");
-        Validate.isTrue(CronExpression.isValidExpression(cronExpression), "cron expression is not valid,please refer to 'https://en.wikipedia.org/wiki/Cron'");
-        Validate.notNull(pickStrategy, "please specified the pick strategy");
+    public TaskDescriptor(TaskID taskID, String cronExpression, PickStrategy pickStrategy) {
+        this(taskID, cronExpression, pickStrategy, null);
+    }
 
-        this.namespace = namespace;
-        this.app = app;
-        this.name = name;
+    public TaskDescriptor(TaskID taskID, String cronExpression, PickStrategy pickStrategy, Map extraParams) {
+        checkNotNull(taskID, "task id name can't be blank");
+
+        this.namespace = taskID.getNamespace();
+        this.app = taskID.getApp();
+        this.name = taskID.getName();
         this.cronExpression = cronExpression;
         this.pickStrategy = pickStrategy;
         if (extraParams != null && !extraParams.isEmpty()) {

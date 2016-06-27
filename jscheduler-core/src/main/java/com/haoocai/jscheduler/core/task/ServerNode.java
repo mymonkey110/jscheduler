@@ -37,4 +37,8 @@ public class ServerNode {
             }
         }));
     }
+
+    public static ServerNode load(ZKAccessor zkAccessor, TaskID taskID) {
+        return new ServerNode(zkAccessor, taskID);
+    }
 }

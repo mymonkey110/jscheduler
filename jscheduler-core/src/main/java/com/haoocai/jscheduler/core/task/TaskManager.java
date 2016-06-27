@@ -19,13 +19,13 @@ public interface TaskManager {
     /**
      * create task
      *
-     * @param namespace      namespace
-     * @param app            app name the task belong to
-     * @param taskName       task name
-     * @param cronExpression task cronExpression
-     * @throws AppNotFoundException task exception
+     * @param taskID taskID
+     * @param cron   task cronExpression
+     * @throws NamespaceNotExistException namespace not found
+     * @throws AppNotFoundException       task exception
      */
-    void create(String namespace, String app, String taskName, String cronExpression) throws NamespaceNotExistException, AppNotFoundException, TaskExistException, CronExpressionException;
+    void create(TaskID taskID, Cron cron) throws NamespaceNotExistException,
+            AppNotFoundException, TaskExistException, CronExpressionException;
 
     /**
      * delete task by task id
@@ -33,6 +33,13 @@ public interface TaskManager {
      * @param taskID task id
      */
     void delete(TaskID taskID);
+
+    /**
+     * load task to local
+     *
+     * @param taskID task id
+     */
+    void load(TaskID taskID);
 
     /**
      * get app all the tasks
@@ -49,5 +56,5 @@ public interface TaskManager {
      * @param taskID task id
      * @return task descriptor
      */
-    TaskDescriptor getSpecTaskDescriptor(TaskID taskID);
+    TaskDescriptor getSpecTask(TaskID taskID);
 }

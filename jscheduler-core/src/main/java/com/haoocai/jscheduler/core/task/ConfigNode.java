@@ -1,10 +1,9 @@
 package com.haoocai.jscheduler.core.task;
 
-import com.google.common.base.Preconditions;
-import com.haoocai.jscheduler.core.CronExpression;
 import com.haoocai.jscheduler.core.trigger.PickStrategy;
 import com.haoocai.jscheduler.core.zk.ZKAccessor;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.haoocai.jscheduler.core.Constants.UTF8_CHARSET;
 
 /**
@@ -15,42 +14,40 @@ import static com.haoocai.jscheduler.core.Constants.UTF8_CHARSET;
 class ConfigNode {
     private final ZKAccessor zkAccessor;
     private final TaskID taskID;
-    private String cronExpression;
+    private Cron cron;
     private PickStrategy pickStrategy;
 
     private static String ROOT = "/config";
     private static String CRON_EXPRESSION = ROOT + "/cron";
     private static String PICK_STRATEGY = ROOT + "/strategy";
 
-    ConfigNode(ZKAccessor zkAccessor, TaskID taskID, String cronExpression) {
-        this(zkAccessor, taskID, cronExpression, PickStrategy.RANDOM);
+    ConfigNode(ZKAccessor zkAccessor, TaskID taskID, Cron cron) {
+        this(zkAccessor, taskID, cron, PickStrategy.RANDOM);
     }
 
-    ConfigNode(ZKAccessor zkAccessor, TaskID taskID, String cronExpression, PickStrategy pickStrategy) {
+    ConfigNode(ZKAccessor zkAccessor, TaskID taskID, Cron cron, PickStrategy pickStrategy) {
         this.zkAccessor = zkAccessor;
         this.taskID = taskID;
-        this.cronExpression = cronExpression;
+        this.cron = cron;
         this.pickStrategy = pickStrategy;
     }
 
     //initialize config node
-    public void init() {
+    void init() {
         zkAccessor.create(taskID.identify() + ROOT, new byte[0]);
-        zkAccessor.create(taskID.identify() + CRON_EXPRESSION, cronExpression.getBytes(UTF8_CHARSET));
-        zkAccessor.create(taskID.identify() + PICK_STRATEGY, cronExpression.getBytes(UTF8_CHARSET));
+        zkAccessor.create(taskID.identify() + CRON_EXPRESSION, cron.cron().getBytes(UTF8_CHARSET));
+        zkAccessor.create(taskID.identify() + PICK_STRATEGY, pickStrategy.toString().getBytes(UTF8_CHARSET));
     }
 
     public static ConfigNode load(ZKAccessor zkAccessor, TaskID taskID) {
         String cronExpr = new String(zkAccessor.getData(taskID.identify() + CRON_EXPRESSION), UTF8_CHARSET);
         PickStrategy pickStrategy = PickStrategy.valueOf(new String(zkAccessor.getData(taskID.identify() + PICK_STRATEGY), UTF8_CHARSET));
-        return new ConfigNode(zkAccessor, taskID, cronExpr, pickStrategy);
+        return new ConfigNode(zkAccessor, taskID, new Cron(cronExpr), pickStrategy);
     }
 
-    public void setCronExpr(String cronExpression) {
-        Preconditions.checkState(CronExpression.isValidExpression(cronExpression));
-
-        this.cronExpression = cronExpression;
-        zkAccessor.setData(taskID.identify() + CRON_EXPRESSION, cronExpression.getBytes(UTF8_CHARSET));
+    public void changeCron(Cron cron) {
+        this.cron = checkNotNull(cron);
+        zkAccessor.setData(taskID.identify() + CRON_EXPRESSION, cron.cron().getBytes(UTF8_CHARSET));
     }
 
     public void setPickStrategy(PickStrategy pickStrategy) {
@@ -59,8 +56,8 @@ class ConfigNode {
         zkAccessor.setData(taskID.identify() + PICK_STRATEGY, pickStrategy.toString().getBytes(UTF8_CHARSET));
     }
 
-    public String getCronExpression() {
-        return cronExpression;
+    public Cron getCron() {
+        return this.cron;
     }
 
     public PickStrategy getPickStrategy() {
@@ -71,7 +68,7 @@ class ConfigNode {
     public String toString() {
         return "ConfigNode{" +
                 "taskID=" + taskID +
-                ", cronExpression='" + cronExpression + '\'' +
+                ", cron=" + cron +
                 ", pickStrategy=" + pickStrategy +
                 '}';
     }

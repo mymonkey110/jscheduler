@@ -1,11 +1,11 @@
 package com.haoocai.jscheduler.core.task.impl;
 
 import com.google.common.base.Preconditions;
-import com.haoocai.jscheduler.core.CronExpression;
 import com.haoocai.jscheduler.core.exception.AppNotFoundException;
 import com.haoocai.jscheduler.core.exception.CronExpressionException;
 import com.haoocai.jscheduler.core.exception.NamespaceNotExistException;
 import com.haoocai.jscheduler.core.exception.TaskExistException;
+import com.haoocai.jscheduler.core.register.TaskRegisterCenter;
 import com.haoocai.jscheduler.core.task.*;
 import com.haoocai.jscheduler.core.zk.ZKAccessor;
 import org.apache.commons.collections.CollectionUtils;
@@ -15,11 +15,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.haoocai.jscheduler.core.Constants.UTF8_CHARSET;
 
 /**
  * Zookeeper Task Manager
@@ -32,39 +29,46 @@ public class ZKTaskManager implements TaskManager {
 
     private static Logger LOG = LoggerFactory.getLogger(ZKTaskManager.class);
 
-    private final static Charset CHARSET = Charset.forName("UTF-8");
-
     @Autowired
     public ZKTaskManager(ZKAccessor zkAccessor) {
         this.zkAccessor = zkAccessor;
     }
 
     @Override
-    public void create(String namespace, String app, String taskName, String cronExpression)
+    public void create(TaskID taskID, Cron cron)
             throws NamespaceNotExistException, AppNotFoundException, TaskExistException, CronExpressionException {
-        if (!CronExpression.isValidExpression(cronExpression)) {
-            throw new CronExpressionException();
-        }
-        if (!zkAccessor.checkNodeExist("/" + namespace)) {
+        if (!zkAccessor.checkNodeExist("/" + taskID.getNamespace())) {
             throw new NamespaceNotExistException();
         }
-        if (!zkAccessor.checkNodeExist("/" + namespace + "/" + app)) {
+        if (!zkAccessor.checkNodeExist("/" + taskID.getNamespace() + "/" + taskID.getApp())) {
             throw new AppNotFoundException();
         }
-        String taskPath = "/" + namespace + "/" + app + "/" + taskName;
+        String taskPath = taskID.identify();
         if (zkAccessor.checkNodeExist(taskPath)) {
             throw new TaskExistException();
         }
 
-        zkAccessor.mkdirAndCreate(taskPath + "/config", "cron", cronExpression.getBytes(CHARSET));
-        LOG.info("create task:{} with cron:{} success.", taskName, cronExpression);
+        Task task = new Task(taskID, cron, zkAccessor);
+        task.init();
+
+        LOG.info("create task:{} with cron:{} success.", taskID.getName(), cron);
     }
 
     @Override
     public void delete(TaskID taskID) {
         LOG.info("deleting the task:{}.", taskID);
-        zkAccessor.delete(taskID.identify());
+        zkAccessor.deleteRecursive(taskID.identify());
         LOG.info("deleted the task:{} node.", taskID.identify());
+    }
+
+    @Override
+    public void load(TaskID taskID) {
+        Task task = Task.load(zkAccessor, taskID);
+        if (!TaskRegisterCenter.exist(taskID)) {
+            TaskRegisterCenter.register(taskID, task);
+        } else {
+            throw new RuntimeException("already load task:" + taskID);
+        }
     }
 
     @Override
@@ -76,7 +80,8 @@ public class ZKTaskManager implements TaskManager {
         List<TaskDescriptor> taskList = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(children)) {
             for (String taskName : children) {
-                taskList.add(getSpecTaskDescriptor(new TaskID(namespace, app, taskName)));
+                Task task = Task.load(zkAccessor, new TaskID(namespace, app, taskName));
+                taskList.add(task.getTaskDescriptor());
             }
         }
 
@@ -84,14 +89,7 @@ public class ZKTaskManager implements TaskManager {
     }
 
     @Override
-    public TaskDescriptor getSpecTaskDescriptor(TaskID taskID) {
-        String taskPath = taskID.identify();
-
-        try {
-            String cronExpression = new String(zkAccessor.getClient().getData().forPath(taskPath + "/config/cron"), UTF8_CHARSET);
-            return new TaskDescriptor(taskID.getNamespace(), taskID.getApp(), taskID.getName(), cronExpression);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    public TaskDescriptor getSpecTask(TaskID taskID) {
+        return Task.load(zkAccessor, taskID).getTaskDescriptor();
     }
 }

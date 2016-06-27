@@ -1,11 +1,12 @@
 package com.haoocai.jscheduler.core.scheduler.impl;
 
-import com.google.common.base.Preconditions;
 import com.haoocai.jscheduler.core.JschedulerConfig;
+import com.haoocai.jscheduler.core.register.TaskRegisterCenter;
 import com.haoocai.jscheduler.core.scheduler.SchedulerService;
-import com.haoocai.jscheduler.core.scheduler.SchedulerUnit;
+import com.haoocai.jscheduler.core.task.Task;
 import com.haoocai.jscheduler.core.task.TaskDescriptor;
 import com.haoocai.jscheduler.core.task.TaskID;
+import com.haoocai.jscheduler.core.task.impl.ZKTaskManager;
 import com.haoocai.jscheduler.core.tracker.TaskTracker;
 import com.haoocai.jscheduler.core.tracker.TaskTrackerFactory;
 import com.haoocai.jscheduler.core.tracker.ZKTaskTracker;
@@ -31,12 +32,15 @@ class ZKSchedulerService implements SchedulerService {
     private final ZKAccessor zkAccessor;
     private final JschedulerConfig jschedulerConfig;
 
+    private final ZKTaskManager zkTaskManager;
+
     private static Logger LOG = LoggerFactory.getLogger(ZKSchedulerService.class);
 
     @Autowired
-    public ZKSchedulerService(ZKAccessor zkAccessor, JschedulerConfig jschedulerConfig) {
+    public ZKSchedulerService(ZKAccessor zkAccessor, JschedulerConfig jschedulerConfig, ZKTaskManager zkTaskManager) {
         this.zkAccessor = zkAccessor;
         this.jschedulerConfig = jschedulerConfig;
+        this.zkTaskManager = zkTaskManager;
     }
 
     @PostConstruct
@@ -79,69 +83,48 @@ class ZKSchedulerService implements SchedulerService {
         }
     }
 
-    @Override
-    public List<SchedulerUnit> getAllSchedulerUnits(TaskID taskID) {
-        Preconditions.checkNotNull(taskID);
-
-        List<SchedulerUnit> schedulerUnitList = new ArrayList<>();
-        List<String> children = zkAccessor.getChildren(taskID.identify() + "/servers");
-
-        for (String child : children) {
-            String[] addr = child.split(":");
-            SchedulerUnit schedulerUnit = new SchedulerUnit(addr[0], Integer.parseInt(addr[1]));
-            schedulerUnitList.add(schedulerUnit);
-        }
-
-        return schedulerUnitList;
-    }
-
     private class SchedulerStarter extends Thread {
 
         @Override
         public void run() {
             List<String> namespaces = jschedulerConfig.getNamespaces();
             LOG.info("found config namespace:{}.", namespaces);
-
             for (String namespace : namespaces) {
-                try {
-                    initNamespace(namespace);
-                    List<String> apps = zkAccessor.getChildren("/" + namespace);
-                    LOG.info("namespace:{} has apps:{}.", namespace, apps);
-                    for (String app : apps) {
-                        List<TaskDescriptor> taskDescriptorList = getTask(namespace, app);
-                        for (TaskDescriptor taskDescriptor : taskDescriptorList) {
-                            TaskTracker taskTracker = new ZKTaskTracker(zkAccessor, taskDescriptor);
-                            taskTracker.track();
-                        }
+                initNamespace(namespace);
+                List<String> apps = zkAccessor.getChildren("/" + namespace);
+                LOG.info("namespace:{} has apps:{}.", namespace, apps);
+                for (String app : apps) {
+                    List<String> taskNames = zkAccessor.getChildren("/" + namespace + "/" + app);
+                    for (String name : taskNames) {
+                        TaskID taskID = new TaskID(namespace, app, name);
+                        zkTaskManager.load(taskID);
+                        Task task = TaskRegisterCenter.task(taskID);
+                        TaskTracker taskTracker = new ZKTaskTracker(zkAccessor, task);
+                        taskTracker.track();
                     }
-                } catch (Exception e) {
-                    LOG.error("init namespace:{} encounter error:{}.", namespace, e.getMessage(), e);
-                    break;
                 }
-            }
-        }
-
-        /**
-         * initialize namespace
-         * <p>
-         * Check the namespace node exist.
-         * If the namespace doesn't exist,then create the node
-         * </p>
-         *
-         * @param namespace namespace
-         * @throws Exception exception
-         */
-        private void initNamespace(String namespace) throws Exception {
-            String namespacePath = "/" + namespace;
-            if (!zkAccessor.checkNodeExist(namespacePath)) {
-                LOG.info("namespace:{} doesn't exist,going to create node.", namespace);
-                zkAccessor.create(namespacePath, new byte[0]);
-            } else {
-                LOG.info("namespace:{} exist.", namespace);
             }
         }
     }
 
+    /**
+     * initialize namespace
+     * <p>
+     * Check the namespace node exist.
+     * If the namespace doesn't exist,then create the node
+     * </p>
+     *
+     * @param namespace namespace
+     */
+    private void initNamespace(String namespace) {
+        String namespacePath = "/" + namespace;
+        if (!zkAccessor.checkNodeExist(namespacePath)) {
+            LOG.info("namespace:{} doesn't exist,going to create node.", namespace);
+            zkAccessor.create(namespacePath, new byte[0]);
+        } else {
+            LOG.info("namespace:{} exist.", namespace);
+        }
+    }
 
     private List<TaskDescriptor> getTask(String namespace, String app) {
         List<TaskDescriptor> taskDescriptors = new ArrayList<>();
@@ -149,7 +132,7 @@ class ZKSchedulerService implements SchedulerService {
         LOG.info("namespace:{} app:{} tasks:{}.", namespace, app, tasks);
         for (String taskName : tasks) {
             byte[] data = zkAccessor.getData("/" + namespace + "/" + app + "/" + taskName + "/config/cron");
-            taskDescriptors.add(new TaskDescriptor(namespace, app, taskName, new String(data, UTF8_CHARSET)));
+            taskDescriptors.add(new TaskDescriptor(new TaskID(namespace, app, taskName), new String(data, UTF8_CHARSET)));
         }
         return taskDescriptors;
     }
