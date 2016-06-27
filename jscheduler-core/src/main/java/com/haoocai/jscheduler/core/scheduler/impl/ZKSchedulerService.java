@@ -89,50 +89,42 @@ class ZKSchedulerService implements SchedulerService {
         public void run() {
             List<String> namespaces = jschedulerConfig.getNamespaces();
             LOG.info("found config namespace:{}.", namespaces);
-
             for (String namespace : namespaces) {
-                try {
-                    initNamespace(namespace);
-                    List<String> apps = zkAccessor.getChildren("/" + namespace);
-                    LOG.info("namespace:{} has apps:{}.", namespace, apps);
-                    for (String app : apps) {
-                        List<String> taskNames = zkAccessor.getChildren("/" + namespace + "/" + app);
-                        for (String name : taskNames) {
-                            TaskID taskID = new TaskID(namespace, app, name);
-                            zkTaskManager.load(taskID);
-                            Task task = TaskRegisterCenter.task(taskID);
-                            TaskTracker taskTracker = new ZKTaskTracker(zkAccessor, task);
-                            taskTracker.track();
-                        }
+                initNamespace(namespace);
+                List<String> apps = zkAccessor.getChildren("/" + namespace);
+                LOG.info("namespace:{} has apps:{}.", namespace, apps);
+                for (String app : apps) {
+                    List<String> taskNames = zkAccessor.getChildren("/" + namespace + "/" + app);
+                    for (String name : taskNames) {
+                        TaskID taskID = new TaskID(namespace, app, name);
+                        zkTaskManager.load(taskID);
+                        Task task = TaskRegisterCenter.task(taskID);
+                        TaskTracker taskTracker = new ZKTaskTracker(zkAccessor, task);
+                        taskTracker.track();
                     }
-                } catch (Exception e) {
-                    LOG.error("init namespace:{} encounter error:{}.", namespace, e.getMessage(), e);
-                    break;
                 }
-            }
-        }
-
-        /**
-         * initialize namespace
-         * <p>
-         * Check the namespace node exist.
-         * If the namespace doesn't exist,then create the node
-         * </p>
-         *
-         * @param namespace namespace
-         * @throws Exception exception
-         */
-        private void initNamespace(String namespace) throws Exception {
-            String namespacePath = "/" + namespace;
-            if (!zkAccessor.checkNodeExist(namespacePath)) {
-                LOG.info("namespace:{} doesn't exist,going to create node.", namespace);
-                zkAccessor.create(namespacePath, new byte[0]);
-            } else {
-                LOG.info("namespace:{} exist.", namespace);
             }
         }
     }
 
+    /**
+     * initialize namespace
+     * <p>
+     * Check the namespace node exist.
+     * If the namespace doesn't exist,then create the node
+     * </p>
+     *
+     * @param namespace namespace
+     */
+    private void initNamespace(String namespace) {
+        String namespacePath = "/" + namespace;
+        if (!zkAccessor.checkNodeExist(namespacePath)) {
+            LOG.info("namespace:{} doesn't exist,going to create node.", namespace);
+            zkAccessor.create(namespacePath, new byte[0]);
+        } else {
+            LOG.info("namespace:{} exist.", namespace);
+        }
+    }
 
     private List<TaskDescriptor> getTask(String namespace, String app) {
         List<TaskDescriptor> taskDescriptors = new ArrayList<>();
