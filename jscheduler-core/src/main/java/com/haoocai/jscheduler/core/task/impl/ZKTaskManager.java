@@ -85,7 +85,7 @@ public class ZKTaskManager implements TaskManager {
     }
 
     @Override
-    public Task getSpecTask(TaskID taskID) {
-        return Task.load(zkAccessor, taskID);
+    public TaskDescriptor getSpecTask(TaskID taskID) {
+        return Task.load(zkAccessor, taskID).getTaskDescriptor();
     }
 }

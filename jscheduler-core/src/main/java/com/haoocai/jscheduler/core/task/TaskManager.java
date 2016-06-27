@@ -49,5 +49,5 @@ public interface TaskManager {
      * @param taskID task id
      * @return task descriptor
      */
-    Task getSpecTask(TaskID taskID);
+    TaskDescriptor getSpecTask(TaskID taskID);
 }

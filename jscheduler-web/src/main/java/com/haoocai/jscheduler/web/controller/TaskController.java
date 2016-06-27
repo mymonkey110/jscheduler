@@ -40,7 +40,7 @@ class TaskController {
                                    @PathVariable String name,
                                    @RequestParam String cron) {
         try {
-            taskManager.create(namespace, app, name, cron);
+            taskManager.create(new TaskID(namespace, app, name), cron);
             return CommonResult.successRet();
         } catch (AbstractCheckedException e) {
             LOG.error("create task error,namespace:{} app:{} name:{},code:{},error:{}.", namespace, app, name, e.code(), e);

@@ -23,7 +23,7 @@ public class TaskTrackerFactory {
         TaskTracker taskTracker = taskTrackerRegMap.get(taskID);
         if (taskTracker == null) {
             byte[] data = zkAccessor.getData(taskID.identify() + "/config/cron");
-            TaskDescriptor taskDescriptor = new TaskDescriptor(taskID.getNamespace(), taskID.getApp(), taskID.getName(), new String(data, UTF8_CHARSET));
+            TaskDescriptor taskDescriptor = new TaskDescriptor(taskID, new String(data, UTF8_CHARSET));
             taskTracker = new ZKTaskTracker(zkAccessor, taskDescriptor);
             taskTrackerRegMap.put(taskID, taskTracker);
         }
