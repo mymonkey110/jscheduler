@@ -1,9 +1,13 @@
 package com.haoocai.jscheduler.core.task;
 
+import com.haoocai.jscheduler.core.shared.ValueObject;
+
 /**
  * @author Michael Jiang on 16/5/11.
  */
-public class TaskID {
+public class TaskID implements ValueObject<TaskID> {
+    private static final long serialVersionUID = -8736193223436228464L;
+
     private String namespace;
     private String app;
     private String name;
@@ -60,5 +64,10 @@ public class TaskID {
                 ", app='" + app + '\'' +
                 ", name='" + name + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean isSame(TaskID other) {
+        return other != null && this.namespace.equals(other.namespace) && this.app.equals(other.app) && this.name.equals(other.name);
     }
 }

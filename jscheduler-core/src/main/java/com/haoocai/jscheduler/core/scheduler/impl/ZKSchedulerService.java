@@ -131,7 +131,7 @@ class ZKSchedulerService implements SchedulerService {
         LOG.info("namespace:{} app:{} tasks:{}.", namespace, app, tasks);
         for (String taskName : tasks) {
             byte[] data = zkAccessor.getData("/" + namespace + "/" + app + "/" + taskName + "/config/cron");
-            taskDescriptors.add(new TaskDescriptor(namespace, app, taskName, new String(data, UTF8_CHARSET)));
+            taskDescriptors.add(new TaskDescriptor(new TaskID(namespace, app, taskName), new String(data, UTF8_CHARSET)));
         }
         return taskDescriptors;
     }

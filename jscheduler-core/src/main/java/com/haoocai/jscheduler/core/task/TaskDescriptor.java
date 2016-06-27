@@ -47,19 +47,23 @@ public class TaskDescriptor implements Serializable {
     private Map extraParams;
 
 
-    public TaskDescriptor(String namespace, String app, String name, String cronExpression) {
-        this(namespace, app, name, cronExpression, PickStrategy.RANDOM, null);
+    public TaskDescriptor(TaskID taskID, String cronExpression) {
+        this(taskID, cronExpression, PickStrategy.RANDOM, null);
     }
 
-    public TaskDescriptor(String namespace, String app, String name, String cronExpression, PickStrategy pickStrategy, Map extraParams) {
+    public TaskDescriptor(TaskID taskID, String cronExpression, PickStrategy pickStrategy) {
+        this(taskID, cronExpression, pickStrategy, null);
+    }
+
+    public TaskDescriptor(TaskID taskID, String cronExpression, PickStrategy pickStrategy, Map extraParams) {
         Validate.isTrue(StringUtils.isNotBlank(app), "app name can't be blank");
         Validate.isTrue(StringUtils.isNotBlank(name), "name name can't be blank");
         Validate.isTrue(CronExpression.isValidExpression(cronExpression), "cron expression is not valid,please refer to 'https://en.wikipedia.org/wiki/Cron'");
         Validate.notNull(pickStrategy, "please specified the pick strategy");
 
-        this.namespace = namespace;
-        this.app = app;
-        this.name = name;
+        this.namespace = taskID.getNamespace();
+        this.app = taskID.getApp();
+        this.name = taskID.getName();
         this.cronExpression = cronExpression;
         this.pickStrategy = pickStrategy;
         if (extraParams != null && !extraParams.isEmpty()) {

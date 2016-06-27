@@ -52,7 +52,7 @@ class TaskController {
     public CommonResult getTask(@PathVariable String namespace,
                                 @PathVariable String app,
                                 @PathVariable String name) {
-        TaskDescriptor taskDescriptor = taskManager.getSpecTaskDescriptor(new TaskID(namespace, app, name));
+        TaskDescriptor taskDescriptor = taskManager.getSpecTask(new TaskID(namespace, app, name));
         return new CommonResult<>(taskDescriptor);
     }
 
