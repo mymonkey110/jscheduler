@@ -1,4 +1,4 @@
-package com.haoocai.jscheduler.core.app.impl;
+package com.haoocai.jscheduler.core.app;
 
 import com.google.common.base.Preconditions;
 import com.haoocai.jscheduler.core.exception.AppExistException;

@@ -38,9 +38,9 @@ public class Task {
     Task(TaskID taskID, Cron cron, PickStrategy pickStrategy, ZKAccessor zkAccessor) {
         this.taskID = taskID;
         this.zkAccessor = zkAccessor;
-        this.serverNode = new ServerNode(zkAccessor, taskID);
-        this.statusNode = new StatusNode(zkAccessor, taskID);
         this.configNode = new ConfigNode(zkAccessor, taskID, cron, pickStrategy);
+        this.serverNode = ServerNode.load(zkAccessor, taskID);
+        this.statusNode = StatusNode.load(zkAccessor, taskID);
     }
 
     public void setConfigNode(ConfigNode configNode) {
@@ -51,18 +51,23 @@ public class Task {
         this.serverNode = serverNode;
     }
 
+    public void setStatusNode(StatusNode statusNode) {
+        this.statusNode = statusNode;
+    }
+
     public TaskID getTaskID() {
         return taskID;
     }
 
-    public static Task load(ZKAccessor zkAccessor, TaskID taskID) {
+    static Task load(ZKAccessor zkAccessor, TaskID taskID) {
         Task task = new Task(taskID, zkAccessor);
         task.setConfigNode(ConfigNode.load(zkAccessor, taskID));
         task.setServerNode(ServerNode.load(zkAccessor, taskID));
+        task.setStatusNode(StatusNode.load(zkAccessor, taskID));
         return task;
     }
 
-    public void init() {
+    void init() {
         //create task node first
         zkAccessor.create(taskID.identify(), new byte[0]);
 
@@ -84,6 +89,10 @@ public class Task {
 
     public boolean isRunning() {
         return statusNode.isRunning();
+    }
+
+    public void start() {
+        this.statusNode.init();
     }
 
     public PickStrategy getPickStrategy() {

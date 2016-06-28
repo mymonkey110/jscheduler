@@ -1,17 +1,14 @@
 package com.haoocai.jscheduler.core.tracker;
 
-
-import com.haoocai.jscheduler.core.util.CronExpression;
 import com.haoocai.jscheduler.core.scheduler.SchedulerUnit;
 import com.haoocai.jscheduler.core.task.Task;
 import com.haoocai.jscheduler.core.task.TaskID;
-import com.haoocai.jscheduler.core.task.ZKTaskManager;
+import com.haoocai.jscheduler.core.task.ZKTaskService;
 import com.haoocai.jscheduler.core.zk.ZKAccessor;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.text.ParseException;
 import java.util.*;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -28,7 +25,7 @@ public class ZKTaskTracker extends TimerTask implements TaskTracker {
     private Timer innerTimer;
     private Random random = new Random(System.currentTimeMillis());
 
-    private static Logger LOG = LoggerFactory.getLogger(ZKTaskManager.class);
+    private static Logger LOG = LoggerFactory.getLogger(ZKTaskService.class);
 
     public ZKTaskTracker(ZKAccessor zkAccessor, Task task) {
         this.zkAccessor = checkNotNull(zkAccessor);
@@ -40,7 +37,7 @@ public class ZKTaskTracker extends TimerTask implements TaskTracker {
         TaskID taskID = task.getTaskID();
         LOG.info("start a tacker for app:{}'s task:{}.", taskID.getApp(), taskID.getName());
         taskInvoker = new ZKTaskInvoker(zkAccessor);
-        Date nextRunTime = calcNextRunTime();
+        Date nextRunTime = task.calcNextRunTime();
         innerTimer = new Timer(taskID.getApp() + "-" + taskID.getName() + "-" + "tracker");
         innerTimer.schedule(this, nextRunTime);
     }
@@ -65,7 +62,7 @@ public class ZKTaskTracker extends TimerTask implements TaskTracker {
         } catch (Exception e) {
             LOG.error("chose scheduler unit error:{}.", e.getMessage(), e);
         } finally {
-            Date nextRunTime = calcNextRunTime();
+            Date nextRunTime = task.calcNextRunTime();
             LOG.trace("task:{} next run time:{}.", taskID.getName(), nextRunTime);
             innerTimer = new Timer(taskID.getApp() + "-" + taskID.getName() + "-" + "tracker");
             innerTimer.schedule(this, nextRunTime);
@@ -88,20 +85,6 @@ public class ZKTaskTracker extends TimerTask implements TaskTracker {
         } else {
             LOG.info("no available scheduler server for task:{}.", taskID.getName());
             return null;
-        }
-    }
-
-    /**
-     * calculate the task next run time point
-     *
-     * @return next run time point
-     */
-    private Date calcNextRunTime() {
-        try {
-            CronExpression cexp = new CronExpression(task.getCron());
-            return cexp.getNextValidTimeAfter(new Date(System.currentTimeMillis()));
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
         }
     }
 }

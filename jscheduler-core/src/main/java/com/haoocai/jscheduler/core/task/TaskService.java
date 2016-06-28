@@ -10,12 +10,12 @@ import java.util.List;
 /**
  * Task Manager
  * <p>
- * TaskManager include the basic task management.
+ * TaskService include the basic task management.
  * </p>
  *
  * @author Michael Jiang on 16/3/16.
  */
-public interface TaskManager {
+public interface TaskService {
     /**
      * create task
      *
@@ -40,6 +40,14 @@ public interface TaskManager {
      * @param taskID task id
      */
     void load(TaskID taskID);
+
+    /**
+     * find task id
+     *
+     * @param taskID task id
+     * @return task
+     */
+    Task find(TaskID taskID);
 
     /**
      * get app all the tasks

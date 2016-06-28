@@ -18,12 +18,12 @@ import static org.mockito.Mockito.*;
 /**
  * @author Michael Jiang on 16/5/27.
  */
-public class TaskManagerTest extends AbstractBaseTest {
+public class TaskServiceTest extends AbstractBaseTest {
     @Mock
     private ZKAccessor zkAccessor;
 
     @InjectMocks
-    private ZKTaskManager taskManager;
+    private ZKTaskService taskManager;
 
     private final static String T_NAMESPACE = "test";
     private final static String T_APP = "t_app";

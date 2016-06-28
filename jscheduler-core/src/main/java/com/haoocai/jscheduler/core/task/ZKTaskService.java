@@ -23,13 +23,13 @@ import java.util.List;
  * @author Michael Jiang on 16/3/16.
  */
 @Service
-public class ZKTaskManager implements TaskManager {
+public class ZKTaskService implements TaskService {
     private final ZKAccessor zkAccessor;
 
-    private static Logger LOG = LoggerFactory.getLogger(ZKTaskManager.class);
+    private static Logger LOG = LoggerFactory.getLogger(ZKTaskService.class);
 
     @Autowired
-    public ZKTaskManager(ZKAccessor zkAccessor) {
+    public ZKTaskService(ZKAccessor zkAccessor) {
         this.zkAccessor = zkAccessor;
     }
 
@@ -68,6 +68,11 @@ public class ZKTaskManager implements TaskManager {
         } else {
             throw new RuntimeException("already load task:" + taskID);
         }
+    }
+
+    @Override
+    public Task find(TaskID taskID) {
+        return Task.load(zkAccessor, taskID);
     }
 
     @Override

@@ -5,17 +5,28 @@ import com.haoocai.jscheduler.core.zk.ZKAccessor;
 /**
  * @author Michael Jiang on 6/28/16.
  */
-public class StatusNode {
-    private final ZKAccessor zkAccessor;
-    private final TaskID taskID;
+class StatusNode extends AbstractNode {
     private final static String ROOT = "/status";
 
-    public StatusNode(ZKAccessor zkAccessor, TaskID taskID) {
-        this.zkAccessor = zkAccessor;
-        this.taskID = taskID;
+    private StatusNode(ZKAccessor zkAccessor, TaskID taskID) {
+        super(zkAccessor, taskID);
     }
 
-    public boolean isRunning() {
+    @Override
+    NodeIdentify identify() {
+        return NodeIdentify.STATUS;
+    }
+
+    @Override
+    void init() {
+        zkAccessor.createEphemeralNode(taskID.identify() + "/status", "RUNNING".getBytes());
+    }
+
+    boolean isRunning() {
         return zkAccessor.checkNodeExist(taskID.identify() + ROOT);
+    }
+
+    static StatusNode load(ZKAccessor zkAccessor, TaskID taskID) {
+        return new StatusNode(zkAccessor, taskID);
     }
 }

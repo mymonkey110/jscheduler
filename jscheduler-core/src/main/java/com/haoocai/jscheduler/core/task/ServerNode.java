@@ -12,14 +12,16 @@ import java.util.List;
  *
  * @author Michael Jiang on 16/6/15.
  */
-public class ServerNode {
-    private final ZKAccessor zkAccessor;
-    private final TaskID taskID;
+class ServerNode extends AbstractNode {
     private final static String ROOT = "/servers";
 
-    public ServerNode(ZKAccessor zkAccessor, TaskID taskID) {
-        this.zkAccessor = zkAccessor;
-        this.taskID = taskID;
+    private ServerNode(ZKAccessor zkAccessor, TaskID taskID) {
+        super(zkAccessor, taskID);
+    }
+
+    @Override
+    NodeIdentify identify() {
+        return NodeIdentify.SERVER;
     }
 
     //initialize server node
@@ -27,7 +29,7 @@ public class ServerNode {
         zkAccessor.create(taskID.identify() + "/servers", new byte[0]);
     }
 
-    public List<SchedulerUnit> getTaskSchedulerUnits() {
+    List<SchedulerUnit> getTaskSchedulerUnits() {
         List<String> servers = zkAccessor.getChildren(taskID.identify() + ROOT);
 
         return Lists.newArrayList(Lists.transform(servers, new Function<String, SchedulerUnit>() {
@@ -38,7 +40,7 @@ public class ServerNode {
         }));
     }
 
-    public static ServerNode load(ZKAccessor zkAccessor, TaskID taskID) {
+    static ServerNode load(ZKAccessor zkAccessor, TaskID taskID) {
         return new ServerNode(zkAccessor, taskID);
     }
 }

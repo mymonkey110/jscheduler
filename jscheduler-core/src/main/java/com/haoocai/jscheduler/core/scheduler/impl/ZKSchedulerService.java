@@ -1,14 +1,13 @@
 package com.haoocai.jscheduler.core.scheduler.impl;
 
-import com.haoocai.jscheduler.core.shared.JschedulerConfig;
 import com.haoocai.jscheduler.core.register.TaskRegisterCenter;
 import com.haoocai.jscheduler.core.scheduler.SchedulerService;
+import com.haoocai.jscheduler.core.shared.JschedulerConfig;
 import com.haoocai.jscheduler.core.task.Task;
 import com.haoocai.jscheduler.core.task.TaskID;
-import com.haoocai.jscheduler.core.task.ZKTaskManager;
+import com.haoocai.jscheduler.core.task.ZKTaskService;
 import com.haoocai.jscheduler.core.tracker.TaskTracker;
 import com.haoocai.jscheduler.core.tracker.TaskTrackerFactory;
-import com.haoocai.jscheduler.core.tracker.ZKTaskTracker;
 import com.haoocai.jscheduler.core.zk.ZKAccessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,12 +27,12 @@ class ZKSchedulerService implements SchedulerService {
     private final ZKAccessor zkAccessor;
     private final JschedulerConfig jschedulerConfig;
 
-    private final ZKTaskManager zkTaskManager;
+    private final ZKTaskService zkTaskManager;
 
     private static Logger LOG = LoggerFactory.getLogger(ZKSchedulerService.class);
 
     @Autowired
-    public ZKSchedulerService(ZKAccessor zkAccessor, JschedulerConfig jschedulerConfig, ZKTaskManager zkTaskManager) {
+    public ZKSchedulerService(ZKAccessor zkAccessor, JschedulerConfig jschedulerConfig, ZKTaskService zkTaskManager) {
         this.zkAccessor = zkAccessor;
         this.jschedulerConfig = jschedulerConfig;
         this.zkTaskManager = zkTaskManager;
@@ -47,10 +46,12 @@ class ZKSchedulerService implements SchedulerService {
     @Override
     public void startTask(TaskID taskID) {
         LOG.info("trying start task:{}.", taskID);
-        String taskPath = taskID.identify();
         try {
-            //reset start flag to zk
-            zkAccessor.createEphemeralNode(taskPath + "/status", "RUNNING".getBytes());
+            Task task = TaskRegisterCenter.task(taskID);
+            if (task == null) {
+                throw new Exception("task not found");
+            }
+            task.start();
 
             //start task tracker
             TaskTracker taskTracker = TaskTrackerFactory.getTaskTracker(taskID, zkAccessor);
@@ -94,9 +95,7 @@ class ZKSchedulerService implements SchedulerService {
                     for (String name : taskNames) {
                         TaskID taskID = new TaskID(namespace, app, name);
                         zkTaskManager.load(taskID);
-                        Task task = TaskRegisterCenter.task(taskID);
-                        TaskTracker taskTracker = new ZKTaskTracker(zkAccessor, task);
-                        taskTracker.track();
+                        startTask(taskID);
                     }
                 }
             }

@@ -13,46 +13,56 @@ import static com.haoocai.jscheduler.core.shared.Constants.UTF8_CHARSET;
  *
  * @author Michael Jiang on 16/6/15.
  */
-class ConfigNode {
-    private final ZKAccessor zkAccessor;
-    private final TaskID taskID;
+class ConfigNode extends AbstractNode {
     private Cron cron;
     private PickStrategy pickStrategy;
 
-    private static String ROOT = "/config";
-    private static String CRON_EXPRESSION = ROOT + "/cron";
-    private static String PICK_STRATEGY = ROOT + "/strategy";
+    private final static String ROOT = NodeIdentify.CONFIG.getRoot();
+    private final static String CRON_EXPRESSION = ROOT + "/cron";
+    private final static String PICK_STRATEGY = ROOT + "/strategy";
 
-    ConfigNode(ZKAccessor zkAccessor, TaskID taskID, Cron cron) {
-        this(zkAccessor, taskID, cron, PickStrategy.RANDOM);
+    private ConfigNode(ZKAccessor zkAccessor, TaskID taskID) {
+        super(zkAccessor, taskID);
     }
 
-    ConfigNode(ZKAccessor zkAccessor, TaskID taskID, Cron cron, PickStrategy pickStrategy) {
-        this.zkAccessor = zkAccessor;
-        this.taskID = taskID;
-        this.cron = cron;
-        this.pickStrategy = pickStrategy;
+    ConfigNode(ZKAccessor zkAccessor,TaskID taskID,Cron cron,PickStrategy pickStrategy) {
+        super(zkAccessor,taskID);
+        this.cron = checkNotNull(cron);
+        this.pickStrategy = checkNotNull(pickStrategy);
+    }
+
+    @Override
+    NodeIdentify identify() {
+        return NodeIdentify.CONFIG;
     }
 
     //initialize config node
+    @Override
     void init() {
         zkAccessor.create(taskID.identify() + ROOT, new byte[0]);
         zkAccessor.create(taskID.identify() + CRON_EXPRESSION, cron.cron().getBytes(UTF8_CHARSET));
         zkAccessor.create(taskID.identify() + PICK_STRATEGY, pickStrategy.toString().getBytes(UTF8_CHARSET));
     }
 
-    public static ConfigNode load(ZKAccessor zkAccessor, TaskID taskID) {
+    static ConfigNode load(ZKAccessor zkAccessor, TaskID taskID) {
         String cronExpr = new String(zkAccessor.getData(taskID.identify() + CRON_EXPRESSION), UTF8_CHARSET);
         PickStrategy pickStrategy = PickStrategy.valueOf(new String(zkAccessor.getData(taskID.identify() + PICK_STRATEGY), UTF8_CHARSET));
-        return new ConfigNode(zkAccessor, taskID, new Cron(cronExpr), pickStrategy);
+        ConfigNode configNode = new ConfigNode(zkAccessor, taskID);
+        configNode.setCron(new Cron(cronExpr));
+        configNode.setPickStrategy(pickStrategy);
+        return configNode;
     }
 
-    public void changeCron(Cron cron) {
+    public void setCron(Cron cron) {
+        this.cron = cron;
+    }
+
+    void changeCron(Cron cron) {
         this.cron = checkNotNull(cron);
         zkAccessor.setData(taskID.identify() + CRON_EXPRESSION, cron.cron().getBytes(UTF8_CHARSET));
     }
 
-    public void setPickStrategy(PickStrategy pickStrategy) {
+    private void setPickStrategy(PickStrategy pickStrategy) {
         this.pickStrategy = pickStrategy;
 
         zkAccessor.setData(taskID.identify() + PICK_STRATEGY, pickStrategy.toString().getBytes(UTF8_CHARSET));
@@ -62,11 +72,11 @@ class ConfigNode {
         return this.cron;
     }
 
-    public Date calcNextRunTime() {
+    Date calcNextRunTime() {
         return cron.calcNextRunTime();
     }
 
-    public PickStrategy getPickStrategy() {
+    PickStrategy getPickStrategy() {
         return pickStrategy;
     }
 
