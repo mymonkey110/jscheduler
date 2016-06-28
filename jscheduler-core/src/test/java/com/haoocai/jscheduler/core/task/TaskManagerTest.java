@@ -3,7 +3,6 @@ package com.haoocai.jscheduler.core.task;
 import com.haoocai.jscheduler.core.AbstractBaseTest;
 import com.haoocai.jscheduler.core.exception.AppNotFoundException;
 import com.haoocai.jscheduler.core.exception.NamespaceNotExistException;
-import com.haoocai.jscheduler.core.task.impl.ZKTaskManager;
 import com.haoocai.jscheduler.core.zk.ZKAccessor;
 import org.junit.Before;
 import org.junit.Test;

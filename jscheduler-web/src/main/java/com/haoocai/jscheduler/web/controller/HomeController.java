@@ -1,6 +1,6 @@
 package com.haoocai.jscheduler.web.controller;
 
-import com.haoocai.jscheduler.core.JschedulerConfig;
+import com.haoocai.jscheduler.core.shared.JschedulerConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

@@ -1,4 +1,4 @@
-package com.haoocai.jscheduler.core;
+package com.haoocai.jscheduler.core.shared;
 
 /**
  * @author Michael Jiang on 16/5/16.

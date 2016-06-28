@@ -1,4 +1,4 @@
-package com.haoocai.jscheduler.core;
+package com.haoocai.jscheduler.core.shared;
 
 import com.google.common.base.Splitter;
 import org.slf4j.Logger;

@@ -4,6 +4,7 @@ import com.haoocai.jscheduler.core.scheduler.SchedulerUnit;
 import com.haoocai.jscheduler.core.trigger.PickStrategy;
 import com.haoocai.jscheduler.core.zk.ZKAccessor;
 
+import java.util.Date;
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -23,12 +24,7 @@ public class Task {
 
     private ServerNode serverNode;
 
-    private Status status;
-
-    enum Status {
-        RUNNING,
-        STOP
-    }
+    private StatusNode statusNode;
 
     public Task(TaskID taskID, ZKAccessor zkAccessor) {
         this.taskID = checkNotNull(taskID);
@@ -43,6 +39,7 @@ public class Task {
         this.taskID = taskID;
         this.zkAccessor = zkAccessor;
         this.serverNode = new ServerNode(zkAccessor, taskID);
+        this.statusNode = new StatusNode(zkAccessor, taskID);
         this.configNode = new ConfigNode(zkAccessor, taskID, cron, pickStrategy);
     }
 
@@ -81,6 +78,14 @@ public class Task {
         return this.configNode.getCron().cron();
     }
 
+    public Date calcNextRunTime() {
+        return this.configNode.calcNextRunTime();
+    }
+
+    public boolean isRunning() {
+        return statusNode.isRunning();
+    }
+
     public PickStrategy getPickStrategy() {
         return this.configNode.getPickStrategy();
     }
@@ -99,6 +104,7 @@ public class Task {
                 "taskID=" + taskID +
                 ", configNode=" + configNode +
                 ", serverNode=" + serverNode +
+                ", statusNode=" + statusNode +
                 '}';
     }
 }

@@ -1,12 +1,11 @@
 package com.haoocai.jscheduler.core.tracker;
 
 
-import com.haoocai.jscheduler.core.CronExpression;
+import com.haoocai.jscheduler.core.util.CronExpression;
 import com.haoocai.jscheduler.core.scheduler.SchedulerUnit;
 import com.haoocai.jscheduler.core.task.Task;
-import com.haoocai.jscheduler.core.task.TaskDescriptor;
 import com.haoocai.jscheduler.core.task.TaskID;
-import com.haoocai.jscheduler.core.task.impl.ZKTaskManager;
+import com.haoocai.jscheduler.core.task.ZKTaskManager;
 import com.haoocai.jscheduler.core.zk.ZKAccessor;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;

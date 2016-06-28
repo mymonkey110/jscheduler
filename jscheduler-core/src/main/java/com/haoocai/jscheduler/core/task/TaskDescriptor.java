@@ -1,9 +1,6 @@
 package com.haoocai.jscheduler.core.task;
 
-import com.haoocai.jscheduler.core.CronExpression;
 import com.haoocai.jscheduler.core.trigger.PickStrategy;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
 
 import java.io.Serializable;
 import java.util.Map;

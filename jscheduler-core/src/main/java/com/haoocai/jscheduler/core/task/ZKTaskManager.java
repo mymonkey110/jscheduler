@@ -1,4 +1,4 @@
-package com.haoocai.jscheduler.core.task.impl;
+package com.haoocai.jscheduler.core.task;
 
 import com.google.common.base.Preconditions;
 import com.haoocai.jscheduler.core.exception.AppNotFoundException;
@@ -6,7 +6,6 @@ import com.haoocai.jscheduler.core.exception.CronExpressionException;
 import com.haoocai.jscheduler.core.exception.NamespaceNotExistException;
 import com.haoocai.jscheduler.core.exception.TaskExistException;
 import com.haoocai.jscheduler.core.register.TaskRegisterCenter;
-import com.haoocai.jscheduler.core.task.*;
 import com.haoocai.jscheduler.core.zk.ZKAccessor;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;

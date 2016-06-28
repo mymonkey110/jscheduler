@@ -1,12 +1,11 @@
 package com.haoocai.jscheduler.core.scheduler.impl;
 
-import com.haoocai.jscheduler.core.JschedulerConfig;
+import com.haoocai.jscheduler.core.shared.JschedulerConfig;
 import com.haoocai.jscheduler.core.register.TaskRegisterCenter;
 import com.haoocai.jscheduler.core.scheduler.SchedulerService;
 import com.haoocai.jscheduler.core.task.Task;
-import com.haoocai.jscheduler.core.task.TaskDescriptor;
 import com.haoocai.jscheduler.core.task.TaskID;
-import com.haoocai.jscheduler.core.task.impl.ZKTaskManager;
+import com.haoocai.jscheduler.core.task.ZKTaskManager;
 import com.haoocai.jscheduler.core.tracker.TaskTracker;
 import com.haoocai.jscheduler.core.tracker.TaskTrackerFactory;
 import com.haoocai.jscheduler.core.tracker.ZKTaskTracker;
@@ -17,10 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
 import java.util.List;
-
-import static com.haoocai.jscheduler.core.Constants.UTF8_CHARSET;
 
 /**
  * Scheduler Service with Zookeeper implementation
@@ -124,17 +120,6 @@ class ZKSchedulerService implements SchedulerService {
         } else {
             LOG.info("namespace:{} exist.", namespace);
         }
-    }
-
-    private List<TaskDescriptor> getTask(String namespace, String app) {
-        List<TaskDescriptor> taskDescriptors = new ArrayList<>();
-        List<String> tasks = zkAccessor.getChildren("/" + namespace + "/" + app);
-        LOG.info("namespace:{} app:{} tasks:{}.", namespace, app, tasks);
-        for (String taskName : tasks) {
-            byte[] data = zkAccessor.getData("/" + namespace + "/" + app + "/" + taskName + "/config/cron");
-            taskDescriptors.add(new TaskDescriptor(new TaskID(namespace, app, taskName), new String(data, UTF8_CHARSET)));
-        }
-        return taskDescriptors;
     }
 
 }

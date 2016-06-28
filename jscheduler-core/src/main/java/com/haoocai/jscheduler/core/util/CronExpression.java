@@ -1,4 +1,4 @@
-package com.haoocai.jscheduler.core;
+package com.haoocai.jscheduler.core.util;
 
 import java.io.Serializable;
 import java.text.ParseException;

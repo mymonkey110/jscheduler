@@ -1,6 +1,6 @@
 package com.haoocai.jscheduler.core.zk;
 
-import com.haoocai.jscheduler.core.JschedulerConfig;
+import com.haoocai.jscheduler.core.shared.JschedulerConfig;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;

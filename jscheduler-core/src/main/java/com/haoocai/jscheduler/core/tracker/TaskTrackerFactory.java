@@ -3,14 +3,11 @@ package com.haoocai.jscheduler.core.tracker;
 import com.google.common.base.Preconditions;
 import com.haoocai.jscheduler.core.register.TaskRegisterCenter;
 import com.haoocai.jscheduler.core.task.Task;
-import com.haoocai.jscheduler.core.task.TaskDescriptor;
 import com.haoocai.jscheduler.core.task.TaskID;
 import com.haoocai.jscheduler.core.zk.ZKAccessor;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import static com.haoocai.jscheduler.core.Constants.UTF8_CHARSET;
 
 /**
  * @author Michael Jiang on 16/5/11.

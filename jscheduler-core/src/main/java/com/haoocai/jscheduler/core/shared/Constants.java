@@ -1,4 +1,4 @@
-package com.haoocai.jscheduler.core;
+package com.haoocai.jscheduler.core.shared;
 
 import java.nio.charset.Charset;
 
