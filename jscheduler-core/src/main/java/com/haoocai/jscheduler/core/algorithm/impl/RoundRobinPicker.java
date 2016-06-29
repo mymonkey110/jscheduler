@@ -1,6 +1,7 @@
 package com.haoocai.jscheduler.core.algorithm.impl;
 
 import com.haoocai.jscheduler.core.scheduler.SchedulerUnit;
+import com.haoocai.jscheduler.core.task.Task;
 import com.haoocai.jscheduler.core.task.TaskID;
 import com.haoocai.jscheduler.core.algorithm.AbstractPickStrategy;
 import com.haoocai.jscheduler.core.algorithm.PickStrategy;
@@ -21,20 +22,13 @@ public class RoundRobinPicker extends AbstractPickStrategy {
 
     private static Logger LOG = LoggerFactory.getLogger(RoundRobinPicker.class);
 
-    public RoundRobinPicker(ZKAccessor zkAccessor, TaskID taskID) {
-        super(zkAccessor, taskID);
+    public RoundRobinPicker(ZKAccessor zkAccessor, Task task) {
+        super(zkAccessor, task);
     }
 
     //todo
     @Override
     public SchedulerUnit assign() throws Exception {
-        String taskNodePath = taskID.identify();
-        List<String> children = zkAccessor.getChildren(taskNodePath);
-        if (CollectionUtils.isEmpty(children)) {
-            LOG.warn("not found available scheduler unit.");
-            return null;
-        }
-
-        return null;
+        throw new UnsupportedOperationException();
     }
 }

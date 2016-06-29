@@ -9,7 +9,7 @@ import com.haoocai.jscheduler.core.task.TaskID;
  *
  * @author Michael Jiang on 16/3/16.
  */
-public interface TaskInvoker {
+interface TaskInvoker {
 
     /**
      * invoke name to scheduler unit.

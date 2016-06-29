@@ -2,6 +2,7 @@ package com.haoocai.jscheduler.core.algorithm;
 
 import com.haoocai.jscheduler.core.algorithm.impl.RandomPicker;
 import com.haoocai.jscheduler.core.algorithm.impl.RoundRobinPicker;
+import com.haoocai.jscheduler.core.task.Task;
 import com.haoocai.jscheduler.core.task.TaskID;
 import com.haoocai.jscheduler.core.zk.ZKAccessor;
 
@@ -16,20 +17,19 @@ public class PickerFactory {
     /**
      * create specified picker algorithm by pick strategy
      *
-     * @param zkAccessor   zkAccessor
-     * @param taskID       task id
-     * @param pickStrategy pick strategy
+     * @param zkAccessor zkAccessor
+     * @param task       task
      * @return specified picker algorithm
      */
-    public static Picker createPicker(ZKAccessor zkAccessor, TaskID taskID, PickStrategy pickStrategy) {
+    public static Picker createPicker(ZKAccessor zkAccessor, Task task) {
         checkNotNull(zkAccessor);
-        checkNotNull(taskID);
+        checkNotNull(task);
 
-        switch (pickStrategy) {
+        switch (task.getPickStrategy()) {
             case RANDOM:
-                return new RandomPicker(zkAccessor, taskID);
+                return new RandomPicker(zkAccessor, task);
             case ROUND_ROBIN:
-                return new RoundRobinPicker(zkAccessor, taskID);
+                return new RoundRobinPicker(zkAccessor, task);
             default:
                 throw new IllegalArgumentException("unknown pick strategy");
         }

@@ -1,6 +1,6 @@
 package com.haoocai.jscheduler.core.algorithm;
 
-import com.haoocai.jscheduler.core.task.TaskID;
+import com.haoocai.jscheduler.core.task.Task;
 import com.haoocai.jscheduler.core.zk.ZKAccessor;
 
 /**
@@ -8,10 +8,10 @@ import com.haoocai.jscheduler.core.zk.ZKAccessor;
  */
 public abstract class AbstractPickStrategy implements Picker{
     protected final ZKAccessor zkAccessor;
-    protected final TaskID taskID;
+    protected final Task task;
 
-    public AbstractPickStrategy(ZKAccessor zkAccessor, TaskID taskID) {
+    public AbstractPickStrategy(ZKAccessor zkAccessor, Task task) {
         this.zkAccessor = zkAccessor;
-        this.taskID = taskID;
+        this.task = task;
     }
 }

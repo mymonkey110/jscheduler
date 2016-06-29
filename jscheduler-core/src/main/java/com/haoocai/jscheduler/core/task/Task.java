@@ -71,8 +71,10 @@ public class Task {
         //create task node first
         zkAccessor.create(taskID.identify(), new byte[0]);
 
+        //initialize node
         configNode.init();
         serverNode.init();
+        statusNode.init();
     }
 
     public void changeCron(Cron cron) {

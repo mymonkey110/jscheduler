@@ -2,7 +2,7 @@ package com.haoocai.jscheduler.core.algorithm.impl;
 
 import com.haoocai.jscheduler.core.algorithm.AbstractPickStrategy;
 import com.haoocai.jscheduler.core.scheduler.SchedulerUnit;
-import com.haoocai.jscheduler.core.task.TaskID;
+import com.haoocai.jscheduler.core.task.Task;
 import com.haoocai.jscheduler.core.zk.ZKAccessor;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -22,24 +22,19 @@ public class RandomPicker extends AbstractPickStrategy {
     private static Logger LOG = LoggerFactory.getLogger(RandomPicker.class);
     private static Random random = new Random(System.currentTimeMillis());
 
-    public RandomPicker(ZKAccessor zkAccessor, TaskID taskID) {
-        super(zkAccessor, taskID);
+    public RandomPicker(ZKAccessor zkAccessor, Task task) {
+        super(zkAccessor, task);
     }
 
     @Override
     public SchedulerUnit assign() throws Exception {
-        String taskNodePath = taskID.identify();
-        List<String> children = zkAccessor.getChildren(taskNodePath);
-        if (CollectionUtils.isEmpty(children)) {
-            LOG.warn("not found available scheduler unit.");
+        List<SchedulerUnit> availableSchedulerUnits = task.getTaskSchedulerUnits();
+        LOG.info("available scheduler units:{}", availableSchedulerUnits);
+
+        if (CollectionUtils.isNotEmpty(availableSchedulerUnits)) {
+            return availableSchedulerUnits.get(random.nextInt(availableSchedulerUnits.size()));
+        } else {
             return null;
         }
-
-        String schedulerNode = children.get(random.nextInt(children.size()));
-        String[] addr = schedulerNode.split(":");
-        String ip = addr[0];
-        int port = Integer.parseInt(addr[1]);
-
-        return new SchedulerUnit(ip, port);
     }
 }

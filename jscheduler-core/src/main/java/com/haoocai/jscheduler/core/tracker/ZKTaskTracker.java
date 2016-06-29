@@ -33,7 +33,7 @@ class ZKTaskTracker extends TimerTask implements TaskTracker {
     ZKTaskTracker(ZKAccessor zkAccessor, Task task) {
         this.task = checkNotNull(task);
         this.taskID = task.getTaskID();
-        this.picker = PickerFactory.createPicker(zkAccessor, taskID, task.getPickStrategy());
+        this.picker = PickerFactory.createPicker(zkAccessor, task);
         this.invoker = new ZKTaskInvoker(zkAccessor);
     }
 
