@@ -39,7 +39,7 @@ public final class Cron implements ValueObject<Cron> {
      *
      * @return next run time point
      */
-    public Date calcNextRunTime() {
+    Date calcNextRunTime() {
         return cexp.getNextValidTimeAfter(new Date(System.currentTimeMillis()));
     }
 

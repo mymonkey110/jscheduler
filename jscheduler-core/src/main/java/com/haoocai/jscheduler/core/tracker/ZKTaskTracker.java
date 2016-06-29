@@ -7,6 +7,7 @@ import com.haoocai.jscheduler.core.task.Task;
 import com.haoocai.jscheduler.core.task.TaskID;
 import com.haoocai.jscheduler.core.task.ZKTaskService;
 import com.haoocai.jscheduler.core.zk.ZKAccessor;
+import org.apache.commons.lang3.time.DateFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,6 +23,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author Michael Jiang on 16/4/5.
  */
 class ZKTaskTracker extends TimerTask implements TaskTracker {
+    private final ZKAccessor zkAccessor;
     private final Task task;
     private final TaskID taskID;
     private final TaskInvoker invoker;
@@ -31,6 +33,7 @@ class ZKTaskTracker extends TimerTask implements TaskTracker {
     private static Logger LOG = LoggerFactory.getLogger(ZKTaskService.class);
 
     ZKTaskTracker(ZKAccessor zkAccessor, Task task) {
+        this.zkAccessor = checkNotNull(zkAccessor);
         this.task = checkNotNull(task);
         this.taskID = task.getTaskID();
         this.picker = PickerFactory.createPicker(zkAccessor, task);
@@ -52,23 +55,22 @@ class ZKTaskTracker extends TimerTask implements TaskTracker {
 
     @Override
     public void run() {
-        TaskID taskID = task.getTaskID();
         SchedulerUnit schedulerUnit;
         try {
             schedulerUnit = picker.assign();
             if (schedulerUnit != null) {
-                LOG.trace("app:{} task:{} this time scheduler unit is:{}.", taskID.getApp(), taskID.getName(), schedulerUnit);
+                LOG.info("app:{} task:{} this time scheduler unit is:{}.", taskID.getApp(), taskID.getName(), schedulerUnit);
                 invoker.invoke(taskID, schedulerUnit);
             } else {
-                LOG.trace("not found available server for task:{}.", taskID.getName());
+                LOG.info("not found available server for task:{}.", taskID.getName());
             }
         } catch (Exception e) {
             LOG.error("chose scheduler unit error:{}.", e.getMessage(), e);
         } finally {
             Date nextRunTime = task.calcNextRunTime();
-            LOG.trace("task:{} next run time:{}.", taskID.getName(), nextRunTime);
+            LOG.info("task:{} next run time:{}.", taskID.getName(), DateFormatUtils.format(nextRunTime,"yyyy-MM-dd HH:mm:ss"));
             innerTimer = new Timer(taskID.getApp() + "-" + taskID.getName() + "-" + "tracker");
-            innerTimer.schedule(this, nextRunTime);
+            innerTimer.schedule(new ZKTaskTracker(this.zkAccessor, this.task), nextRunTime);
         }
     }
 

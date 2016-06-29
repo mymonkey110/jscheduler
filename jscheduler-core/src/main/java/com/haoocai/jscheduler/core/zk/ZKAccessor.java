@@ -58,7 +58,6 @@ public class ZKAccessor {
      *
      * @param path    node absolute path
      * @param content node data
-     * @throws ZKRuntimeException
      */
     public void create(String path, byte[] content) {
         try {
@@ -132,7 +131,6 @@ public class ZKAccessor {
      *
      * @param path node absolute path
      * @return children
-     * @throws ZKRuntimeException
      */
     public List<String> getChildren(String path) {
         try {

@@ -3,6 +3,8 @@ package com.haoocai.jscheduler.core.scheduler;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.validator.routines.InetAddressValidator;
 
+import java.lang.management.ManagementFactory;
+
 /**
  * @author Michael Jiang on 16/3/16.
  */

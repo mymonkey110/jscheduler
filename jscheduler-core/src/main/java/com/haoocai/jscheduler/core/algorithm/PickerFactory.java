@@ -3,7 +3,6 @@ package com.haoocai.jscheduler.core.algorithm;
 import com.haoocai.jscheduler.core.algorithm.impl.RandomPicker;
 import com.haoocai.jscheduler.core.algorithm.impl.RoundRobinPicker;
 import com.haoocai.jscheduler.core.task.Task;
-import com.haoocai.jscheduler.core.task.TaskID;
 import com.haoocai.jscheduler.core.zk.ZKAccessor;
 
 import static com.google.common.base.Preconditions.checkNotNull;
