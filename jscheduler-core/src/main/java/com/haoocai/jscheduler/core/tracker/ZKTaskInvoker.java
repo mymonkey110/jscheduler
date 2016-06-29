@@ -28,9 +28,9 @@ class ZKTaskInvoker implements TaskInvoker {
         checkNotNull(taskID);
         checkNotNull(schedulerUnit);
 
-        LOG.trace("invoke task:{} on scheduler unit:{}.", taskID, schedulerUnit);
         try {
-            zkAccessor.setData(taskID.identify() + "/" + schedulerUnit.identify(), Long.toHexString(System.currentTimeMillis()).getBytes());
+            zkAccessor.setData(taskID.identify() + "/servers/" + schedulerUnit.identify(), Long.toHexString(System.currentTimeMillis()).getBytes());
+            LOG.info("invoke task:{} on scheduler unit:{} successfully", taskID, schedulerUnit);
             //todo success handler
         } catch (Exception e) {
             LOG.info("invoke error:{}.", e.getMessage(), e);
