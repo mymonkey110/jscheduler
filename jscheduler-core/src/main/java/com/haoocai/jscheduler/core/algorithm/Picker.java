@@ -1,9 +1,10 @@
-package com.haoocai.jscheduler.core.trigger;
+package com.haoocai.jscheduler.core.algorithm;
 
 import com.haoocai.jscheduler.core.scheduler.SchedulerUnit;
-import com.haoocai.jscheduler.core.task.TaskDescriptor;
 
 /**
+ * Scheduler Unit Picker Algorithm
+ *
  * @author Michael Jiang on 16/3/16.
  */
 public interface Picker {

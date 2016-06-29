@@ -1,6 +1,6 @@
 package com.haoocai.jscheduler.core.task;
 
-import com.haoocai.jscheduler.core.trigger.PickStrategy;
+import com.haoocai.jscheduler.core.algorithm.PickStrategy;
 
 import java.io.Serializable;
 import java.util.Map;

@@ -1,6 +1,6 @@
 package com.haoocai.jscheduler.core.task;
 
-import com.haoocai.jscheduler.core.trigger.PickStrategy;
+import com.haoocai.jscheduler.core.algorithm.PickStrategy;
 import com.haoocai.jscheduler.core.zk.ZKAccessor;
 
 import java.util.Date;
@@ -9,7 +9,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.haoocai.jscheduler.core.shared.Constants.UTF8_CHARSET;
 
 /**
- * Task Configuration
+ * Task Configuration Node
  *
  * @author Michael Jiang on 16/6/15.
  */

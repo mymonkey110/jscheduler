@@ -3,6 +3,8 @@ package com.haoocai.jscheduler.core.task;
 import com.haoocai.jscheduler.core.zk.ZKAccessor;
 
 /**
+ * Task Status Node, Ephemeral Node
+ *
  * @author Michael Jiang on 6/28/16.
  */
 class StatusNode extends AbstractNode {

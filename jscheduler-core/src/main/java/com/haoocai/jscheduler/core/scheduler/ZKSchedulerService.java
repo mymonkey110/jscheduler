@@ -1,7 +1,6 @@
-package com.haoocai.jscheduler.core.scheduler.impl;
+package com.haoocai.jscheduler.core.scheduler;
 
 import com.haoocai.jscheduler.core.register.TaskRegisterCenter;
-import com.haoocai.jscheduler.core.scheduler.SchedulerService;
 import com.haoocai.jscheduler.core.shared.JschedulerConfig;
 import com.haoocai.jscheduler.core.task.Task;
 import com.haoocai.jscheduler.core.task.TaskID;

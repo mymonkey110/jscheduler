@@ -2,7 +2,6 @@ package com.haoocai.jscheduler.core.app;
 
 import com.google.common.base.Preconditions;
 import com.haoocai.jscheduler.core.exception.AppExistException;
-import com.haoocai.jscheduler.core.app.AppService;
 import com.haoocai.jscheduler.core.exception.NamespaceNotExistException;
 import com.haoocai.jscheduler.core.zk.ZKAccessor;
 import org.apache.commons.lang3.StringUtils;

@@ -1,7 +1,7 @@
 package com.haoocai.jscheduler.core.task;
 
 import com.haoocai.jscheduler.core.shared.ValueObject;
-import com.haoocai.jscheduler.core.trigger.PickStrategy;
+import com.haoocai.jscheduler.core.algorithm.PickStrategy;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

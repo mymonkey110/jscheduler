@@ -1,11 +1,9 @@
-package com.haoocai.jscheduler.core.trigger.impl;
+package com.haoocai.jscheduler.core.algorithm.impl;
 
 import com.haoocai.jscheduler.core.scheduler.SchedulerUnit;
-import com.haoocai.jscheduler.core.task.TaskDescriptor;
 import com.haoocai.jscheduler.core.task.TaskID;
-import com.haoocai.jscheduler.core.trigger.AbstractPickStrategy;
-import com.haoocai.jscheduler.core.trigger.PickStrategy;
-import com.haoocai.jscheduler.core.trigger.Picker;
+import com.haoocai.jscheduler.core.algorithm.AbstractPickStrategy;
+import com.haoocai.jscheduler.core.algorithm.PickStrategy;
 import com.haoocai.jscheduler.core.zk.ZKAccessor;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -25,11 +23,6 @@ public class RoundRobinPicker extends AbstractPickStrategy {
 
     public RoundRobinPicker(ZKAccessor zkAccessor, TaskID taskID) {
         super(zkAccessor, taskID);
-    }
-
-    @Override
-    public PickStrategy identify() {
-        return PickStrategy.ROUND_ROBIN;
     }
 
     //todo

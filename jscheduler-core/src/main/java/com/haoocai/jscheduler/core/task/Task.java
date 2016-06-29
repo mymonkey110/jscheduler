@@ -1,7 +1,7 @@
 package com.haoocai.jscheduler.core.task;
 
 import com.haoocai.jscheduler.core.scheduler.SchedulerUnit;
-import com.haoocai.jscheduler.core.trigger.PickStrategy;
+import com.haoocai.jscheduler.core.algorithm.PickStrategy;
 import com.haoocai.jscheduler.core.zk.ZKAccessor;
 
 import java.util.Date;
@@ -43,15 +43,15 @@ public class Task {
         this.statusNode = StatusNode.load(zkAccessor, taskID);
     }
 
-    public void setConfigNode(ConfigNode configNode) {
+    private void setConfigNode(ConfigNode configNode) {
         this.configNode = configNode;
     }
 
-    public void setServerNode(ServerNode serverNode) {
+    private void setServerNode(ServerNode serverNode) {
         this.serverNode = serverNode;
     }
 
-    public void setStatusNode(StatusNode statusNode) {
+    private void setStatusNode(StatusNode statusNode) {
         this.statusNode = statusNode;
     }
 

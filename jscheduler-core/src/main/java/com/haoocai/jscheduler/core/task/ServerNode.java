@@ -8,7 +8,7 @@ import com.haoocai.jscheduler.core.zk.ZKAccessor;
 import java.util.List;
 
 /**
- * Server Node
+ * Task Server Node
  *
  * @author Michael Jiang on 16/6/15.
  */
