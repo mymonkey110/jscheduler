@@ -16,17 +16,19 @@ import static com.haoocai.jscheduler.client.util.Validate.checkNotNull;
  */
 class TaskWatcher implements Watcher {
     private final ZKClient zkClient;
-    private final SimpleTask task;
+    private final Task task;
+    private final String pathPrefix;
 
     private static Logger LOG = LoggerFactory.getLogger(TaskWatcher.class);
 
-    TaskWatcher(ZKClient zkClient, SimpleTask task) {
+    TaskWatcher(ZKClient zkClient, Task task, String pathPrefix) {
         this.zkClient = checkNotNull(zkClient);
         this.task = checkNotNull(task);
+        this.pathPrefix = pathPrefix;
     }
 
     public void start() {
-        zkClient.addListener(task.taskPath(), this);
+        zkClient.addListener(pathPrefix + "/" + task.name(), this);
     }
 
     @Override

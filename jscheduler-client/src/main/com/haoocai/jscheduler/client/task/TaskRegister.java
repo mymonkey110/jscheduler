@@ -1,5 +1,6 @@
 package com.haoocai.jscheduler.client.task;
 
+import com.haoocai.jscheduler.client.shared.JvmIdentify;
 import com.haoocai.jscheduler.client.util.Validate;
 import com.haoocai.jscheduler.client.zk.ZKClient;
 import org.slf4j.Logger;
@@ -19,6 +20,7 @@ class TaskRegister {
     private final String namespace;
     private final String app;
     private final ZKClient zkClient;
+    private final String pathPrefix;
 
     private static Logger LOG = LoggerFactory.getLogger(TaskRegister.class);
 
@@ -26,26 +28,27 @@ class TaskRegister {
         this.namespace = Validate.checkNotNull(namespace);
         this.app = Validate.checkNotNull(app);
         this.zkClient = Validate.checkNotNull(zkClient);
+        this.pathPrefix = "/" + namespace + "/" + app;
     }
 
-    public synchronized void register(SimpleTask simpleTask) {
-        Validate.checkNotNull(simpleTask);
+    public synchronized void register(Task task) {
+        Validate.checkNotNull(task);
 
-        if (taskWatcherMap.containsKey(simpleTask.name())) {
-            throw new RuntimeException("name:" + simpleTask.name() + " already registered!");
+        if (taskWatcherMap.containsKey(task.name())) {
+            throw new RuntimeException("name:" + task.name() + " already registered!");
         }
 
-        initTask(simpleTask);
-
-        TaskWatcher taskWatcher = new TaskWatcher(zkClient, simpleTask);
-        taskWatcherMap.put(simpleTask.name(), taskWatcher);
+        registerToZK(task);
+        TaskWatcher taskWatcher = new TaskWatcher(zkClient, task, pathPrefix);
+        taskWatcherMap.put(task.name(), taskWatcher);
         taskWatcher.start();
-        LOG.info("registered task:{} successfully.", simpleTask.name());
+        LOG.info("registered task:{} successfully.", task.name());
     }
 
-    private void initTask(SimpleTask simpleTask) {
-        simpleTask.setNamespace(namespace);
-        simpleTask.setApp(app);
+    private void registerToZK(Task task) {
+        String serverNode = pathPrefix + "/" + task.name() + "/servers/" + JvmIdentify.id();
+
+        zkClient.createEphemeralNode(serverNode, new byte[0]);
     }
 
 }

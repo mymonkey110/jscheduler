@@ -4,6 +4,7 @@ import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.ExponentialBackoffRetry;
+import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.Watcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +43,20 @@ public class ZKClient {
     public byte[] getData(String path) {
         try {
             return client.getData().forPath(path);
+        } catch (Exception e) {
+            throw new ZKRuntimeException(e);
+        }
+    }
+
+    /**
+     * create ephemeral node with specify path
+     *
+     * @param path    node absolute path
+     * @param content node data
+     */
+    public void createEphemeralNode(String path, byte[] content) {
+        try {
+            client.create().withMode(CreateMode.EPHEMERAL).forPath(path, content);
         } catch (Exception e) {
             throw new ZKRuntimeException(e);
         }
