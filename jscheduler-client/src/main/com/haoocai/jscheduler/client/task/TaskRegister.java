@@ -9,58 +9,43 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * name register
+ * task register
  *
  * @author Michael Jiang on 16/3/31.
  */
 class TaskRegister {
     private final Map<String, TaskWatcher> taskWatcherMap = new ConcurrentHashMap<>();
 
+    private final String namespace;
     private final String app;
     private final ZKClient zkClient;
 
     private static Logger LOG = LoggerFactory.getLogger(TaskRegister.class);
 
-    TaskRegister(ZKClient zkClient, String app) {
-        this.zkClient = zkClient;
-        this.app = app;
+    TaskRegister(String namespace, String app, ZKClient zkClient) {
+        this.namespace = Validate.checkNotNull(namespace);
+        this.app = Validate.checkNotNull(app);
+        this.zkClient = Validate.checkNotNull(zkClient);
     }
 
-    public synchronized <T extends Task> void register(T job) {
-        Validate.checkNotNull(job);
+    public synchronized void register(SimpleTask simpleTask) {
+        Validate.checkNotNull(simpleTask);
 
-        if (taskWatcherMap.containsKey(job.name())) {
-            throw new RuntimeException("name:" + job.name() + " has already registered!");
+        if (taskWatcherMap.containsKey(simpleTask.name())) {
+            throw new RuntimeException("name:" + simpleTask.name() + " already registered!");
         }
 
-        taskWatcherMap.put(job.name(), new TaskWatcher(zkClient, app, job));
+        initTask(simpleTask);
+
+        TaskWatcher taskWatcher = new TaskWatcher(zkClient, simpleTask);
+        taskWatcherMap.put(simpleTask.name(), taskWatcher);
+        taskWatcher.start();
+        LOG.info("registered task:{} successfully.", simpleTask.name());
     }
 
-    /**
-     * Encapsulate register runtime error
-     *
-     * @author Michael Jiang on 16/4/1.
-     */
-    public static class RegisterException extends RuntimeException {
-
-        private static final long serialVersionUID = 2466552277133591930L;
-
-        public RegisterException(String message) {
-            super(message);
-        }
-    }
-
-    /**
-     * start all the registered name watcher
-     */
-    public synchronized void init() {
-        LOG.debug("starting registered name watcher...");
-
-        for (String task : taskWatcherMap.keySet()) {
-            LOG.debug("start name:{} watcher.", task);
-            TaskWatcher taskWatcher = taskWatcherMap.get(task);
-            taskWatcher.start();
-        }
+    private void initTask(SimpleTask simpleTask) {
+        simpleTask.setNamespace(namespace);
+        simpleTask.setApp(app);
     }
 
 }

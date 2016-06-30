@@ -1,4 +1,4 @@
-package com.haoocai.jscheduler.client;
+package com.haoocai.jscheduler.client.task;
 
 import com.haoocai.jscheduler.client.util.StringUtils;
 
