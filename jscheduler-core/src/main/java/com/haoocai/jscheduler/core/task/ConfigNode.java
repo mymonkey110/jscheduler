@@ -41,8 +41,8 @@ class ConfigNode extends AbstractNode {
         super(zkAccessor, taskID);
     }
 
-    ConfigNode(ZKAccessor zkAccessor,TaskID taskID,Cron cron,PickStrategy pickStrategy) {
-        super(zkAccessor,taskID);
+    ConfigNode(ZKAccessor zkAccessor, TaskID taskID, Cron cron, PickStrategy pickStrategy) {
+        super(zkAccessor, taskID);
         this.cron = checkNotNull(cron);
         this.pickStrategy = checkNotNull(pickStrategy);
     }
@@ -65,7 +65,7 @@ class ConfigNode extends AbstractNode {
         PickStrategy pickStrategy = PickStrategy.valueOf(new String(zkAccessor.getData(taskID.identify() + PICK_STRATEGY), UTF8_CHARSET));
         ConfigNode configNode = new ConfigNode(zkAccessor, taskID);
         configNode.setCron(new Cron(cronExpr));
-        configNode.setPickStrategy(pickStrategy);
+        configNode.changePickStrategy(pickStrategy);
         return configNode;
     }
 
@@ -78,7 +78,7 @@ class ConfigNode extends AbstractNode {
         zkAccessor.setData(taskID.identify() + CRON_EXPRESSION, cron.cron().getBytes(UTF8_CHARSET));
     }
 
-    private void setPickStrategy(PickStrategy pickStrategy) {
+    void changePickStrategy(PickStrategy pickStrategy) {
         this.pickStrategy = pickStrategy;
 
         zkAccessor.setData(taskID.identify() + PICK_STRATEGY, pickStrategy.toString().getBytes(UTF8_CHARSET));

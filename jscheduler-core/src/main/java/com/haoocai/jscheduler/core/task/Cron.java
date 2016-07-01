@@ -16,13 +16,11 @@
 
 package com.haoocai.jscheduler.core.task;
 
-import com.haoocai.jscheduler.core.util.CronExpression;
 import com.haoocai.jscheduler.core.shared.ValueObject;
+import com.haoocai.jscheduler.core.util.CronExpression;
 
 import java.text.ParseException;
 import java.util.Date;
-
-import static com.google.common.base.Preconditions.checkArgument;
 
 /**
  * Cron Expression Value Object
@@ -36,18 +34,20 @@ public final class Cron implements ValueObject<Cron> {
     private CronExpression cexp;
 
     public Cron(String cron) {
-        checkArgument(CronExpression.isValidExpression(cron));
-
         this.cron = cron;
         try {
             this.cexp = new CronExpression(cron);
         } catch (ParseException e) {
-            throw new RuntimeException(e);
+            throw new IllegalArgumentException();
         }
     }
 
     public String cron() {
         return this.cron;
+    }
+
+    public static boolean isValid(String cronExpression) {
+        return CronExpression.isValidExpression(cronExpression);
     }
 
     /**
@@ -58,6 +58,16 @@ public final class Cron implements ValueObject<Cron> {
     Date calcNextRunTime() {
         return cexp.getNextValidTimeAfter(new Date(System.currentTimeMillis()));
     }
+
+    /**
+     * judge current datetime is satisfied with cron expression
+     *
+     * @return true/false
+     */
+    public boolean isOkNow() {
+        return cexp.isSatisfiedBy(new Date());
+    }
+
 
     @Override
     public boolean isSame(Cron other) {

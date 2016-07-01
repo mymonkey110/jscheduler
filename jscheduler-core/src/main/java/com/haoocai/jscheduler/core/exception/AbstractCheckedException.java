@@ -37,11 +37,15 @@ public abstract class AbstractCheckedException extends Exception {
         return errorCode().code();
     }
 
+    public String msg() {
+        return errorCode().msg();
+    }
+
     public static int successCode() {
         return ErrorCode.SUCCESS.code();
     }
 
-    protected enum ErrorCode {
+    public enum ErrorCode {
         SUCCESS(1000, "success"),
         PARAM_ERROR(1001, "parameter error"),
         ILLEGAL_REQUEST(1002, "illegal request"),
@@ -70,16 +74,8 @@ public abstract class AbstractCheckedException extends Exception {
             return code;
         }
 
-        public void setCode(int code) {
-            this.code = code;
-        }
-
         public String msg() {
             return msg;
-        }
-
-        public void setMsg(String msg) {
-            this.msg = msg;
         }
 
         public static ErrorCode getErrorCode(int code) {

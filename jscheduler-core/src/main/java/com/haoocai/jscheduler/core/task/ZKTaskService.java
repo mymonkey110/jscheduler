@@ -17,6 +17,7 @@
 package com.haoocai.jscheduler.core.task;
 
 import com.google.common.base.Preconditions;
+import com.haoocai.jscheduler.core.algorithm.PickStrategy;
 import com.haoocai.jscheduler.core.exception.AppNotFoundException;
 import com.haoocai.jscheduler.core.exception.CronExpressionException;
 import com.haoocai.jscheduler.core.exception.NamespaceNotExistException;
@@ -64,7 +65,7 @@ public class ZKTaskService implements TaskService {
         }
 
         Task task = new Task(taskID, cron, zkAccessor);
-        task.init();
+        task.initNode();
 
         LOG.info("create task:{} with cron:{} success.", taskID.getName(), cron);
     }
@@ -89,6 +90,12 @@ public class ZKTaskService implements TaskService {
     @Override
     public Task find(TaskID taskID) {
         return Task.load(zkAccessor, taskID);
+    }
+
+    @Override
+    public void updateConfig(TaskID taskID, Cron cron, PickStrategy pickStrategy) {
+        Task task = find(taskID);
+        task.changeConfig(cron, pickStrategy);
     }
 
     @Override

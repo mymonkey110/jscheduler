@@ -30,25 +30,34 @@ import org.slf4j.LoggerFactory;
 import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Zookeeper task tracker implementation
+ * Task Tracker with Zookeeper Implementation
+ * <p>
+ * Every single task should have its own task tracker, they are one-to-one relationship.
+ * Task tracker is responsible for calculation the task next run time point, and choose
+ * one scheduler unit for the task.
+ * </p>
  *
  * @author Michael Jiang on 16/4/5.
  */
-class ZKTaskTracker extends TimerTask implements TaskTracker {
+public class ZKTaskTracker extends TimerTask {
     private final ZKAccessor zkAccessor;
     private final Task task;
     private final TaskID taskID;
     private final TaskInvoker invoker;
-    private Timer innerTimer;
     private final Picker picker;
+
+    private transient volatile boolean runFlag = false;
+    private Lock runLock = new ReentrantLock();
 
     private static Logger LOG = LoggerFactory.getLogger(ZKTaskService.class);
 
-    ZKTaskTracker(ZKAccessor zkAccessor, Task task) {
+    public ZKTaskTracker(ZKAccessor zkAccessor, Task task) {
         this.zkAccessor = checkNotNull(zkAccessor);
         this.task = checkNotNull(task);
         this.taskID = task.getTaskID();
@@ -56,38 +65,50 @@ class ZKTaskTracker extends TimerTask implements TaskTracker {
         this.invoker = new ZKTaskInvoker(zkAccessor);
     }
 
-    @Override
     public void track() {
-        LOG.info("start a tacker for app:{}'s task:{}.", taskID.getApp(), taskID.getName());
-        Date nextRunTime = task.calcNextRunTime();
-        innerTimer = new Timer(taskID.getApp() + "-" + taskID.getName() + "-" + "tracker");
-        innerTimer.schedule(this, nextRunTime);
+        setNextTimer(this);
     }
 
-    @Override
     public void untrack() {
-        innerTimer.cancel();
+        cancel();
+    }
+
+    public void updateConfig() {
+        if (!runFlag && runLock.tryLock()) {
+            //cancel current timer first
+            untrack();
+
+            //set next timer
+            setNextTimer(new ZKTaskTracker(zkAccessor, task));
+        }
     }
 
     @Override
     public void run() {
-        SchedulerUnit schedulerUnit;
-        try {
-            schedulerUnit = picker.assign();
-            if (schedulerUnit != null) {
-                LOG.info("app:{} task:{} this time scheduler unit is:{}.", taskID.getApp(), taskID.getName(), schedulerUnit);
-                invoker.invoke(taskID, schedulerUnit);
-            } else {
-                LOG.info("not found available server for task:{}.", taskID.getName());
+        runFlag = true;
+        if (runLock.tryLock()) {
+            SchedulerUnit schedulerUnit;
+            try {
+                schedulerUnit = picker.assign();
+                if (schedulerUnit != null) {
+                    LOG.info("app:{} task:{} this time scheduler unit is:{}.", taskID.getApp(), taskID.getName(), schedulerUnit);
+                    invoker.invoke(taskID, schedulerUnit);
+                } else {
+                    LOG.info("not found available server for task:{}.", taskID.getName());
+                }
+            } catch (Exception e) {
+                LOG.error("chose scheduler unit error:{}.", e.getMessage(), e);
+            } finally {
+                setNextTimer(new ZKTaskTracker(zkAccessor, task));
             }
-        } catch (Exception e) {
-            LOG.error("chose scheduler unit error:{}.", e.getMessage(), e);
-        } finally {
-            Date nextRunTime = task.calcNextRunTime();
-            LOG.info("task:{} next run time:{}.", taskID.getName(), DateFormatUtils.format(nextRunTime,"yyyy-MM-dd HH:mm:ss"));
-            innerTimer = new Timer(taskID.getApp() + "-" + taskID.getName() + "-" + "tracker");
-            innerTimer.schedule(new ZKTaskTracker(this.zkAccessor, this.task), nextRunTime);
         }
     }
 
+    private void setNextTimer(ZKTaskTracker zkTaskTracker) {
+        Date nextRunTime = task.calcNextRunTime();
+        LOG.info("task:{} next run time:{}.", taskID.getName(), DateFormatUtils.format(nextRunTime, "yyyy-MM-dd HH:mm:ss"));
+        Timer timer = new Timer(taskID.getApp() + "-" + taskID.getName() + "-" + "tracker");
+        task.registerNewTracker(zkTaskTracker);
+        timer.schedule(zkTaskTracker, nextRunTime);
+    }
 }

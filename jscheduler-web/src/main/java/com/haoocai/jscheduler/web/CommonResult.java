@@ -36,7 +36,14 @@ public class CommonResult<T> {
     public static CommonResult errorOf(AbstractCheckedException e) {
         CommonResult commonResult = new CommonResult();
         commonResult.setCode(e.code());
-        commonResult.setMsg(e.getMessage());
+        commonResult.setMsg(e.msg());
+        return commonResult;
+    }
+
+    public static CommonResult errorOf(AbstractCheckedException.ErrorCode errorCode) {
+        CommonResult commonResult = new CommonResult();
+        commonResult.setCode(errorCode.code());
+        commonResult.setMsg(errorCode.msg());
         return commonResult;
     }
 

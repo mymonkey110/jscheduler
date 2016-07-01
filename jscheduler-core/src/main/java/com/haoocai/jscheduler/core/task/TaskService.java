@@ -16,6 +16,7 @@
 
 package com.haoocai.jscheduler.core.task;
 
+import com.haoocai.jscheduler.core.algorithm.PickStrategy;
 import com.haoocai.jscheduler.core.exception.AppNotFoundException;
 import com.haoocai.jscheduler.core.exception.CronExpressionException;
 import com.haoocai.jscheduler.core.exception.NamespaceNotExistException;
@@ -64,6 +65,9 @@ public interface TaskService {
      * @return task
      */
     Task find(TaskID taskID);
+
+
+    void updateConfig(TaskID taskID, Cron cron, PickStrategy pickStrategy);
 
     /**
      * get app all the tasks

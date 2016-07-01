@@ -16,8 +16,9 @@
 
 package com.haoocai.jscheduler.core.task;
 
-import com.haoocai.jscheduler.core.scheduler.SchedulerUnit;
 import com.haoocai.jscheduler.core.algorithm.PickStrategy;
+import com.haoocai.jscheduler.core.scheduler.SchedulerUnit;
+import com.haoocai.jscheduler.core.tracker.ZKTaskTracker;
 import com.haoocai.jscheduler.core.zk.ZKAccessor;
 
 import java.util.Date;
@@ -41,6 +42,8 @@ public class Task {
     private ServerNode serverNode;
 
     private StatusNode statusNode;
+
+    private ZKTaskTracker taskTracker;
 
     public Task(TaskID taskID, ZKAccessor zkAccessor) {
         this.taskID = checkNotNull(taskID);
@@ -83,7 +86,7 @@ public class Task {
         return task;
     }
 
-    void init() {
+    void initNode() {
         //create task node first
         zkAccessor.create(taskID.identify(), new byte[0]);
 
@@ -93,8 +96,26 @@ public class Task {
         statusNode.init();
     }
 
-    public void changeCron(Cron cron) {
+    void changeCron(Cron cron) {
         this.configNode.changeCron(cron);
+        if (taskTracker != null) {
+            taskTracker.updateConfig();
+        }
+    }
+
+    void changePickStrategy(PickStrategy pickStrategy) {
+        this.configNode.changePickStrategy(pickStrategy);
+        if (taskTracker != null) {
+            taskTracker.updateConfig();
+        }
+    }
+
+    void changeConfig(Cron cron, PickStrategy pickStrategy) {
+        this.configNode.changeCron(cron);
+        this.configNode.changePickStrategy(pickStrategy);
+        if (taskTracker != null) {
+            taskTracker.updateConfig();
+        }
     }
 
     public String getCron() {
@@ -109,8 +130,26 @@ public class Task {
         return statusNode.isRunning();
     }
 
+    public void init() {
+        this.statusNode.init();
+    }
+
     public void start() {
         this.statusNode.init();
+        if (taskTracker == null) {
+            taskTracker = new ZKTaskTracker(zkAccessor, this);
+            taskTracker.track();
+        }
+    }
+
+    public void stop() {
+        this.taskTracker.untrack();
+
+        this.statusNode.delete();
+    }
+
+    public void registerNewTracker(ZKTaskTracker taskTracker) {
+        this.taskTracker = taskTracker;
     }
 
     public PickStrategy getPickStrategy() {
@@ -121,7 +160,7 @@ public class Task {
         return serverNode.getTaskSchedulerUnits();
     }
 
-    public TaskDescriptor getTaskDescriptor() {
+    TaskDescriptor getTaskDescriptor() {
         return new TaskDescriptor(taskID, getCron(), getPickStrategy());
     }
 

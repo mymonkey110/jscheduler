@@ -21,8 +21,6 @@ import com.haoocai.jscheduler.core.shared.JschedulerConfig;
 import com.haoocai.jscheduler.core.task.Task;
 import com.haoocai.jscheduler.core.task.TaskID;
 import com.haoocai.jscheduler.core.task.ZKTaskService;
-import com.haoocai.jscheduler.core.tracker.TaskTracker;
-import com.haoocai.jscheduler.core.tracker.TaskTrackerFactory;
 import com.haoocai.jscheduler.core.zk.ZKAccessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,39 +58,17 @@ class ZKSchedulerService implements SchedulerService {
 
     @Override
     public void startTask(TaskID taskID) {
-        LOG.info("trying start task:{}.", taskID);
-        try {
-            Task task = TaskRegisterCenter.task(taskID);
-            if (task == null) {
-                throw new Exception("task not found");
-            }
-            task.start();
-
-            //start task tracker
-            TaskTracker taskTracker = TaskTrackerFactory.getTaskTracker(taskID, zkAccessor);
-            taskTracker.track();
-            LOG.info("started task:{} successfully.", taskID);
-        } catch (Exception e) {
-            LOG.error("start task:{} error:{}.", taskID, e.getMessage(), e);
-        }
+        LOG.info("trying init task:{}.", taskID);
+        Task task = TaskRegisterCenter.task(taskID);
+        task.start();
+        LOG.info("started task:{} successfully.", taskID);
     }
 
     @Override
     public void stopTask(TaskID taskID) {
         LOG.trace("trying to stop task:{}.", taskID);
-        String taskPath = taskID.identify();
-        try {
-            TaskTracker taskTracker = TaskTrackerFactory.getTaskTracker(taskID, zkAccessor);
-            if (taskTracker == null) {
-                throw new RuntimeException("local has no task tracker.");
-            }
-            //cancel local task tracker
-            taskTracker.untrack();
-            //set untrack flag to zk
-            zkAccessor.getClient().delete().forPath(taskPath + "/status");
-        } catch (Exception e) {
-            LOG.error("stop task:{} error:{}.", taskID, e.getMessage(), e);
-        }
+        Task task = TaskRegisterCenter.task(taskID);
+        task.stop();
     }
 
     private class SchedulerStarter extends Thread {

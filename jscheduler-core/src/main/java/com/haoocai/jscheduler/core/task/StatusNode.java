@@ -44,6 +44,10 @@ class StatusNode extends AbstractNode {
         return zkAccessor.checkNodeExist(taskID.identify() + ROOT);
     }
 
+    void delete() {
+        zkAccessor.delete(taskID.identify() + "/status");
+    }
+
     static StatusNode load(ZKAccessor zkAccessor, TaskID taskID) {
         return new StatusNode(zkAccessor, taskID);
     }

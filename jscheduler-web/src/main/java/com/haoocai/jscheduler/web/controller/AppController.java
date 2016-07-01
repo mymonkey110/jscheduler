@@ -36,8 +36,12 @@ import java.util.List;
 @RestController
 @RequestMapping(value = "/app")
 public class AppController {
+    private final AppService appService;
+
     @Autowired
-    private AppService appService;
+    public AppController(AppService appService) {
+        this.appService = appService;
+    }
 
 
     @RequestMapping(value = "/list/{namespace}", method = RequestMethod.GET)

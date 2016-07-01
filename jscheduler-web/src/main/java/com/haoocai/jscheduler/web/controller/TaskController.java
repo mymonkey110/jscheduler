@@ -16,6 +16,7 @@
 
 package com.haoocai.jscheduler.web.controller;
 
+import com.haoocai.jscheduler.core.algorithm.PickStrategy;
 import com.haoocai.jscheduler.core.exception.AbstractCheckedException;
 import com.haoocai.jscheduler.core.task.Cron;
 import com.haoocai.jscheduler.core.task.TaskDescriptor;
@@ -78,6 +79,21 @@ class TaskController {
                                    @PathVariable String app,
                                    @PathVariable String name) {
         taskService.delete(new TaskID(namespace, app, name));
+        return CommonResult.successRet();
+    }
+
+    @RequestMapping(value = "/update/{namespace}/{app}/{name}", method = RequestMethod.PUT)
+    public CommonResult updateConfig(@PathVariable String namespace,
+                                     @PathVariable String app,
+                                     @PathVariable String name,
+                                     @RequestParam String cron,
+                                     @RequestParam PickStrategy pickStrategy) {
+        TaskID taskID = new TaskID(namespace, app, name);
+        if (pickStrategy == null || !Cron.isValid(cron)) {
+            return CommonResult.errorOf(AbstractCheckedException.ErrorCode.PARAM_ERROR);
+        }
+
+        taskService.updateConfig(taskID, new Cron(cron), pickStrategy);
         return CommonResult.successRet();
     }
 }

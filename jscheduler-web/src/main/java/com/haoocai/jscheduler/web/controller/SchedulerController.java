@@ -31,15 +31,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/schedule")
 public class SchedulerController {
+    private final SchedulerService schedulerService;
+
     @Autowired
-    private SchedulerService schedulerService;
-
-    /*@RequestMapping(value = "/info/{namespace}/{app}/{task}", method = RequestMethod.GET)
-    public CommonResult monitorTask(@PathVariable String namespace,
-                                    @PathVariable String app,
-                                    @PathVariable String task) {
-
-    }*/
+    public SchedulerController(SchedulerService schedulerService) {
+        this.schedulerService = schedulerService;
+    }
 
     @RequestMapping(value = "/start/{namespace}/{app}/{task}", method = RequestMethod.GET)
     public CommonResult startTask(@PathVariable String namespace,
@@ -60,6 +57,5 @@ public class SchedulerController {
 
         return CommonResult.successRet();
     }
-
 
 }

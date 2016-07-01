@@ -30,8 +30,12 @@ import java.util.Date;
  */
 @Controller
 public class HomeController {
+    private final JschedulerConfig jschedulerConfig;
+
     @Autowired
-    private JschedulerConfig jschedulerConfig;
+    public HomeController(JschedulerConfig jschedulerConfig) {
+        this.jschedulerConfig = jschedulerConfig;
+    }
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public String dashboard(Model model) {
