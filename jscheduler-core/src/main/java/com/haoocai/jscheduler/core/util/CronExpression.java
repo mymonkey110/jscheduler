@@ -1,4 +1,20 @@
-package com.haoocai.jscheduler.core;
+/*
+ * Copyright 2016  Michael Jiang
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.haoocai.jscheduler.core.util;
 
 import java.io.Serializable;
 import java.text.ParseException;
@@ -90,7 +106,7 @@ import java.util.*;
  * in the seconds field means &quot;the seconds 0, 15, 30, and 45&quot;. And 
  * &quot;5/15&quot; in the seconds field means &quot;the seconds 5, 20, 35, and
  * 50&quot;.  Specifying '*' before the  '/' is equivalent to specifying 0 is
- * the value to start with. Essentially, for each field in the expression, there
+ * the value to init with. Essentially, for each field in the expression, there
  * is a set of numbers that can be turned on or off. For seconds and minutes, 
  * the numbers range from 0 to 59. For hours 0 to 23, for days of the month 0 to
  * 31, and for months 1 to 12. The &quot;/&quot; character simply helps you turn
@@ -1069,7 +1085,7 @@ public class CronExpression implements Serializable, Cloneable {
 			}
 		}
 
-		// if the end of the range is before the start, then we need to overflow into
+		// if the end of the range is before the init, then we need to overflow into
 		// the next day, month etc. This is done by adding the maximum amount for that
 		// type, and using modulus max to determine the value being added.
 		int max = -1;

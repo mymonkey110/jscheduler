@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
-package com.haoocai.jscheduler.core;
+package com.haoocai.jscheduler.core.algorithm;
 
-import org.junit.runner.RunWith;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import com.haoocai.jscheduler.core.scheduler.SchedulerUnit;
 
 /**
- * @author Michael Jiang on 16/5/26.
+ * Scheduler Unit Picker Algorithm
+ *
+ * @author Michael Jiang on 16/3/16.
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(locations = {"classpath:application-test.xml"})
-public class AbstractBaseTest {
+public interface Picker {
 
+    SchedulerUnit assign() throws Exception;
 }

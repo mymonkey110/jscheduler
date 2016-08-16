@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package com.haoocai.jscheduler.core;
+package com.haoocai.jscheduler.core.shared;
 
-import org.junit.runner.RunWith;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import java.nio.charset.Charset;
 
 /**
- * @author Michael Jiang on 16/5/26.
+ * @author Michael Jiang on 16/3/22.
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(locations = {"classpath:application-test.xml"})
-public class AbstractBaseTest {
+public interface Constants {
+    String ID = "jscheduler";
 
+    String VERSION = "1.0.0";
+
+    Charset UTF8_CHARSET = Charset.forName("UTF-8");
 }

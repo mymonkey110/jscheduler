@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package com.haoocai.jscheduler.core.zk;
+package com.haoocai.jscheduler.client.zk;
 
 /**
- * @author Michael Jiang on 16/3/25.
+ * @author Michael Jiang on 16/3/31.
  */
 public class ZKRuntimeException extends RuntimeException {
-    private static final long serialVersionUID = -7952890645635888751L;
+
+    private static final long serialVersionUID = -3889767496723782130L;
 
     public ZKRuntimeException() {
     }

@@ -14,17 +14,20 @@
  * limitations under the License.
  */
 
-package com.haoocai.jscheduler.core;
+package com.haoocai.jscheduler.core.algorithm;
 
-import org.junit.runner.RunWith;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import com.haoocai.jscheduler.core.task.Task;
+import com.haoocai.jscheduler.core.zk.ZKAccessor;
 
 /**
- * @author Michael Jiang on 16/5/26.
+ * @author Michael Jiang on 16/6/15.
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(locations = {"classpath:application-test.xml"})
-public class AbstractBaseTest {
+public abstract class AbstractPickStrategy implements Picker{
+    protected final ZKAccessor zkAccessor;
+    protected final Task task;
 
+    public AbstractPickStrategy(ZKAccessor zkAccessor, Task task) {
+        this.zkAccessor = zkAccessor;
+        this.task = task;
+    }
 }

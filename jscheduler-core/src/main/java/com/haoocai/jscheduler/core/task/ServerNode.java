@@ -1,3 +1,19 @@
+/*
+ * Copyright 2016  Michael Jiang
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.haoocai.jscheduler.core.task;
 
 import com.google.common.base.Function;
@@ -8,18 +24,20 @@ import com.haoocai.jscheduler.core.zk.ZKAccessor;
 import java.util.List;
 
 /**
- * Server Node
+ * Task Server Node
  *
  * @author Michael Jiang on 16/6/15.
  */
-public class ServerNode {
-    private final ZKAccessor zkAccessor;
-    private final TaskID taskID;
+class ServerNode extends AbstractNode {
     private final static String ROOT = "/servers";
 
-    public ServerNode(ZKAccessor zkAccessor, TaskID taskID) {
-        this.zkAccessor = zkAccessor;
-        this.taskID = taskID;
+    private ServerNode(ZKAccessor zkAccessor, TaskID taskID) {
+        super(zkAccessor, taskID);
+    }
+
+    @Override
+    NodeIdentify identify() {
+        return NodeIdentify.SERVER;
     }
 
     //initialize server node
@@ -27,7 +45,7 @@ public class ServerNode {
         zkAccessor.create(taskID.identify() + "/servers", new byte[0]);
     }
 
-    public List<SchedulerUnit> getTaskSchedulerUnits() {
+    List<SchedulerUnit> getTaskSchedulerUnits() {
         List<String> servers = zkAccessor.getChildren(taskID.identify() + ROOT);
 
         return Lists.newArrayList(Lists.transform(servers, new Function<String, SchedulerUnit>() {
@@ -38,7 +56,7 @@ public class ServerNode {
         }));
     }
 
-    public static ServerNode load(ZKAccessor zkAccessor, TaskID taskID) {
+    static ServerNode load(ZKAccessor zkAccessor, TaskID taskID) {
         return new ServerNode(zkAccessor, taskID);
     }
 }

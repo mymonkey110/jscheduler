@@ -14,17 +14,15 @@
  * limitations under the License.
  */
 
-package com.haoocai.jscheduler.core;
-
-import org.junit.runner.RunWith;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+package com.haoocai.jscheduler.core.algorithm;
 
 /**
- * @author Michael Jiang on 16/5/26.
+ * Pick Strategy
+ *
+ * @author Michael Jiang on 16/4/1.
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(locations = {"classpath:application-test.xml"})
-public class AbstractBaseTest {
+public enum PickStrategy {
+    RANDOM,
 
+    ROUND_ROBIN
 }

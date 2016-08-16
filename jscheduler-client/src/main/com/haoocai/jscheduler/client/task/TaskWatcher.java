@@ -1,62 +1,64 @@
+/*
+ * Copyright 2016  Michael Jiang
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.haoocai.jscheduler.client.task;
 
-import com.haoocai.jscheduler.client.SchedulerContext;
-import com.haoocai.jscheduler.client.util.StringUtils;
+import com.haoocai.jscheduler.client.util.SerializationUtils;
 import com.haoocai.jscheduler.client.zk.ZKClient;
-import org.apache.zookeeper.KeeperException;
+import org.apache.zookeeper.WatchedEvent;
+import org.apache.zookeeper.Watcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static com.haoocai.jscheduler.client.util.Validate.checkArguments;
 import static com.haoocai.jscheduler.client.util.Validate.checkNotNull;
 
 /**
+ * Task Watcher
+ *
  * @author Michael Jiang on 16/3/31.
  */
-class TaskWatcher implements TriggerHandler {
+class TaskWatcher implements Watcher {
     private final ZKClient zkClient;
-    private final String app;
     private final Task task;
+    private final String pathPrefix;
 
     private static Logger LOG = LoggerFactory.getLogger(TaskWatcher.class);
 
-    TaskWatcher(ZKClient zkClient, String app, Task task) {
+    TaskWatcher(ZKClient zkClient, Task task, String pathPrefix) {
         this.zkClient = checkNotNull(zkClient);
         this.task = checkNotNull(task);
-        checkArguments(StringUtils.isNotBlank(app), "app name is blank");
-        this.app = app;
+        this.pathPrefix = pathPrefix;
     }
 
-    //todo to be write
-    void start() {
-        String zkConnectAddr = zkClient.clientIdentify();
-        String listenPath = "/" + app + "/" + task + "/" + zkConnectAddr;
+    public void start() {
+        zkClient.addListener(pathPrefix + "/" + task.name(), this);
+    }
 
-        try {
-            zkClient.createListenNode(listenPath);
-            zkClient.listenNodeOnDateChange(listenPath, this);
-        } catch (Exception e) {
-            if (e instanceof KeeperException) {
-                KeeperException err = (KeeperException) e;
-                if (err.code() == KeeperException.Code.NODEEXISTS) {
-                    throw new RuntimeException(String.format("app:%s name:%s already exist in zookeeper", app, task.name()));
-                }
-                if (err.code() == KeeperException.Code.NONODE) {
-                    throw new RuntimeException(String.format("please start jscheduler center node first, and then create the %s in app:%s.", task.name(), app));
-                }
-                LOG.error("create task:{} listen node error,code:{},message:{}.", task.name(), err.code(), err.getMessage());
-                throw new RuntimeException(e);
+    @Override
+    public void process(WatchedEvent event) {
+        if (event.getType() == Event.EventType.NodeDataChanged) {
+            byte[] data = zkClient.getData(event.getPath());
+            try {
+                SchedulerContext schedulerContext = SerializationUtils.deserialize(data);
+                task.run(schedulerContext);
+            } catch (Exception e) {
+                LOG.error("process task error:{}.", e.getMessage(), e);
             }
-            LOG.info("create task:{} listen node error:{}.", task.name(), e.getMessage(), e);
-            throw new RuntimeException(e);
+        } else {
+            LOG.error("unexpected event type:{}.", event.getType());
         }
-    }
-
-
-    public void handler(Object event) {
-        if (event instanceof SchedulerContext) {
-
-        }
-        LOG.error("task watcher receive unexpected event.");
     }
 }

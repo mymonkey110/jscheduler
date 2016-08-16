@@ -1,5 +1,22 @@
+/*
+ * Copyright 2016  Michael Jiang
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.haoocai.jscheduler.client.task;
 
+import com.haoocai.jscheduler.client.shared.JvmIdentify;
 import com.haoocai.jscheduler.client.util.Validate;
 import com.haoocai.jscheduler.client.zk.ZKClient;
 import org.slf4j.Logger;
@@ -9,58 +26,41 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * name register
+ * task register
  *
  * @author Michael Jiang on 16/3/31.
  */
 class TaskRegister {
     private final Map<String, TaskWatcher> taskWatcherMap = new ConcurrentHashMap<>();
 
-    private final String app;
     private final ZKClient zkClient;
+    private final String pathPrefix;
 
     private static Logger LOG = LoggerFactory.getLogger(TaskRegister.class);
 
-    TaskRegister(ZKClient zkClient, String app) {
-        this.zkClient = zkClient;
-        this.app = app;
+    TaskRegister(String namespace, String app, ZKClient zkClient) {
+        this.zkClient = Validate.checkNotNull(zkClient);
+        this.pathPrefix = "/" + namespace + "/" + app;
     }
 
-    public synchronized <T extends Task> void register(T job) {
-        Validate.checkNotNull(job);
+    public synchronized void register(Task task) {
+        Validate.checkNotNull(task);
 
-        if (taskWatcherMap.containsKey(job.name())) {
-            throw new RuntimeException("name:" + job.name() + " has already registered!");
+        if (taskWatcherMap.containsKey(task.name())) {
+            throw new RuntimeException("name:" + task.name() + " already registered!");
         }
 
-        taskWatcherMap.put(job.name(), new TaskWatcher(zkClient, app, job));
+        registerToZK(task);
+        TaskWatcher taskWatcher = new TaskWatcher(zkClient, task, pathPrefix);
+        taskWatcherMap.put(task.name(), taskWatcher);
+        taskWatcher.start();
+        LOG.info("registered task:{} successfully.", task.name());
     }
 
-    /**
-     * Encapsulate register runtime error
-     *
-     * @author Michael Jiang on 16/4/1.
-     */
-    public static class RegisterException extends RuntimeException {
+    private void registerToZK(Task task) {
+        String serverNode = pathPrefix + "/" + task.name() + "/servers/" + JvmIdentify.id();
 
-        private static final long serialVersionUID = 2466552277133591930L;
-
-        public RegisterException(String message) {
-            super(message);
-        }
-    }
-
-    /**
-     * start all the registered name watcher
-     */
-    public synchronized void init() {
-        LOG.debug("starting registered name watcher...");
-
-        for (String task : taskWatcherMap.keySet()) {
-            LOG.debug("start name:{} watcher.", task);
-            TaskWatcher taskWatcher = taskWatcherMap.get(task);
-            taskWatcher.start();
-        }
+        zkClient.createEphemeralNode(serverNode, new byte[0]);
     }
 
 }
