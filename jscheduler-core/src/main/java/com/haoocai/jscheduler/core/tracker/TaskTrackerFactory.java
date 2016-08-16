@@ -30,14 +30,14 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class TaskTrackerFactory {
 
-    private static Map<TaskID, TaskTracker> taskTrackerRegMap = new ConcurrentHashMap<>();
+    private static Map<TaskID, ZKTaskTracker> taskTrackerRegMap = new ConcurrentHashMap<>();
 
-    public synchronized static TaskTracker getTaskTracker(TaskID taskID, ZKAccessor zkAccessor) throws Exception {
+    public synchronized static ZKTaskTracker getTaskTracker(TaskID taskID, ZKAccessor zkAccessor) throws Exception {
         Preconditions.checkNotNull(taskID);
         Preconditions.checkNotNull(zkAccessor);
 
         Task task = TaskRegisterCenter.task(taskID);
-        TaskTracker taskTracker = taskTrackerRegMap.get(taskID);
+        ZKTaskTracker taskTracker = taskTrackerRegMap.get(taskID);
         if (taskTracker == null) {
             taskTracker = new ZKTaskTracker(zkAccessor, task);
             taskTrackerRegMap.put(taskID, taskTracker);
