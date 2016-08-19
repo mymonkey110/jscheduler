@@ -32,13 +32,11 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author Michael Jiang on 16/3/31.
  */
 public class TaskRegister {
-    private final Map<String, TaskWatcher> taskWatcherMap = new ConcurrentHashMap<>();
-
-    private final ZKClient zkClient;
-    private final String pathPrefix;
-
     private static Logger LOG = LoggerFactory.getLogger(TaskRegister.class);
     private static TaskRegister instance;
+    private final Map<String, TaskWatcher> taskWatcherMap = new ConcurrentHashMap<>();
+    private final ZKClient zkClient;
+    private final String pathPrefix;
 
     private TaskRegister(String namespace, String app, ZKClient zkClient) {
         this.zkClient = Validate.checkNotNull(zkClient);
@@ -46,10 +44,10 @@ public class TaskRegister {
     }
 
     public static synchronized TaskRegister getInstance(String namespace, String app, ZKClient zkClient) {
-        Validate.checkArguments(StringUtils.isNotBlank(namespace),"namespace is blank");
-        Validate.checkArguments(StringUtils.isNotBlank(app),"app name is blank");
+        Validate.checkArguments(StringUtils.isNotBlank(namespace), "namespace is blank");
+        Validate.checkArguments(StringUtils.isNotBlank(app), "app name is blank");
 
-        if (instance==null) {
+        if (instance == null) {
             instance = new TaskRegister(namespace, app, zkClient);
         }
         return instance;
@@ -61,8 +59,8 @@ public class TaskRegister {
         if (taskWatcherMap.containsKey(task.name())) {
             throw new RuntimeException("name:" + task.name() + " already registered!");
         }
-        if (!zkClient.checkNodeExist(pathPrefix+task.name())) {
-            throw new RuntimeException("task "+task.name()+" not exist, please create task first.");
+        if (!zkClient.checkNodeExist(pathPrefix + "/" + task.name())) {
+            throw new RuntimeException("task " + task.name() + " not exist, please create task first.");
         }
 
         registerToZK(task);

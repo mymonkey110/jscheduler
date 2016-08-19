@@ -130,10 +130,6 @@ public class Task {
         return statusNode.isRunning();
     }
 
-    public void init() {
-        this.statusNode.init();
-    }
-
     public void start() {
         this.statusNode.makeRunning();
         if (taskTracker == null) {

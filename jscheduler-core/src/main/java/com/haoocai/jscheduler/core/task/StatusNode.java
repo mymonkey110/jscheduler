@@ -32,6 +32,10 @@ class StatusNode extends AbstractNode {
         super(zkAccessor, taskID);
     }
 
+    static StatusNode load(ZKAccessor zkAccessor, TaskID taskID) {
+        return new StatusNode(zkAccessor, taskID);
+    }
+
     @Override
     NodeIdentify identify() {
         return NodeIdentify.STATUS;
@@ -43,26 +47,25 @@ class StatusNode extends AbstractNode {
     }
 
     void makeRunning() {
-        zkAccessor.setData(taskID.identify()+ROOT,RUNNING_STATUS.getBytes());
+        if (!zkAccessor.checkNodeExist(taskID.identify() + ROOT)) {
+            init();
+        }
+        zkAccessor.setData(taskID.identify() + ROOT, RUNNING_STATUS.getBytes());
     }
 
     void makePause() {
-        zkAccessor.setData(taskID.identify()+ROOT,PAUSE_STATUS.getBytes());
+        zkAccessor.setData(taskID.identify() + ROOT, PAUSE_STATUS.getBytes());
     }
 
     boolean isRunning() {
-        return zkAccessor.checkNodeExist(taskID.identify() + ROOT);
+        return zkAccessor.checkNodeExist(taskID.identify() + ROOT) && RUNNING_STATUS.equals(zkAccessor.getDataStr(taskID.identify() + ROOT));
     }
 
     boolean isPause() {
-        return zkAccessor.checkNodeExist(taskID.identify()+ROOT) && PAUSE_STATUS.equals(new String(zkAccessor.getData(taskID.identify()+ROOT)));
+        return zkAccessor.checkNodeExist(taskID.identify() + ROOT) && PAUSE_STATUS.equals(zkAccessor.getDataStr(taskID.identify() + ROOT));
     }
 
     void delete() {
-        zkAccessor.delete(taskID.identify() + "/status");
-    }
-
-    static StatusNode load(ZKAccessor zkAccessor, TaskID taskID) {
-        return new StatusNode(zkAccessor, taskID);
+        zkAccessor.delete(taskID.identify() + ROOT);
     }
 }
