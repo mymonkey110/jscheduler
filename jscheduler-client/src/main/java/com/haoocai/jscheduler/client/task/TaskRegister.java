@@ -30,17 +30,25 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author Michael Jiang on 16/3/31.
  */
-class TaskRegister {
+public class TaskRegister {
     private final Map<String, TaskWatcher> taskWatcherMap = new ConcurrentHashMap<>();
 
     private final ZKClient zkClient;
     private final String pathPrefix;
 
     private static Logger LOG = LoggerFactory.getLogger(TaskRegister.class);
+    private static TaskRegister instance;
 
-    TaskRegister(String namespace, String app, ZKClient zkClient) {
+    private TaskRegister(String namespace, String app, ZKClient zkClient) {
         this.zkClient = Validate.checkNotNull(zkClient);
         this.pathPrefix = "/" + namespace + "/" + app;
+    }
+
+    public static synchronized TaskRegister getInstance(String namespace, String app, ZKClient zkClient) {
+        if (instance==null) {
+            instance = new TaskRegister(namespace, app, zkClient);
+        }
+        return instance;
     }
 
     public synchronized void register(Task task) {

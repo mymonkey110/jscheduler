@@ -16,6 +16,8 @@
 
 package com.haoocai.jscheduler.client.zk;
 
+import com.haoocai.jscheduler.client.util.StringUtils;
+import com.haoocai.jscheduler.client.util.Validate;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
@@ -33,19 +35,23 @@ import org.slf4j.LoggerFactory;
 public class ZKClient {
 
     private CuratorFramework client;
+    private String connectStr;
+    private final static int SLEEP=1000;
+    private final static int TRY_TIMES =3;
 
     private static Logger LOG = LoggerFactory.getLogger(ZKClient.class);
 
-    ZKClient(String connectStr) {
-        this(connectStr, 1000, 3);
-    }
-
-    ZKClient(String connectStr, int sleep, int tryTimes) {
+    public void init() {
         LOG.info("trying to connect to zookeeper:{}", connectStr);
-        RetryPolicy retryPolicy = new ExponentialBackoffRetry(sleep, tryTimes);
+        RetryPolicy retryPolicy = new ExponentialBackoffRetry(SLEEP, TRY_TIMES);
         client = CuratorFrameworkFactory.newClient(connectStr, retryPolicy);
         client.start();
         LOG.info("connected to zookeeper:{}", connectStr);
+    }
+
+    public void setConnectStr(String connectStr) {
+        Validate.checkArguments(StringUtils.isNotBlank(connectStr),"zookeeper connect string can't be blank");
+        this.connectStr=connectStr;
     }
 
     public void addListener(String path, Watcher watcher) {

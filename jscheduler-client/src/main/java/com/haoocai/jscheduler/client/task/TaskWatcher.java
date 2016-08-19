@@ -16,7 +16,6 @@
 
 package com.haoocai.jscheduler.client.task;
 
-import com.haoocai.jscheduler.client.util.SerializationUtils;
 import com.haoocai.jscheduler.client.zk.ZKClient;
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
@@ -52,8 +51,8 @@ class TaskWatcher implements Watcher {
         if (event.getType() == Event.EventType.NodeDataChanged) {
             byte[] data = zkClient.getData(event.getPath());
             try {
-                SchedulerContext schedulerContext = SerializationUtils.deserialize(data);
-                task.run(schedulerContext);
+                //SchedulerContext schedulerContext = SerializationUtils.deserialize(data);
+                task.run();
             } catch (Exception e) {
                 LOG.error("process task error:{}.", e.getMessage(), e);
             }
