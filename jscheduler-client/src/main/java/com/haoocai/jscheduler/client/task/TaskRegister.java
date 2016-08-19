@@ -17,6 +17,7 @@
 package com.haoocai.jscheduler.client.task;
 
 import com.haoocai.jscheduler.client.shared.JvmIdentify;
+import com.haoocai.jscheduler.client.util.StringUtils;
 import com.haoocai.jscheduler.client.util.Validate;
 import com.haoocai.jscheduler.client.zk.ZKClient;
 import org.slf4j.Logger;
@@ -45,6 +46,9 @@ public class TaskRegister {
     }
 
     public static synchronized TaskRegister getInstance(String namespace, String app, ZKClient zkClient) {
+        Validate.checkArguments(StringUtils.isNotBlank(namespace),"namespace is blank");
+        Validate.checkArguments(StringUtils.isNotBlank(app),"app name is blank");
+
         if (instance==null) {
             instance = new TaskRegister(namespace, app, zkClient);
         }
@@ -56,6 +60,9 @@ public class TaskRegister {
 
         if (taskWatcherMap.containsKey(task.name())) {
             throw new RuntimeException("name:" + task.name() + " already registered!");
+        }
+        if (!zkClient.checkNodeExist(pathPrefix+task.name())) {
+            throw new RuntimeException("task "+task.name()+" not exist, please create task first.");
         }
 
         registerToZK(task);

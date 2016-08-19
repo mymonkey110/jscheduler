@@ -36,10 +36,19 @@ public class ZKClient {
 
     private CuratorFramework client;
     private String connectStr;
-    private final static int SLEEP=1000;
-    private final static int TRY_TIMES =3;
+    private final static int SLEEP = 1000;
+    private final static int TRY_TIMES = 3;
 
     private static Logger LOG = LoggerFactory.getLogger(ZKClient.class);
+
+    public ZKClient() {
+
+    }
+
+    public ZKClient(String connectStr) {
+        Validate.checkArguments(StringUtils.isNotBlank(connectStr), "zookeeper connect string can't be blank");
+        this.connectStr = connectStr;
+    }
 
     public void init() {
         LOG.info("trying to connect to zookeeper:{}", connectStr);
@@ -50,8 +59,8 @@ public class ZKClient {
     }
 
     public void setConnectStr(String connectStr) {
-        Validate.checkArguments(StringUtils.isNotBlank(connectStr),"zookeeper connect string can't be blank");
-        this.connectStr=connectStr;
+        Validate.checkArguments(StringUtils.isNotBlank(connectStr), "zookeeper connect string can't be blank");
+        this.connectStr = connectStr;
     }
 
     public void addListener(String path, Watcher watcher) {
@@ -79,6 +88,14 @@ public class ZKClient {
     public void createEphemeralNode(String path, byte[] content) {
         try {
             client.create().withMode(CreateMode.EPHEMERAL).forPath(path, content);
+        } catch (Exception e) {
+            throw new ZKRuntimeException(e);
+        }
+    }
+
+    public boolean checkNodeExist(String path) throws ZKRuntimeException {
+        try {
+            return client.checkExists().forPath(path) != null;
         } catch (Exception e) {
             throw new ZKRuntimeException(e);
         }
