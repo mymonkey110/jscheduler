@@ -25,6 +25,8 @@ import com.haoocai.jscheduler.core.zk.ZKAccessor;
  */
 class StatusNode extends AbstractNode {
     private final static String ROOT = "/status";
+    private final static String RUNNING_STATUS = "RUNNING";
+    private final static String PAUSE_STATUS = "PAUSE";
 
     private StatusNode(ZKAccessor zkAccessor, TaskID taskID) {
         super(zkAccessor, taskID);
@@ -37,11 +39,23 @@ class StatusNode extends AbstractNode {
 
     @Override
     void init() {
-        zkAccessor.createEphemeralNode(taskID.identify() + "/status", "RUNNING".getBytes());
+        zkAccessor.createEphemeralNode(taskID.identify() + ROOT, PAUSE_STATUS.getBytes());
+    }
+
+    void makeRunning() {
+        zkAccessor.setData(taskID.identify()+ROOT,RUNNING_STATUS.getBytes());
+    }
+
+    void makePause() {
+        zkAccessor.setData(taskID.identify()+ROOT,PAUSE_STATUS.getBytes());
     }
 
     boolean isRunning() {
         return zkAccessor.checkNodeExist(taskID.identify() + ROOT);
+    }
+
+    boolean isPause() {
+        return zkAccessor.checkNodeExist(taskID.identify()+ROOT) && PAUSE_STATUS.equals(new String(zkAccessor.getData(taskID.identify()+ROOT)));
     }
 
     void delete() {

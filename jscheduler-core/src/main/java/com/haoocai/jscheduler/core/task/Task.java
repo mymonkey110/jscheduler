@@ -135,7 +135,7 @@ public class Task {
     }
 
     public void start() {
-        this.statusNode.init();
+        this.statusNode.makeRunning();
         if (taskTracker == null) {
             taskTracker = new ZKTaskTracker(zkAccessor, this);
             taskTracker.track();
@@ -145,7 +145,7 @@ public class Task {
     public void stop() {
         this.taskTracker.untrack();
 
-        this.statusNode.delete();
+        this.statusNode.makePause();
     }
 
     public void registerNewTracker(ZKTaskTracker taskTracker) {

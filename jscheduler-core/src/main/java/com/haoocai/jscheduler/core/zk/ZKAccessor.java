@@ -31,6 +31,8 @@ import org.springframework.stereotype.Repository;
 import javax.annotation.PostConstruct;
 import java.util.List;
 
+import static com.haoocai.jscheduler.core.shared.Constants.UTF8_CHARSET;
+
 /**
  * @author Michael Jiang on 16/3/16.
  */
@@ -168,6 +170,16 @@ public class ZKAccessor {
         } catch (Exception e) {
             throw new ZKRuntimeException(e);
         }
+    }
+
+    /**
+     * get the specify node data, wrap into utf8 string
+     * {@link #getData}
+     * @param path node absolute path
+     * @return string data
+     */
+    public String getDataStr(String path) {
+        return new String(getData(path), UTF8_CHARSET);
     }
 
     /**
