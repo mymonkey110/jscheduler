@@ -100,4 +100,17 @@ public class ZKClient {
             throw new ZKRuntimeException(e);
         }
     }
+
+    /**
+     * delete the specify node
+     *
+     * @param path node absolute path
+     */
+    public void delete(String path) {
+        try {
+            client.delete().forPath(path);
+        } catch (Exception e) {
+            throw new ZKRuntimeException(e);
+        }
+    }
 }

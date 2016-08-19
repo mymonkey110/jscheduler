@@ -29,7 +29,7 @@ class IP implements ValueObject<IP> {
     private final String ip;
 
     IP(String ip) {
-        Validate.isTrue(InetAddressValidator.getInstance().isValid(ip), "ip address is illegal");
+        //Validate.isTrue(InetAddressValidator.getInstance().isValid(ip), "ip address is illegal");
         this.ip = ip;
     }
 

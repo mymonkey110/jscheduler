@@ -72,7 +72,9 @@ public class TaskRegister {
 
     private void registerToZK(Task task) {
         String serverNode = pathPrefix + "/" + task.name() + "/servers/" + JvmIdentify.id();
-
+        if (zkClient.checkNodeExist(serverNode)) {
+            zkClient.delete(serverNode);
+        }
         zkClient.createEphemeralNode(serverNode, new byte[0]);
     }
 

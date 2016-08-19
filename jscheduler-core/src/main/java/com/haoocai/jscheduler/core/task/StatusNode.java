@@ -28,8 +28,12 @@ class StatusNode extends AbstractNode {
     private final static String RUNNING_STATUS = "RUNNING";
     private final static String PAUSE_STATUS = "PAUSE";
 
+    private volatile boolean initialized = false;
+    private String path;
+
     private StatusNode(ZKAccessor zkAccessor, TaskID taskID) {
         super(zkAccessor, taskID);
+        this.path = taskID.identify() + ROOT;
     }
 
     static StatusNode load(ZKAccessor zkAccessor, TaskID taskID) {
@@ -43,18 +47,27 @@ class StatusNode extends AbstractNode {
 
     @Override
     void init() {
+        if (zkAccessor.checkNodeExist(path)) {
+            zkAccessor.delete(taskID.identify() + ROOT);
+        }
         zkAccessor.createEphemeralNode(taskID.identify() + ROOT, PAUSE_STATUS.getBytes());
+        initialized = true;
     }
 
     void makeRunning() {
-        if (!zkAccessor.checkNodeExist(taskID.identify() + ROOT)) {
-            init();
-        }
+        makeSureInitialized();
         zkAccessor.setData(taskID.identify() + ROOT, RUNNING_STATUS.getBytes());
     }
 
     void makePause() {
+        makeSureInitialized();
         zkAccessor.setData(taskID.identify() + ROOT, PAUSE_STATUS.getBytes());
+    }
+
+    private void makeSureInitialized() {
+        if (!initialized) {
+            init();
+        }
     }
 
     boolean isRunning() {

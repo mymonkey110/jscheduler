@@ -16,6 +16,7 @@
 
 package com.haoocai.jscheduler.client.task;
 
+import com.haoocai.jscheduler.client.shared.JvmIdentify;
 import com.haoocai.jscheduler.client.zk.ZKClient;
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
@@ -30,11 +31,10 @@ import static com.haoocai.jscheduler.client.util.Validate.checkNotNull;
  * @author Michael Jiang on 16/3/31.
  */
 class TaskWatcher implements Watcher {
+    private static Logger LOG = LoggerFactory.getLogger(TaskWatcher.class);
     private final ZKClient zkClient;
     private final Task task;
     private final String pathPrefix;
-
-    private static Logger LOG = LoggerFactory.getLogger(TaskWatcher.class);
 
     TaskWatcher(ZKClient zkClient, Task task, String pathPrefix) {
         this.zkClient = checkNotNull(zkClient);
@@ -43,11 +43,13 @@ class TaskWatcher implements Watcher {
     }
 
     public void start() {
-        zkClient.addListener(pathPrefix + "/" + task.name(), this);
+        zkClient.addListener(pathPrefix + "/" + task.name() + "/servers/" + JvmIdentify.id(), this);
     }
 
     @Override
     public void process(WatchedEvent event) {
+        start();
+
         if (event.getType() == Event.EventType.NodeDataChanged) {
             byte[] data = zkClient.getData(event.getPath());
             try {
