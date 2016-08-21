@@ -23,6 +23,7 @@ import org.apache.zookeeper.Watcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.haoocai.jscheduler.client.shared.Constants.UTF8_CHARSET;
 import static com.haoocai.jscheduler.client.util.Validate.checkNotNull;
 
 /**
@@ -51,12 +52,12 @@ class TaskWatcher implements Watcher {
         start();
 
         if (event.getType() == Event.EventType.NodeDataChanged) {
-            byte[] data = zkClient.getData(event.getPath());
             try {
-                //SchedulerContext schedulerContext = SerializationUtils.deserialize(data);
                 task.run();
             } catch (Exception e) {
                 LOG.error("process task error:{}.", e.getMessage(), e);
+            } finally {
+                zkClient.setData(pathPrefix + "/" + task.name() + "/servers", JvmIdentify.id().getBytes(UTF8_CHARSET));
             }
         } else {
             LOG.error("unexpected event type:{}.", event.getType());

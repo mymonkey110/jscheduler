@@ -80,6 +80,20 @@ public class ZKClient {
     }
 
     /**
+     * set data to specify node
+     *
+     * @param path node path
+     * @param data new data
+     */
+    public void setData(String path, byte[] data) {
+        try {
+            client.setData().forPath(path, data);
+        } catch (Exception e) {
+            throw new ZKRuntimeException(e);
+        }
+    }
+
+    /**
      * create ephemeral node with specify path
      *
      * @param path    node absolute path

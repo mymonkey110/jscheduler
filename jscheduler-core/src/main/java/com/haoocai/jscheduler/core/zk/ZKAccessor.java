@@ -173,10 +173,6 @@ public class ZKAccessor {
         }
     }
 
-    public void setClient(CuratorFramework client) {
-        client.getData().
-    }
-
     /**
      * get the specify node data, wrap into utf8 string
      * {@link #getData}
