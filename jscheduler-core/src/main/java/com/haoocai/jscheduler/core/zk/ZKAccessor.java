@@ -60,10 +60,6 @@ public class ZKAccessor {
         LOG.info("connected to zookeeper:{}", zkConnectStr);
     }
 
-    public CuratorFramework getClient() {
-        return this.client;
-    }
-
     public boolean checkNodeExist(String path) throws ZKRuntimeException {
         try {
             return client.checkExists().forPath(path) != null;
