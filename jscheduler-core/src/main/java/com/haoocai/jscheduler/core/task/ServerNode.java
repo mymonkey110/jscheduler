@@ -35,6 +35,10 @@ class ServerNode extends AbstractNode {
         super(zkAccessor, taskID);
     }
 
+    static ServerNode load(ZKAccessor zkAccessor, TaskID taskID) {
+        return new ServerNode(zkAccessor, taskID);
+    }
+
     @Override
     NodeIdentify identify() {
         return NodeIdentify.SERVER;
@@ -56,7 +60,7 @@ class ServerNode extends AbstractNode {
         }));
     }
 
-    static ServerNode load(ZKAccessor zkAccessor, TaskID taskID) {
-        return new ServerNode(zkAccessor, taskID);
+    boolean isSchedulerUnitExist(SchedulerUnit schedulerUnit) {
+        return zkAccessor.checkNodeExist(taskID + ROOT + "/" + schedulerUnit.identify());
     }
 }

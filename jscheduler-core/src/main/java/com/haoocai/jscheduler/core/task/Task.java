@@ -148,6 +148,10 @@ public class Task {
         this.statusNode.makePause();
     }
 
+    public boolean isSchedulerUnitExist(SchedulerUnit schedulerUnit) {
+        return this.serverNode.isSchedulerUnitExist(checkNotNull(schedulerUnit));
+    }
+
     public void registerNewTracker(ZKTaskTracker taskTracker) {
         this.taskTracker = taskTracker;
     }

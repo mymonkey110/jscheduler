@@ -69,13 +69,17 @@ public class TaskExecutionMonitor implements Watcher {
         updateTriggerLock.unlock();
     }
 
-    //todo to be completed
     public boolean isLastJobRunOver() {
         if (lastSchedulerUnit == null) {
             return true;
         }
-         updateTriggerLock.lock();
-
+        updateTriggerLock.lock();
+        boolean runOverFlag = this.lastSchedulerUnit.isSame(this.recvDoneSchedulerUnit) && this.lastTriggerPoint < this.recvDonePoint;
+        updateTriggerLock.unlock();
+        return runOverFlag;
     }
 
+    public SchedulerUnit getLastSchedulerUnit() {
+        return lastSchedulerUnit;
+    }
 }

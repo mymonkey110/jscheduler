@@ -18,6 +18,7 @@ package com.haoocai.jscheduler.core.tracker;
 
 import com.haoocai.jscheduler.core.algorithm.Picker;
 import com.haoocai.jscheduler.core.algorithm.PickerFactory;
+import com.haoocai.jscheduler.core.monitor.TaskExecutionMonitor;
 import com.haoocai.jscheduler.core.scheduler.SchedulerUnit;
 import com.haoocai.jscheduler.core.task.Task;
 import com.haoocai.jscheduler.core.task.TaskID;
@@ -46,16 +47,15 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author Michael Jiang on 16/4/5.
  */
 public class ZKTaskTracker extends TimerTask {
+    private static Logger LOG = LoggerFactory.getLogger(ZKTaskService.class);
     private final ZKAccessor zkAccessor;
     private final Task task;
     private final TaskID taskID;
     private final TaskInvoker invoker;
     private final Picker picker;
-
+    private final TaskExecutionMonitor taskExecutionMonitor;
     private transient volatile boolean runFlag = false;
     private Lock runLock = new ReentrantLock();
-
-    private static Logger LOG = LoggerFactory.getLogger(ZKTaskService.class);
 
     public ZKTaskTracker(ZKAccessor zkAccessor, Task task) {
         this.zkAccessor = checkNotNull(zkAccessor);
@@ -63,10 +63,12 @@ public class ZKTaskTracker extends TimerTask {
         this.taskID = task.getTaskID();
         this.picker = PickerFactory.createPicker(zkAccessor, task);
         this.invoker = new ZKTaskInvoker(zkAccessor);
+        this.taskExecutionMonitor = new TaskExecutionMonitor(zkAccessor, task);
     }
 
     public void track() {
         setNextTimer(this);
+        taskExecutionMonitor.watch();
     }
 
     public void untrack() {
@@ -87,20 +89,31 @@ public class ZKTaskTracker extends TimerTask {
     public void run() {
         runFlag = true;
         if (runLock.tryLock()) {
-            SchedulerUnit schedulerUnit;
-            try {
-                schedulerUnit = picker.assign();
-                if (schedulerUnit != null) {
-                    LOG.info("task:{} scheduler on :{}.", taskID.getName(), schedulerUnit);
-                    invoker.invoke(taskID, schedulerUnit);
-                } else {
-                    LOG.info("not found available server for task:{}.", taskID.getName());
-                }
-            } catch (Exception e) {
-                LOG.error("chose scheduler unit error:{}.", e.getMessage(), e);
-            } finally {
-                setNextTimer(new ZKTaskTracker(zkAccessor, task));
+            boolean isLastJobRunOver = taskExecutionMonitor.isLastJobRunOver();
+            if (isLastJobRunOver || !task.isSchedulerUnitExist(taskExecutionMonitor.getLastSchedulerUnit())) {
+                LOG.info("start scheduling for task:{}", taskID.getName());
+                scheduleRun();
+            } else {
+                LOG.info("task:{} scheduling not qualified, not scheduling this round.", taskID.getName());
             }
+        }
+    }
+
+    private void scheduleRun() {
+        SchedulerUnit schedulerUnit;
+        try {
+            schedulerUnit = picker.assign();
+            if (schedulerUnit != null) {
+                LOG.info("task:{} scheduler on :{}.", taskID.getName(), schedulerUnit);
+                taskExecutionMonitor.setLastSchedulerUnit(schedulerUnit);
+                invoker.invoke(taskID, schedulerUnit);
+            } else {
+                LOG.info("not found available server for task:{}.", taskID.getName());
+            }
+        } catch (Exception e) {
+            LOG.error("chose scheduler unit error:{}.", e.getMessage(), e);
+        } finally {
+            setNextTimer(new ZKTaskTracker(zkAccessor, task));
         }
     }
 
