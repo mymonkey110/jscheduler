@@ -49,6 +49,7 @@ public class JvmIdentify {
             InetAddress localAddr = InetAddress.getLocalHost();
             System.out.println("Local IP:" + localAddr.getHostAddress());
             System.out.println("hostname:" + localAddr.getHostName());
+            System.out.println("ID:"+id());
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
@@ -65,7 +66,7 @@ public class JvmIdentify {
             Enumeration<InetAddress> addresses = networkInterface.getInetAddresses();
             while (addresses.hasMoreElements()) {
                 InetAddress inetAddress = addresses.nextElement();
-                if (inetAddress.isAnyLocalAddress()) {
+                if (inetAddress.isSiteLocalAddress()) {
                     return inetAddress.getHostAddress();
                 }
                 if (isPublic(inetAddress)) {
