@@ -27,4 +27,6 @@ public interface Constants {
     String VERSION = "1.0.0";
 
     Charset UTF8_CHARSET = Charset.forName("UTF-8");
+
+    int TASK_MAX_EXECUTION_TIME = 10;
 }

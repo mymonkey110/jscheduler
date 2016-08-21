@@ -23,6 +23,7 @@ import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.curator.utils.ZKPaths;
 import org.apache.zookeeper.CreateMode;
+import org.apache.zookeeper.Watcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -172,6 +173,10 @@ public class ZKAccessor {
         }
     }
 
+    public void setClient(CuratorFramework client) {
+        client.getData().
+    }
+
     /**
      * get the specify node data, wrap into utf8 string
      * {@link #getData}
@@ -191,6 +196,14 @@ public class ZKAccessor {
     public void setData(String path, byte[] data) {
         try {
             client.setData().forPath(path, data);
+        } catch (Exception e) {
+            throw new ZKRuntimeException(e);
+        }
+    }
+
+    public void addDataListener(String path, Watcher watcher) {
+        try {
+            client.getData().usingWatcher(watcher).forPath(path);
         } catch (Exception e) {
             throw new ZKRuntimeException(e);
         }

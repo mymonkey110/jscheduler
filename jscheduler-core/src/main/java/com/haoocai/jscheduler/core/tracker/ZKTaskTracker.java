@@ -91,7 +91,7 @@ public class ZKTaskTracker extends TimerTask {
             try {
                 schedulerUnit = picker.assign();
                 if (schedulerUnit != null) {
-                    LOG.info("app:{} task:{} this time scheduler unit is:{}.", taskID.getApp(), taskID.getName(), schedulerUnit);
+                    LOG.info("task:{} scheduler on :{}.", taskID.getName(), schedulerUnit);
                     invoker.invoke(taskID, schedulerUnit);
                 } else {
                     LOG.info("not found available server for task:{}.", taskID.getName());
